@@ -344,9 +344,13 @@ function closeBubble() {
 }
 
 function updateUI() {
-    document.getElementById('money').textContent = gameState.money;
-    document.getElementById('planks').textContent = gameState.planks;
-    document.getElementById('corn').textContent = gameState.corn;
+    const moneyEl = document.getElementById('money');
+    const planksEl = document.getElementById('planks');
+    const cornEl = document.getElementById('corn');
+    
+    if (moneyEl) moneyEl.textContent = gameState.money;
+    if (planksEl) planksEl.textContent = gameState.planks;
+    if (cornEl) cornEl.textContent = gameState.corn;
 }
 
 function openPlankModal() {
