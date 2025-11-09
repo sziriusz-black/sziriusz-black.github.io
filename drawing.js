@@ -58,90 +58,80 @@ export function drawTree(ctx, x, y) {
 }
 
 export function drawHouse(ctx, x, y) {
-    // 8-bites pixeles ház rajzolása (bőrszínű szélek, szürke közép, kerítés teteje)
-    const baseY = y + CONFIG.TILE_SIZE - 12;
-    const roofTopY = y + 8;
-    const roofLeftX = x + 4;
-    const roofRightX = x + CONFIG.TILE_SIZE - 4;
-    const centerX = x + CONFIG.TILE_SIZE / 2;
-    const tileWidth = CONFIG.TILE_SIZE;
-    const tileHeight = CONFIG.TILE_SIZE;
+    const tileSize = CONFIG.TILE_SIZE;
+    const borderWidth = 2; // barna keret szélessége
+    const centerX = x + tileSize / 2;
     
-    // Bőrszín (fakó barna)
-    const leatherColor = '#8b6f47';
-    const darkLeatherColor = '#7a5f37';
-    const grayColor = '#666666';
+    // Színek
+    const brownColor = '#8b6f47'; // barna keret
+    const grayColor = '#666666'; // szürke belseje
+    const blackColor = '#000000'; // fekete téglalapok
+    const redColor = '#ff0000'; // piros háromszög
+    const lightBlueColor = '#87ceeb'; // világoskék kör
     
-    // Ház alap - bal szél (bőrszínű)
-    ctx.fillStyle = leatherColor;
-    ctx.fillRect(Math.floor(x), Math.floor(baseY), 4, 8);
+    // Piros háromszög a tetején (először ezt rajzoljuk)
+    const triangleTopY = y;
+    const triangleLeftX = x;
+    const triangleRightX = x + tileSize;
+    const triangleBottomY = y + tileSize / 3; // háromszög magassága
     
-    // Ház alap - jobb szél (bőrszínű)
-    ctx.fillRect(Math.floor(x + tileWidth - 4), Math.floor(baseY), 4, 8);
+    ctx.fillStyle = redColor;
+    ctx.beginPath();
+    ctx.moveTo(Math.floor(centerX), Math.floor(triangleTopY));
+    ctx.lineTo(Math.floor(triangleLeftX), Math.floor(triangleBottomY));
+    ctx.lineTo(Math.floor(triangleRightX), Math.floor(triangleBottomY));
+    ctx.closePath();
+    ctx.fill();
     
-    // Ház alap - közép (szürke)
+    // Szürke belseje - a háromszög alsó vonala után kezdődik
     ctx.fillStyle = grayColor;
-    ctx.fillRect(Math.floor(x + 4), Math.floor(baseY), tileWidth - 8, 8);
+    const innerX = x + borderWidth;
+    const innerY = triangleBottomY + borderWidth; // a háromszög alsó vonala után kezdődik
+    const innerWidth = tileSize - borderWidth * 2;
+    const innerHeight = (y + tileSize - borderWidth) - innerY; // az alsó barna keretig
+    ctx.fillRect(Math.floor(innerX), Math.floor(innerY), innerWidth, innerHeight);
     
-    // Felső csík (bőrszínű)
-    ctx.fillStyle = leatherColor;
-    ctx.fillRect(Math.floor(x), Math.floor(y + 2), tileWidth, 2);
+    // Fekete téglalapok - a szürke téglalap függőleges felénél (közepén) mindkét irányba 20px
+    // A fekete téglalap alja a barna kerethez ér, teteje a szürke téglalap tetejéig ér
+    ctx.fillStyle = blackColor;
+    const blackRectWidth = 20;
+    const blackRectTopY = innerY; // szürke téglalap teteje
+    const blackRectBottomY = y + tileSize - borderWidth; // barna keret alja
+    const blackRectHeight = blackRectBottomY - blackRectTopY;
     
-    // Tető - bal oldal (bőrszínű)
-    ctx.fillStyle = leatherColor;
-    const steps = 5;
-    for (let i = 0; i < steps; i++) {
-        const t = i / steps;
-        const t2 = (i + 1) / steps;
-        const x1 = Math.floor(roofLeftX + (centerX - roofLeftX) * t);
-        const y1 = Math.floor(baseY + (roofTopY - baseY) * t);
-        const x2 = Math.floor(roofLeftX + (centerX - roofLeftX) * t2);
-        const y2 = Math.floor(baseY + (roofTopY - baseY) * t2);
-        
-        const height = Math.max(2, Math.ceil((y2 - y1) / 2));
-        ctx.fillRect(x1, y1, x2 - x1 + 1, height);
-    }
+    // Bal oldali fekete téglalap (a szürke téglalap közepétől balra 20px)
+    const leftBlackX = innerX - blackRectWidth;
+    ctx.fillRect(Math.floor(leftBlackX), Math.floor(blackRectTopY), blackRectWidth, Math.floor(blackRectHeight));
     
-    // Tető - jobb oldal (bőrszínű)
-    for (let i = 0; i < steps; i++) {
-        const t = i / steps;
-        const t2 = (i + 1) / steps;
-        const x1 = Math.floor(centerX + (roofRightX - centerX) * t);
-        const y1 = Math.floor(roofTopY + (baseY - roofTopY) * t);
-        const x2 = Math.floor(centerX + (roofRightX - centerX) * t2);
-        const y2 = Math.floor(roofTopY + (baseY - roofTopY) * t2);
-        
-        const height = Math.max(2, Math.ceil((y2 - y1) / 2));
-        ctx.fillRect(x1, y1, x2 - x1 + 1, height);
-    }
+    // Jobb oldali fekete téglalap (a szürke téglalap közepétől jobbra 20px)
+    const rightBlackX = innerX + innerWidth;
+    ctx.fillRect(Math.floor(rightBlackX), Math.floor(blackRectTopY), blackRectWidth, Math.floor(blackRectHeight));
     
-    // Tető középső része (szürke)
-    ctx.fillStyle = grayColor;
-    const midRoofY = Math.floor((roofTopY + baseY) / 2);
-    ctx.fillRect(Math.floor(centerX - 2), Math.floor(midRoofY - 1), 4, 2);
+    // Fekete ajtó a szürke téglalapon
+    ctx.fillStyle = blackColor;
+    const doorWidth = 8;
+    const doorHeight = 12;
+    const doorX = centerX - doorWidth / 2; // középre igazítva
+    const doorY = (y + tileSize - borderWidth) - doorHeight; // az alsó barna keret fölött
+    ctx.fillRect(Math.floor(doorX), Math.floor(doorY), doorWidth, doorHeight);
     
-    // Kerítés rudak a tetején (vékony bőrszínű)
-    ctx.fillStyle = darkLeatherColor;
-    const fenceSpacing = 3;
-    const fenceStartX = Math.floor(x + 2);
-    const fenceEndX = Math.floor(x + tileWidth - 2);
-    const fenceY = Math.floor(roofTopY);
+    // Barna keretek
+    ctx.fillStyle = brownColor;
+    // Felső vonal - a háromszög alsó vonalához igazítva
+    ctx.fillRect(Math.floor(x), Math.floor(triangleBottomY), tileSize, borderWidth);
+    // Alsó vonal
+    ctx.fillRect(Math.floor(x), Math.floor(y + tileSize - borderWidth), tileSize, borderWidth);
+    // Bal oldal - a háromszög alsó vonalától kezdődik
+    ctx.fillRect(Math.floor(x), Math.floor(triangleBottomY), borderWidth, tileSize - (triangleBottomY - y));
+    // Jobb oldal - a háromszög alsó vonalától kezdődik
+    ctx.fillRect(Math.floor(x + tileSize - borderWidth), Math.floor(triangleBottomY), borderWidth, tileSize - (triangleBottomY - y));
     
-    for (let fx = fenceStartX; fx < fenceEndX; fx += fenceSpacing) {
-        ctx.fillRect(fx, fenceY, 1, 2);
-    }
-    
-    // Ajtó (pixeles)
-    ctx.fillStyle = '#4a2a1a';
-    const doorX = Math.floor(centerX - 3);
-    const doorY = Math.floor(y + CONFIG.TILE_SIZE - 10);
-    ctx.fillRect(doorX, doorY, 6, 6);
-    
-    // Ablak (pixeles)
-    ctx.fillStyle = '#4a9eff';
-    const windowX = Math.floor(x + 6);
-    const windowY = Math.floor(baseY - 4);
-    ctx.fillRect(windowX, windowY, 4, 4);
-    ctx.fillRect(Math.floor(x + CONFIG.TILE_SIZE - 10), windowY, 4, 4);
+    // Világoskék kör a háromszög közepén (a háromszög után rajzoljuk, hogy a barna keret alatt legyen)
+    ctx.fillStyle = lightBlueColor;
+    const circleRadius = 3;
+    const circleY = triangleTopY + (triangleBottomY - triangleTopY) / 2;
+    ctx.beginPath();
+    ctx.arc(Math.floor(centerX), Math.floor(circleY), circleRadius, 0, Math.PI * 2);
+    ctx.fill();
 }
 
