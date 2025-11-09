@@ -127,54 +127,60 @@ function playChopSound(audioContext) {
     oscillator.stop(audioContext.currentTime + duration);
 }
 
-// Minecraft fa vágás hang (teljes kivágás)
+// Minecraft fa vágás hang (teljes kivágás) - 3x ismétlés
 function playMinecraftChopSound(audioContext) {
-    const duration = 0.12;
+    const singleDuration = 0.12;
+    const delayBetween = 0.05; // Késleltetés a hangok között
     
-    // Minecraft stílusú "chop" hang - két részletből áll
-    // 1. rész: rövid, éles "chop"
-    const oscillator1 = audioContext.createOscillator();
-    const gainNode1 = audioContext.createGain();
-    
-    oscillator1.type = 'square';
-    oscillator1.frequency.value = 150; // Közepes-mély frekvencia
-    
-    oscillator1.connect(gainNode1);
-    gainNode1.connect(audioContext.destination);
-    
-    // Gyors attack, gyors decay
-    gainNode1.gain.setValueAtTime(0, audioContext.currentTime);
-    gainNode1.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.005);
-    gainNode1.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.08);
-    
-    // 2. rész: mély rezonancia (fa hangja)
-    const oscillator2 = audioContext.createOscillator();
-    const gainNode2 = audioContext.createGain();
-    
-    oscillator2.type = 'sawtooth';
-    oscillator2.frequency.value = 60; // Mély rezonancia
-    
-    oscillator2.connect(gainNode2);
-    gainNode2.connect(audioContext.destination);
-    
-    // Lassabb attack, hosszabb decay
-    gainNode2.gain.setValueAtTime(0, audioContext.currentTime);
-    gainNode2.gain.linearRampToValueAtTime(0.2, audioContext.currentTime + 0.01);
-    gainNode2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
-    
-    // Lowpass szűrő a Minecraft hangjához
-    const filter = audioContext.createBiquadFilter();
-    filter.type = 'lowpass';
-    filter.frequency.value = 300;
-    filter.Q.value = 1.5;
-    
-    oscillator2.connect(filter);
-    filter.connect(gainNode2);
-    
-    oscillator1.start(audioContext.currentTime);
-    oscillator1.stop(audioContext.currentTime + 0.08);
-    
-    oscillator2.start(audioContext.currentTime);
-    oscillator2.stop(audioContext.currentTime + duration);
+    // 3-szor ismétlés
+    for (let i = 0; i < 3; i++) {
+        const startTime = audioContext.currentTime + i * (singleDuration + delayBetween);
+        
+        // Minecraft stílusú "chop" hang - két részletből áll
+        // 1. rész: rövid, éles "chop"
+        const oscillator1 = audioContext.createOscillator();
+        const gainNode1 = audioContext.createGain();
+        
+        oscillator1.type = 'square';
+        oscillator1.frequency.value = 150; // Közepes-mély frekvencia
+        
+        oscillator1.connect(gainNode1);
+        gainNode1.connect(audioContext.destination);
+        
+        // Gyors attack, gyors decay
+        gainNode1.gain.setValueAtTime(0, startTime);
+        gainNode1.gain.linearRampToValueAtTime(0.3, startTime + 0.005);
+        gainNode1.gain.exponentialRampToValueAtTime(0.01, startTime + 0.08);
+        
+        // 2. rész: mély rezonancia (fa hangja)
+        const oscillator2 = audioContext.createOscillator();
+        const gainNode2 = audioContext.createGain();
+        
+        oscillator2.type = 'sawtooth';
+        oscillator2.frequency.value = 60; // Mély rezonancia
+        
+        oscillator2.connect(gainNode2);
+        gainNode2.connect(audioContext.destination);
+        
+        // Lassabb attack, hosszabb decay
+        gainNode2.gain.setValueAtTime(0, startTime);
+        gainNode2.gain.linearRampToValueAtTime(0.2, startTime + 0.01);
+        gainNode2.gain.exponentialRampToValueAtTime(0.01, startTime + singleDuration);
+        
+        // Lowpass szűrő a Minecraft hangjához
+        const filter = audioContext.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.value = 300;
+        filter.Q.value = 1.5;
+        
+        oscillator2.connect(filter);
+        filter.connect(gainNode2);
+        
+        oscillator1.start(startTime);
+        oscillator1.stop(startTime + 0.08);
+        
+        oscillator2.start(startTime);
+        oscillator2.stop(startTime + singleDuration);
+    }
 }
 
