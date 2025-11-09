@@ -70,6 +70,7 @@ function setupEventListeners() {
         if (e.key === 'Escape') {
             closeBubble();
             closeModal();
+            closeDiscordModal();
         }
     });
 
@@ -86,6 +87,15 @@ function setupEventListeners() {
     document.getElementById('plankSlider').addEventListener('input', (e) => {
         document.getElementById('sellAmount').textContent = e.target.value;
     });
+
+    // Discord modal
+    document.getElementById('discordIcon').addEventListener('click', openDiscordModal);
+    document.getElementById('closeDiscordModal').addEventListener('click', closeDiscordModal);
+    document.getElementById('discordModal').addEventListener('click', (e) => {
+        if (e.target.id === 'discordModal') {
+            closeDiscordModal();
+        }
+    });
 }
 
 export function handleClick(e) {
@@ -97,8 +107,12 @@ export function handleClick(e) {
     // Ne kezeljük ha a buborékon vagy modalon kattintottunk
     const bubble = document.getElementById('bubble');
     const modal = document.getElementById('plankModal');
+    const discordModal = document.getElementById('discordModal');
+    const discordIcon = document.getElementById('discordIcon');
     if ((bubble && bubble.contains(e.target)) || 
-        (modal && modal.contains(e.target))) {
+        (modal && modal.contains(e.target)) ||
+        (discordModal && discordModal.contains(e.target)) ||
+        (discordIcon && discordIcon.contains(e.target))) {
         return;
     }
 
@@ -284,6 +298,16 @@ function showError(message) {
     setTimeout(() => {
         errorMsg.classList.add('hidden');
     }, 3000);
+}
+
+function openDiscordModal() {
+    const modal = document.getElementById('discordModal');
+    modal.classList.remove('hidden');
+}
+
+function closeDiscordModal() {
+    const modal = document.getElementById('discordModal');
+    modal.classList.add('hidden');
 }
 
 // Játék ciklus
