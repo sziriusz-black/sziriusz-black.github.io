@@ -19,8 +19,8 @@
             <span id="planks">0</span>
         </div>
         <div class="status-item">
-            <span class="icon">🗺️</span>
-            <span id="ownedTiles">0</span>
+            <span class="icon">🌽</span>
+            <span id="corn">0</span>
         </div>
     </div>
 
@@ -34,7 +34,7 @@
             <h2>Deszka Eladás</h2>
             <div class="slider-container">
                 <label>Eladandó deszkák: <span id="sellAmount">0</span></span>
-                <input type="range" id="plankSlider" min="1" max="1" value="1">
+                <input type="range" id="plankSlider" min="1" max="1" value="1" maxlength="10">
             </div>
             <div class="modal-buttons">
                 <button id="cancelSell">Mégsem</button>
@@ -43,9 +43,23 @@
         </div>
     </div>
 
+    <div id="cornModal" class="modal hidden">
+        <div class="modal-content">
+            <h2>Kukorica Eladás</h2>
+            <div class="slider-container">
+                <label>Eladandó kukorica: <span id="cornSellAmount">0</span></span>
+                <input type="range" id="cornSlider" min="1" max="1" value="1" maxlength="10">
+            </div>
+            <div class="modal-buttons">
+                <button id="cancelCornSell">Mégsem</button>
+                <button id="confirmCornSell">Eladás</button>
+            </div>
+        </div>
+    </div>
+
     <div id="errorMessage" class="error-message hidden"></div>
 
-    <div id="version">V1.1.1</div>
+    <div id="version">V1.2</div>
 
     <div id="discordIcon" class="discord-icon">
         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

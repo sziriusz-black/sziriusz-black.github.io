@@ -1,6 +1,6 @@
 import { CONFIG } from './config.js';
 import { gameState } from './gameState.js';
-import { drawTree, drawHouse } from './drawing.js';
+import { drawTree, drawHouse, drawCornField, drawEmptyCornField } from './drawing.js';
 
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d', { 
@@ -84,6 +84,24 @@ export function render(updateBubblePosition, findTile) {
             ctx.fillStyle = '#2a5a2a';
             ctx.fillRect(x, y, CONFIG.TILE_SIZE, CONFIG.TILE_SIZE);
             drawHouse(ctx, x, y);
+        } else if (tile.type === 'cornfield') {
+            // Kukorica föld
+            ctx.fillStyle = '#2a5a2a';
+            ctx.fillRect(x, y, CONFIG.TILE_SIZE, CONFIG.TILE_SIZE);
+            drawCornField(ctx, x, y);
+        } else if (tile.type === 'emptycornfield') {
+            // Üres kukorica föld
+            ctx.fillStyle = '#2a5a2a';
+            ctx.fillRect(x, y, CONFIG.TILE_SIZE, CONFIG.TILE_SIZE);
+            drawEmptyCornField(ctx, x, y);
+            
+            // Ha építés alatt van, jelenjen meg valami jelzés
+            const isBuilding = gameState.buildingCornfields.has(`${tile.x},${tile.y}`);
+            if (isBuilding) {
+                // Féláttetsző szürke réteg az építés jelzésére
+                ctx.fillStyle = 'rgba(100, 100, 100, 0.5)';
+                ctx.fillRect(x, y, CONFIG.TILE_SIZE, CONFIG.TILE_SIZE);
+            }
         }
 
         // Grid vonalak (pixeles)

@@ -2,6 +2,7 @@
 export const gameState = {
     money: 10,
     planks: 0,
+    corn: 0,
     ownedTiles: 0,
     map: [],
     camera: {
@@ -10,6 +11,8 @@ export const gameState = {
         zoom: 5
     },
     activeBubble: null,
-    cuttingTrees: new Map()
+    cuttingTrees: new Map(),
+    buildingCornfields: new Map(),
+    replantingCornfields: new Map()
 };
 
