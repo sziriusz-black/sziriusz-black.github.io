@@ -1,7 +1,14 @@
 // Hangok (8-bites)
 export function playSound(type) {
-    // Egyszerű beep hangok generálása
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    
+    // Speciális hang: levelek suhogása (fa ültetés)
+    if (type === 'plantTree' || type === 'rustle') {
+        playRustleSound(audioContext);
+        return;
+    }
+    
+    // Egyszerű beep hangok generálása
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
 
@@ -34,5 +41,41 @@ export function playSound(type) {
 
     oscillator.start(audioContext.currentTime);
     oscillator.stop(audioContext.currentTime + duration);
+}
+
+// Levelek suhogása (rugdosás hangja)
+function playRustleSound(audioContext) {
+    const duration = 0.2;
+    const sampleRate = audioContext.sampleRate;
+    const buffer = audioContext.createBuffer(1, sampleRate * duration, sampleRate);
+    const data = buffer.getChannelData(0);
+    
+    // Fehér zaj generálása (suhogó hatás)
+    for (let i = 0; i < buffer.length; i++) {
+        // Fehér zaj + gyors frekvencia változás
+        const noise = (Math.random() * 2 - 1) * 0.3;
+        const freqMod = Math.sin(i * 0.1) * 0.2;
+        data[i] = noise + freqMod;
+    }
+    
+    // Szűrés (magas frekvenciák kiemelése - levelek hangja)
+    const filter = audioContext.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.value = 2000;
+    filter.Q.value = 1;
+    
+    const source = audioContext.createBufferSource();
+    source.buffer = buffer;
+    source.connect(filter);
+    
+    const gainNode = audioContext.createGain();
+    filter.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+    
+    source.start(audioContext.currentTime);
+    source.stop(audioContext.currentTime + duration);
 }
 

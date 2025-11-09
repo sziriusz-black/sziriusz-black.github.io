@@ -67,7 +67,7 @@ export function buildTree(x, y, updateUI, saveGameState) {
         gameState.money -= CONFIG.TREE_BUILD_PRICE;
         updateUI();
         saveGameState();
-        playSound('build');
+        playSound('plantTree');
     }
 }
 
