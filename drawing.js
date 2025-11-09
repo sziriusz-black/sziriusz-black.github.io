@@ -58,22 +58,37 @@ export function drawTree(ctx, x, y) {
 }
 
 export function drawHouse(ctx, x, y) {
-    // 8-bites pixeles ház rajzolása (lépcsős ferde vonalak)
+    // 8-bites pixeles ház rajzolása (bőrszínű szélek, szürke közép, kerítés teteje)
     const baseY = y + CONFIG.TILE_SIZE - 12;
     const roofTopY = y + 8;
     const roofLeftX = x + 4;
     const roofRightX = x + CONFIG.TILE_SIZE - 4;
     const centerX = x + CONFIG.TILE_SIZE / 2;
+    const tileWidth = CONFIG.TILE_SIZE;
+    const tileHeight = CONFIG.TILE_SIZE;
     
-    // Ház alap (pixeles)
-    ctx.fillStyle = '#8b6f47';
-    const baseX = Math.floor(x + 4);
-    const baseWidth = Math.floor(CONFIG.TILE_SIZE - 8);
-    ctx.fillRect(baseX, Math.floor(baseY), baseWidth, 8);
+    // Bőrszín (fakó barna)
+    const leatherColor = '#8b6f47';
+    const darkLeatherColor = '#7a5f37';
+    const grayColor = '#666666';
     
-    // Tető (lépcsős ferde vonalak) - finomabb lépcsőzés
-    ctx.fillStyle = '#cc4444';
-    // Bal oldal tető (lépcsős) - kevesebb lépcső
+    // Ház alap - bal szél (bőrszínű)
+    ctx.fillStyle = leatherColor;
+    ctx.fillRect(Math.floor(x), Math.floor(baseY), 4, 8);
+    
+    // Ház alap - jobb szél (bőrszínű)
+    ctx.fillRect(Math.floor(x + tileWidth - 4), Math.floor(baseY), 4, 8);
+    
+    // Ház alap - közép (szürke)
+    ctx.fillStyle = grayColor;
+    ctx.fillRect(Math.floor(x + 4), Math.floor(baseY), tileWidth - 8, 8);
+    
+    // Felső csík (bőrszínű)
+    ctx.fillStyle = leatherColor;
+    ctx.fillRect(Math.floor(x), Math.floor(y + 2), tileWidth, 2);
+    
+    // Tető - bal oldal (bőrszínű)
+    ctx.fillStyle = leatherColor;
     const steps = 5;
     for (let i = 0; i < steps; i++) {
         const t = i / steps;
@@ -83,11 +98,11 @@ export function drawHouse(ctx, x, y) {
         const x2 = Math.floor(roofLeftX + (centerX - roofLeftX) * t2);
         const y2 = Math.floor(baseY + (roofTopY - baseY) * t2);
         
-        // Vastagabb vonalak a finomabb lépcsőzéshez
         const height = Math.max(2, Math.ceil((y2 - y1) / 2));
         ctx.fillRect(x1, y1, x2 - x1 + 1, height);
     }
-    // Jobb oldal tető (lépcsős) - kevesebb lépcső
+    
+    // Tető - jobb oldal (bőrszínű)
     for (let i = 0; i < steps; i++) {
         const t = i / steps;
         const t2 = (i + 1) / steps;
@@ -96,9 +111,24 @@ export function drawHouse(ctx, x, y) {
         const x2 = Math.floor(centerX + (roofRightX - centerX) * t2);
         const y2 = Math.floor(roofTopY + (baseY - roofTopY) * t2);
         
-        // Vastagabb vonalak a finomabb lépcsőzéshez
         const height = Math.max(2, Math.ceil((y2 - y1) / 2));
         ctx.fillRect(x1, y1, x2 - x1 + 1, height);
+    }
+    
+    // Tető középső része (szürke)
+    ctx.fillStyle = grayColor;
+    const midRoofY = Math.floor((roofTopY + baseY) / 2);
+    ctx.fillRect(Math.floor(centerX - 2), Math.floor(midRoofY - 1), 4, 2);
+    
+    // Kerítés rudak a tetején (vékony bőrszínű)
+    ctx.fillStyle = darkLeatherColor;
+    const fenceSpacing = 3;
+    const fenceStartX = Math.floor(x + 2);
+    const fenceEndX = Math.floor(x + tileWidth - 2);
+    const fenceY = Math.floor(roofTopY);
+    
+    for (let fx = fenceStartX; fx < fenceEndX; fx += fenceSpacing) {
+        ctx.fillRect(fx, fenceY, 1, 2);
     }
     
     // Ajtó (pixeles)
