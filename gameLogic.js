@@ -298,7 +298,7 @@ export function loadGameState(createInitialMap, updateUI) {
                 gameState.camera.zoomLevel = state.camera.zoomLevel || 1;
                 gameState.camera.zoom = getZoomLevel(gameState.camera.zoomLevel);
             }
-            updateUI();
+            if (updateUI) updateUI();
         }
     } catch (e) {
         console.error('Betöltés hiba:', e);

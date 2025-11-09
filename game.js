@@ -25,11 +25,15 @@ function initGame() {
     });
 
     // Local storage betöltése
-    loadGameState(createInitialMap, updateUI);
+    loadGameState(() => {
+        createInitialMap();
+        updateUI();
+    }, updateUI);
 
     // Kezdő térkép létrehozása (ha nincs mentett állapot)
     if (gameState.map.length === 0) {
         createInitialMap();
+        updateUI();
     }
 
     // Event listener-ek
@@ -54,7 +58,6 @@ function createInitialMap() {
     // Kezdő zoom: 1-es level (maximális zoom, ház nagy)
     gameState.camera.zoomLevel = 1;
     gameState.camera.zoom = getZoomLevel(1);
-    updateUI();
 }
 
 function setupEventListeners() {
