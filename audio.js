@@ -5,6 +5,7 @@ let musicVolume = 0.3;
 let nextNoteTime = 0;
 let currentChord = 0;
 let schedulerTimer = null;
+let isMuted = false;
 
 // Western akkordmenet (Am - G - F - E)
 const westernChords = [
@@ -80,7 +81,7 @@ function scheduleMusic() {
 }
 
 function playWesternBeat(time) {
-    if (!audioContext) return;
+    if (!audioContext || isMuted) return;
     
     const chord = westernChords[currentChord];
     const bass = bassNotes[currentChord];
@@ -100,7 +101,7 @@ function playWesternBeat(time) {
 }
 
 function playNote(frequency, time, duration, waveType, volume) {
-    if (!audioContext) return;
+    if (!audioContext || isMuted || volume <= 0) return;
     
     const oscillator = audioContext.createOscillator();
     const gainNode = audioContext.createGain();
@@ -143,8 +144,6 @@ export function stopBackgroundMusic() {
 export function setMusicVolume(volume) {
     musicVolume = Math.max(0, Math.min(1, volume));
 }
-
-let isMuted = false;
 
 export function toggleMute() {
     isMuted = !isMuted;
