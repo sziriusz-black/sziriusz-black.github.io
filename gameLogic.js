@@ -294,7 +294,9 @@ export function saveGameState() {
             try {
                 const prev = JSON.parse(previousSave);
                 tutorialCompleted = prev.tutorialCompleted || false;
-            } catch (e) {}
+            } catch (e) {
+                console.error('Tutorial állapot olvasási hiba:', e);
+            }
         }
         
         const state = {

@@ -20,7 +20,9 @@ export function startBackgroundMusic() {
     // Ha nem sikerült, akkor első kattintásra próbáljuk újra
     const playOnInteraction = () => {
         if (backgroundMusic && backgroundMusic.paused) {
-            backgroundMusic.play().catch(() => {});
+            backgroundMusic.play().catch(err => {
+                console.error('Háttérzene lejátszási hiba:', err);
+            });
         }
         document.removeEventListener('click', playOnInteraction);
         document.removeEventListener('keydown', playOnInteraction);

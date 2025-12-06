@@ -42,6 +42,7 @@ export function isNewPlayer() {
         const state = JSON.parse(saved);
         return state.tutorialCompleted !== true;
     } catch (e) {
+        console.error('Mentett állapot olvasási hiba:', e);
         return true;
     }
 }
