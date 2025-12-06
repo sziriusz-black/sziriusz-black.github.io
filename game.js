@@ -6,6 +6,7 @@ import { setupZoom } from './zoom.js';
 import { getCanvas, getContext, resizeCanvas, render } from './renderer.js';
 import { findTile, isAdjacentToOwned, purchaseTile, cutTree, sellHouse, buildHouse, buildTree, buildStoneCutter, buildCornField, harvestCornField, replantCornField, sellCornField, updateTimers, saveGameState, loadGameState } from './gameLogic.js';
 import { playSound, startBackgroundMusic } from './audio.js';
+import { isNewPlayer, startTutorial, setupTutorialListeners } from './tutorial.js';
 
 // Canvas és kontextus
 const canvas = getCanvas();
@@ -39,8 +40,16 @@ function initGame() {
     // Event listener-ek
     setupEventListeners();
 
+    // Tutorial listener-ek
+    setupTutorialListeners();
+
     // Háttérzene indítása
     startBackgroundMusic();
+
+    // Tutorial indítása új játékosnak
+    if (isNewPlayer()) {
+        startTutorial();
+    }
 
     // Renderelés indítása
     gameLoop();

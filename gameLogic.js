@@ -287,6 +287,16 @@ export function updateTimers(updateUI, saveGameState, closeBubble) {
 // Local storage
 export function saveGameState() {
     try {
+        // Előző mentés beolvasása a tutorialCompleted flag megőrzéséhez
+        const previousSave = localStorage.getItem('skyblockGame');
+        let tutorialCompleted = false;
+        if (previousSave) {
+            try {
+                const prev = JSON.parse(previousSave);
+                tutorialCompleted = prev.tutorialCompleted || false;
+            } catch (e) {}
+        }
+        
         const state = {
             money: gameState.money,
             planks: gameState.planks,
@@ -297,7 +307,9 @@ export function saveGameState() {
             // Folyamatban lévő műveletek mentése
             cuttingTrees: Object.fromEntries(gameState.cuttingTrees),
             buildingCornfields: Object.fromEntries(gameState.buildingCornfields),
-            replantingCornfields: Object.fromEntries(gameState.replantingCornfields)
+            replantingCornfields: Object.fromEntries(gameState.replantingCornfields),
+            // Tutorial állapot megőrzése
+            tutorialCompleted: tutorialCompleted
         };
         localStorage.setItem('skyblockGame', JSON.stringify(state));
     } catch (e) {

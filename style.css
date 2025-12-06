@@ -386,3 +386,78 @@ body {
     text-decoration: underline;
 }
 
+/* Tutorial modal */
+#tutorialModal {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+.tutorial-modal {
+    max-width: 450px;
+    text-align: center;
+}
+
+.tutorial-modal h2 {
+    color: #4a9eff;
+    font-size: 20px;
+    margin-bottom: 15px;
+}
+
+.tutorial-content {
+    background: rgba(0, 0, 0, 0.4);
+    border: 2px solid #4a4a4a;
+    padding: 20px;
+    margin: 15px 0;
+    font-size: 14px;
+    line-height: 1.6;
+    text-align: left;
+    min-height: 100px;
+}
+
+.tutorial-content b {
+    color: #4a9eff;
+}
+
+.tutorial-step-indicator {
+    color: #888;
+    font-size: 12px;
+    margin-bottom: 15px;
+}
+
+.tutorial-buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tutorial-nav {
+    display: flex;
+    gap: 10px;
+}
+
+.tutorial-skip {
+    background: #444 !important;
+    border-color: #333 !important;
+    font-size: 12px !important;
+    padding: 8px 12px !important;
+    flex: none !important;
+}
+
+.tutorial-skip:hover {
+    background: #555 !important;
+}
+
+#tutorialPrev {
+    background: #666;
+    border-color: #555;
+}
+
+#tutorialPrev:hover {
+    background: #777;
+}
+
+#tutorialNext {
+    background: #4a9eff;
+    min-width: 100px;
+}
+
