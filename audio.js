@@ -11,7 +11,7 @@ export function startBackgroundMusic() {
     // Lejátszás (böngészők miatt user interaction után működik csak)
     const tryPlay = () => {
         backgroundMusic.play().catch(err => {
-            console.log('Háttérzene lejátszás várakozik felhasználói interakcióra...');
+            console.error('Háttérzene lejátszás várakozik felhasználói interakcióra:', err);
         });
     };
     
