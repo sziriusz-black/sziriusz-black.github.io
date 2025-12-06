@@ -17,37 +17,51 @@ const westernChords = [
 // Western basszus hangok
 const bassNotes = [110, 98, 87, 82];
 
+let musicListenersAdded = false;
+
 export function startBackgroundMusic() {
-    if (isPlaying) return;
+    if (musicListenersAdded) return;
+    musicListenersAdded = true;
     
     const tryStart = () => {
+        if (isPlaying) return true;
+        
         try {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
             
             // Ha suspended állapotban van, resume-olni kell
             if (audioContext.state === 'suspended') {
                 audioContext.resume().then(() => {
-                    isPlaying = true;
-                    nextNoteTime = audioContext.currentTime;
-                    scheduleMusic();
+                    if (!isPlaying) {
+                        isPlaying = true;
+                        nextNoteTime = audioContext.currentTime;
+                        scheduleMusic();
+                    }
                 }).catch(err => {
                     console.error('Western zene resume hiba:', err);
                 });
+                return false;
             } else {
                 isPlaying = true;
                 nextNoteTime = audioContext.currentTime;
                 scheduleMusic();
+                return true;
             }
         } catch (err) {
             console.error('Western zene indítási hiba:', err);
+            return false;
         }
     };
     
-    // Első interakcióra indul (böngésző korlátozás miatt)
+    // Interakcióra indul (böngésző korlátozás miatt)
     const startOnInteraction = () => {
-        tryStart();
-        document.removeEventListener('click', startOnInteraction);
-        document.removeEventListener('keydown', startOnInteraction);
+        if (tryStart()) {
+            // Csak akkor töröljük a listenereket, ha sikeresen elindult
+            document.removeEventListener('click', startOnInteraction);
+            document.removeEventListener('keydown', startOnInteraction);
+        }
     };
     
     document.addEventListener('click', startOnInteraction);
@@ -128,6 +142,22 @@ export function stopBackgroundMusic() {
 
 export function setMusicVolume(volume) {
     musicVolume = Math.max(0, Math.min(1, volume));
+}
+
+let isMuted = false;
+
+export function toggleMute() {
+    isMuted = !isMuted;
+    if (isMuted) {
+        musicVolume = 0;
+    } else {
+        musicVolume = 0.3;
+    }
+    return isMuted;
+}
+
+export function isMusicMuted() {
+    return isMuted;
 }
 
 // Hangok (8-bites)

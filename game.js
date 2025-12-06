@@ -5,7 +5,7 @@ import { setupScroll } from './scroll.js';
 import { setupZoom } from './zoom.js';
 import { getCanvas, getContext, resizeCanvas, render } from './renderer.js';
 import { findTile, isAdjacentToOwned, purchaseTile, cutTree, sellHouse, buildHouse, buildTree, buildStoneCutter, buildCornField, harvestCornField, replantCornField, sellCornField, updateTimers, saveGameState, loadGameState } from './gameLogic.js';
-import { playSound, startBackgroundMusic } from './audio.js';
+import { playSound, startBackgroundMusic, toggleMute } from './audio.js';
 import { isNewPlayer, startTutorial, setupTutorialListeners } from './tutorial.js';
 
 // Canvas és kontextus
@@ -87,6 +87,24 @@ function setupEventListeners() {
             closeModal();
             closeCornModal();
             closeDiscordModal();
+        }
+    });
+
+    // Hangszóró némítás gomb
+    document.getElementById('soundToggle').addEventListener('click', () => {
+        const isMuted = toggleMute();
+        const soundOn = document.getElementById('soundOn');
+        const soundOff = document.getElementById('soundOff');
+        const toggle = document.getElementById('soundToggle');
+        
+        if (isMuted) {
+            soundOn.classList.add('hidden');
+            soundOff.classList.remove('hidden');
+            toggle.classList.add('muted');
+        } else {
+            soundOn.classList.remove('hidden');
+            soundOff.classList.add('hidden');
+            toggle.classList.remove('muted');
         }
     });
 
