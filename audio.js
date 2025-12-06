@@ -23,9 +23,21 @@ export function startBackgroundMusic() {
     const tryStart = () => {
         try {
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            isPlaying = true;
-            nextNoteTime = audioContext.currentTime;
-            scheduleMusic();
+            
+            // Ha suspended állapotban van, resume-olni kell
+            if (audioContext.state === 'suspended') {
+                audioContext.resume().then(() => {
+                    isPlaying = true;
+                    nextNoteTime = audioContext.currentTime;
+                    scheduleMusic();
+                }).catch(err => {
+                    console.error('Western zene resume hiba:', err);
+                });
+            } else {
+                isPlaying = true;
+                nextNoteTime = audioContext.currentTime;
+                scheduleMusic();
+            }
         } catch (err) {
             console.error('Western zene indítási hiba:', err);
         }
@@ -33,18 +45,13 @@ export function startBackgroundMusic() {
     
     // Első interakcióra indul (böngésző korlátozás miatt)
     const startOnInteraction = () => {
-        if (!isPlaying) {
-            tryStart();
-        }
+        tryStart();
         document.removeEventListener('click', startOnInteraction);
         document.removeEventListener('keydown', startOnInteraction);
     };
     
     document.addEventListener('click', startOnInteraction);
     document.addEventListener('keydown', startOnInteraction);
-    
-    // Próbáljuk meg azonnal is
-    tryStart();
 }
 
 function scheduleMusic() {
