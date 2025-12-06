@@ -9,7 +9,11 @@ export function findTile(x, y) {
 }
 
 export function isAdjacentToOwned(x, y) {
-    const directions = [[0, 1], [0, -1], [1, 0], [-1, 0]];
+    // 8 irány: 4 él + 4 sarok (átlós szomszédok)
+    const directions = [
+        [0, 1], [0, -1], [1, 0], [-1, 0],  // él menti szomszédok
+        [-1, -1], [-1, 1], [1, -1], [1, 1]  // átlós szomszédok (sarkok)
+    ];
     return directions.some(([dx, dy]) => {
         const adjacent = findTile(x + dx, y + dy);
         return adjacent && (adjacent.type === 'owned' || adjacent.type === 'tree' || adjacent.type === 'house');

@@ -45,7 +45,7 @@ function createInitialMap() {
         { x: 0, y: 0, type: 'house' },
         { x: 1, y: 0, type: 'owned' },
         { x: 0, y: 1, type: 'owned' },
-        { x: -1, y: 0, type: 'owned' }
+        { x: 1, y: 1, type: 'owned' }
     ];
     gameState.ownedTiles = 4;
     // Kezdő kamera pozíció a középpontra
