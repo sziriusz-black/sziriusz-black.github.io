@@ -1,49 +1,126 @@
-// Háttérzene
-let backgroundMusic = null;
+// Háttérzene - Western stílus generálva
+let audioContext = null;
+let isPlaying = false;
+let musicVolume = 0.3;
+let nextNoteTime = 0;
+let currentChord = 0;
+let schedulerTimer = null;
+
+// Western akkordmenet (Am - G - F - E)
+const westernChords = [
+    [220, 277, 330],      // Am
+    [196, 247, 294],      // G
+    [175, 220, 262],      // F
+    [165, 208, 247]       // E
+];
+
+// Western basszus hangok
+const bassNotes = [110, 98, 87, 82];
 
 export function startBackgroundMusic() {
-    if (backgroundMusic) return; // Már játszik
+    if (isPlaying) return;
     
-    backgroundMusic = new Audio('zene.mp3');
-    backgroundMusic.loop = true;
-    backgroundMusic.volume = 1.0; // 100% hangerő
-    
-    // Lejátszás (böngészők miatt user interaction után működik csak)
-    const tryPlay = () => {
-        backgroundMusic.play().catch(err => {
-            console.error('Háttérzene lejátszás várakozik felhasználói interakcióra:', err);
-        });
-    };
-    
-    tryPlay();
-    
-    // Ha nem sikerült, akkor első kattintásra próbáljuk újra
-    const playOnInteraction = () => {
-        if (backgroundMusic && backgroundMusic.paused) {
-            backgroundMusic.play().catch(err => {
-                console.error('Háttérzene lejátszási hiba:', err);
-            });
+    const tryStart = () => {
+        try {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            isPlaying = true;
+            nextNoteTime = audioContext.currentTime;
+            scheduleMusic();
+        } catch (err) {
+            console.error('Western zene indítási hiba:', err);
         }
-        document.removeEventListener('click', playOnInteraction);
-        document.removeEventListener('keydown', playOnInteraction);
     };
     
-    document.addEventListener('click', playOnInteraction);
-    document.addEventListener('keydown', playOnInteraction);
+    // Első interakcióra indul (böngésző korlátozás miatt)
+    const startOnInteraction = () => {
+        if (!isPlaying) {
+            tryStart();
+        }
+        document.removeEventListener('click', startOnInteraction);
+        document.removeEventListener('keydown', startOnInteraction);
+    };
+    
+    document.addEventListener('click', startOnInteraction);
+    document.addEventListener('keydown', startOnInteraction);
+    
+    // Próbáljuk meg azonnal is
+    tryStart();
+}
+
+function scheduleMusic() {
+    if (!isPlaying || !audioContext) return;
+    
+    while (nextNoteTime < audioContext.currentTime + 0.2) {
+        playWesternBeat(nextNoteTime);
+        nextNoteTime += 0.5; // Fél másodperces ütem
+    }
+    
+    schedulerTimer = setTimeout(scheduleMusic, 100);
+}
+
+function playWesternBeat(time) {
+    if (!audioContext) return;
+    
+    const chord = westernChords[currentChord];
+    const bass = bassNotes[currentChord];
+    
+    // Basszus hang (mély, rövid)
+    playNote(bass, time, 0.4, 'triangle', musicVolume * 0.5);
+    
+    // Akkord hangok (gitár-szerű twang)
+    chord.forEach((freq, i) => {
+        playNote(freq, time + 0.05 + i * 0.02, 0.3, 'sawtooth', musicVolume * 0.2);
+    });
+    
+    // Következő akkord (4 ütem után vált)
+    if (Math.random() < 0.25) {
+        currentChord = (currentChord + 1) % westernChords.length;
+    }
+}
+
+function playNote(frequency, time, duration, waveType, volume) {
+    if (!audioContext) return;
+    
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    const filter = audioContext.createBiquadFilter();
+    
+    oscillator.type = waveType;
+    oscillator.frequency.setValueAtTime(frequency, time);
+    
+    // Gitár-szerű hangszín
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(1500, time);
+    filter.Q.setValueAtTime(1, time);
+    
+    // Western "twang" - gyors attack, lassú decay
+    gainNode.gain.setValueAtTime(0, time);
+    gainNode.gain.linearRampToValueAtTime(volume, time + 0.02);
+    gainNode.gain.exponentialRampToValueAtTime(volume * 0.3, time + duration * 0.3);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, time + duration);
+    
+    oscillator.connect(filter);
+    filter.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    oscillator.start(time);
+    oscillator.stop(time + duration);
 }
 
 export function stopBackgroundMusic() {
-    if (backgroundMusic) {
-        backgroundMusic.pause();
-        backgroundMusic.currentTime = 0;
-        backgroundMusic = null;
+    isPlaying = false;
+    if (schedulerTimer) {
+        clearTimeout(schedulerTimer);
+        schedulerTimer = null;
+    }
+    if (audioContext) {
+        audioContext.close();
+        audioContext = null;
     }
 }
 
 export function setMusicVolume(volume) {
-    if (backgroundMusic) {
-        backgroundMusic.volume = Math.max(0, Math.min(1, volume));
-    }
+    musicVolume = Math.max(0, Math.min(1, volume));
 }
 
 // Hangok (8-bites)
