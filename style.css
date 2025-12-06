@@ -388,6 +388,7 @@ body {
 
 /* Tutorial modal */
 #tutorialModal {
+    background: rgba(0, 0, 0, 0.85);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
 }
@@ -395,10 +396,11 @@ body {
 .tutorial-modal {
     max-width: 450px;
     text-align: center;
+    background: #2a2a3e;
 }
 
 .tutorial-modal h2 {
-    color: #4a9eff;
+    color: #ffcc00;
     font-size: 20px;
     margin-bottom: 15px;
 }
@@ -415,7 +417,7 @@ body {
 }
 
 .tutorial-content b {
-    color: #4a9eff;
+    color: #ffcc00;
 }
 
 .tutorial-step-indicator {
@@ -457,7 +459,12 @@ body {
 }
 
 #tutorialNext {
-    background: #4a9eff;
+    background: #4a9e4a;
+    border-color: #3a7a3a;
     min-width: 100px;
+}
+
+#tutorialNext:hover {
+    background: #5ab85a;
 }
 
