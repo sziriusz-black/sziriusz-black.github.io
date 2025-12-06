@@ -72,6 +72,11 @@ body {
     font-size: 14px;
 }
 
+#bubble.large {
+    min-width: 300px;
+    padding: 20px;
+}
+
 #bubble.hidden {
     display: none;
 }
@@ -181,7 +186,8 @@ body {
     font-size: 14px;
 }
 
-#plankSlider {
+#plankSlider,
+#cornSlider {
     width: 100%;
     height: 8px;
     background: #4a4a4a;
@@ -190,7 +196,8 @@ body {
     appearance: none;
 }
 
-#plankSlider::-webkit-slider-thumb {
+#plankSlider::-webkit-slider-thumb,
+#cornSlider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
     width: 20px;
@@ -201,7 +208,8 @@ body {
     box-shadow: 2px 2px 0px #000;
 }
 
-#plankSlider::-moz-range-thumb {
+#plankSlider::-moz-range-thumb,
+#cornSlider::-moz-range-thumb {
     width: 20px;
     height: 20px;
     background: #4a9eff;
@@ -293,5 +301,88 @@ body {
     font-family: 'Courier New', monospace;
     pointer-events: none;
     user-select: none;
+}
+
+.discord-icon {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    width: 40px;
+    height: 40px;
+    background: rgba(0, 0, 0, 0.8);
+    border: 3px solid #4a4a4a;
+    border-radius: 0;
+    padding: 4px;
+    z-index: 1000;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 4px 4px 0px #000;
+    color: #5865F2;
+    transition: all 0.1s;
+}
+
+.discord-icon:hover {
+    background: rgba(0, 0, 0, 0.9);
+    transform: translate(-1px, -1px);
+    box-shadow: 5px 5px 0px #000;
+}
+
+.discord-icon:active {
+    transform: translate(1px, 1px);
+    box-shadow: 3px 3px 0px #000;
+}
+
+.discord-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+#discordModal {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+#discordModal .modal-content {
+    position: relative;
+    background: #2a2a3e;
+    border: 4px solid #4a4a4a;
+    padding: 30px;
+    min-width: 400px;
+    box-shadow: 6px 6px 0px #000;
+    color: #fff;
+}
+
+#discordModal .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.discord-box {
+    background: rgba(0, 0, 0, 0.5);
+    border: 3px solid #4a4a4a;
+    padding: 20px;
+    margin-top: 20px;
+    box-shadow: 2px 2px 0px #000;
+}
+
+.discord-url {
+    font-family: 'Courier New', monospace;
+    font-size: 16px;
+    color: #4a9eff;
+    text-align: center;
+    word-break: break-all;
+    user-select: all;
+    cursor: pointer;
+    text-decoration: none;
+    display: block;
+    transition: color 0.2s;
+}
+
+.discord-url:hover {
+    color: #6ab4ff;
+    text-decoration: underline;
 }
 

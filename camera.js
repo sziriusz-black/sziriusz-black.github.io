@@ -19,7 +19,7 @@ export function constrainCamera(canvas) {
     if (gameState.map.length === 0) return;
 
     const ownedTiles = gameState.map.filter(t => 
-        t.type === 'owned' || t.type === 'tree' || t.type === 'house'
+        t.type === 'owned' || t.type === 'tree' || t.type === 'house' || t.type === 'cornfield' || t.type === 'emptycornfield'
     );
     
     if (ownedTiles.length === 0) return;

@@ -12,9 +12,11 @@ export function setupScroll(canvas, saveGameState, handleClick) {
         // Csak akkor kezdjünk el húzni, ha nincs buborék és nem a buborékon kattintottunk
         const bubble = document.getElementById('bubble');
         const modal = document.getElementById('plankModal');
+        const cornModal = document.getElementById('cornModal');
         if (e.button === 0 && 
             !bubble.contains(e.target) && 
             !modal.contains(e.target) &&
+            !cornModal.contains(e.target) &&
             !gameState.activeBubble) {
             isDragging = true;
             lastMouseX = e.clientX;

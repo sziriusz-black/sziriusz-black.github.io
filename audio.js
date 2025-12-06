@@ -1,5 +1,11 @@
 // Hangok (8-bites)
 export function playSound(type) {
+    // Speciális hang: Minecraft fa vágás (teljes kivágás) - először ellenőrizzük
+    if (type === 'minecraftChop') {
+        playMinecraftChopMP3();
+        return;
+    }
+    
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
     
     // Speciális hang: levelek suhogása (fa ültetés)
@@ -18,12 +24,6 @@ export function playSound(type) {
     // Speciális hang: fa vágás (téli sufniban)
     if (type === 'cut') {
         playChopSound(audioContext);
-        return;
-    }
-    
-    // Speciális hang: Minecraft fa vágás (teljes kivágás)
-    if (type === 'minecraftChop') {
-        playMinecraftChopSound(audioContext);
         return;
     }
 
@@ -127,60 +127,57 @@ function playChopSound(audioContext) {
     oscillator.stop(audioContext.currentTime + duration);
 }
 
-// Minecraft fa vágás hang (teljes kivágás) - 3x ismétlés
-function playMinecraftChopSound(audioContext) {
-    const singleDuration = 0.06; // Felére csökkentve (0.12 -> 0.06)
-    const delayBetween = 0.025; // Felére csökkentve (0.05 -> 0.025)
-    
-    // 3-szor ismétlés
-    for (let i = 0; i < 3; i++) {
-        const startTime = audioContext.currentTime + i * (singleDuration + delayBetween);
+// Minecraft fa vágás hang (teljes kivágás) - MP3 fájl lejátszása 2 másodperc alatt
+function playMinecraftChopMP3() {
+    try {
+        const audio = new Audio('Breaking a Wood Sound Effect [Minecraft].mp3');
+        audio.volume = 0.7;
+        let stopTimeout = null;
         
-        // Minecraft stílusú "chop" hang - két részletből áll
-        // 1. rész: rövid, éles "chop"
-        const oscillator1 = audioContext.createOscillator();
-        const gainNode1 = audioContext.createGain();
+        // 2 másodperc után leállítjuk a lejátszást
+        const setupStopTimeout = () => {
+            if (stopTimeout) clearTimeout(stopTimeout);
+            stopTimeout = setTimeout(() => {
+                if (audio && !audio.paused) {
+                    audio.pause();
+                    audio.currentTime = 0;
+                }
+            }, 2000);
+        };
         
-        oscillator1.type = 'square';
-        oscillator1.frequency.value = 150; // Közepes-mély frekvencia
+        // Ha a hang véget ér 2 másodperc előtt, akkor töröljük a timeout-ot
+        audio.addEventListener('ended', () => {
+            if (stopTimeout) {
+                clearTimeout(stopTimeout);
+                stopTimeout = null;
+            }
+        });
         
-        oscillator1.connect(gainNode1);
-        gainNode1.connect(audioContext.destination);
+        // Lejátszás - várjuk meg, amíg a fájl betöltődik
+        const playAudio = () => {
+            audio.play().then(() => {
+                setupStopTimeout();
+            }).catch(err => {
+                console.error('Hang lejátszási hiba:', err);
+                if (stopTimeout) {
+                    clearTimeout(stopTimeout);
+                    stopTimeout = null;
+                }
+            });
+        };
         
-        // Gyors attack, gyors decay
-        gainNode1.gain.setValueAtTime(0, startTime);
-        gainNode1.gain.linearRampToValueAtTime(0.3, startTime + 0.005);
-        gainNode1.gain.exponentialRampToValueAtTime(0.01, startTime + 0.08);
-        
-        // 2. rész: mély rezonancia (fa hangja)
-        const oscillator2 = audioContext.createOscillator();
-        const gainNode2 = audioContext.createGain();
-        
-        oscillator2.type = 'sawtooth';
-        oscillator2.frequency.value = 60; // Mély rezonancia
-        
-        oscillator2.connect(gainNode2);
-        gainNode2.connect(audioContext.destination);
-        
-        // Lassabb attack, hosszabb decay
-        gainNode2.gain.setValueAtTime(0, startTime);
-        gainNode2.gain.linearRampToValueAtTime(0.2, startTime + 0.01);
-        gainNode2.gain.exponentialRampToValueAtTime(0.01, startTime + singleDuration);
-        
-        // Lowpass szűrő a Minecraft hangjához
-        const filter = audioContext.createBiquadFilter();
-        filter.type = 'lowpass';
-        filter.frequency.value = 300;
-        filter.Q.value = 1.5;
-        
-        oscillator2.connect(filter);
-        filter.connect(gainNode2);
-        
-        oscillator1.start(startTime);
-        oscillator1.stop(startTime + 0.08);
-        
-        oscillator2.start(startTime);
-        oscillator2.stop(startTime + singleDuration);
+        // Ha már betöltődött, azonnal lejátszás
+        if (audio.readyState >= 2) {
+            playAudio();
+        } else {
+            // Várjuk meg, amíg betöltődik
+            audio.addEventListener('canplaythrough', playAudio, { once: true });
+            audio.addEventListener('loadeddata', playAudio, { once: true });
+            // Betöltés indítása
+            audio.load();
+        }
+    } catch (err) {
+        console.error('MP3 lejátszás hiba:', err);
     }
 }
 
