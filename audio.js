@@ -152,11 +152,46 @@ export function toggleMute() {
     } else {
         musicVolume = 0.3;
     }
+    // Mentés localStorage-ba
+    saveMuteState();
     return isMuted;
+}
+
+export function setMuted(muted) {
+    isMuted = muted;
+    if (isMuted) {
+        musicVolume = 0;
+    } else {
+        musicVolume = 0.3;
+    }
 }
 
 export function isMusicMuted() {
     return isMuted;
+}
+
+// Zene állapot mentése
+function saveMuteState() {
+    try {
+        localStorage.setItem('skyblockMusicMuted', isMuted ? 'true' : 'false');
+    } catch (e) {
+        console.error('Zene állapot mentési hiba:', e);
+    }
+}
+
+// Zene állapot betöltése
+export function loadMuteState() {
+    try {
+        const saved = localStorage.getItem('skyblockMusicMuted');
+        if (saved === 'true') {
+            isMuted = true;
+            musicVolume = 0;
+            return true;
+        }
+    } catch (e) {
+        console.error('Zene állapot betöltési hiba:', e);
+    }
+    return false;
 }
 
 // Hangok (8-bites)
