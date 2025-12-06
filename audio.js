@@ -6,7 +6,7 @@ export function startBackgroundMusic() {
     
     backgroundMusic = new Audio('zene.mp3');
     backgroundMusic.loop = true;
-    backgroundMusic.volume = 0.3; // Halkabb, hogy ne zavarja a játékot
+    backgroundMusic.volume = 1.0; // 100% hangerő
     
     // Lejátszás (böngészők miatt user interaction után működik csak)
     const tryPlay = () => {
