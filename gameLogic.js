@@ -31,7 +31,7 @@ export function purchaseTile(x, y, updateUI, saveGameState) {
     }
 }
 
-export function cutTree(x, y) {
+export function cutTree(x, y, saveGameStateFn) {
     const tile = findTile(x, y);
     if (tile && tile.type === 'tree' && !gameState.cuttingTrees.has(`${x},${y}`)) {
         gameState.cuttingTrees.set(`${x},${y}`, {
@@ -39,6 +39,8 @@ export function cutTree(x, y) {
             startTime: Date.now()
         });
         playSound('cut');
+        // Mentés, hogy frissítés után is folytatódjon
+        if (saveGameStateFn) saveGameStateFn();
     }
 }
 
@@ -110,6 +112,8 @@ export function replantCornField(x, y, updateUI, saveGameState) {
             startTime: Date.now()
         });
         playSound('plantTree');
+        // Mentés, hogy frissítés után is folytatódjon
+        if (saveGameState) saveGameState();
     }
 }
 
@@ -278,7 +282,11 @@ export function saveGameState() {
             corn: gameState.corn,
             ownedTiles: gameState.ownedTiles,
             map: gameState.map,
-            camera: gameState.camera
+            camera: gameState.camera,
+            // Folyamatban lévő műveletek mentése
+            cuttingTrees: Object.fromEntries(gameState.cuttingTrees),
+            buildingCornfields: Object.fromEntries(gameState.buildingCornfields),
+            replantingCornfields: Object.fromEntries(gameState.replantingCornfields)
         };
         localStorage.setItem('skyblockGame', JSON.stringify(state));
     } catch (e) {
@@ -301,6 +309,16 @@ export function loadGameState(createInitialMap, updateUI) {
                 gameState.camera.y = state.camera.y || 0;
                 gameState.camera.zoomLevel = state.camera.zoomLevel || 1;
                 gameState.camera.zoom = getZoomLevel(gameState.camera.zoomLevel);
+            }
+            // Folyamatban lévő műveletek visszaállítása
+            if (state.cuttingTrees) {
+                gameState.cuttingTrees = new Map(Object.entries(state.cuttingTrees));
+            }
+            if (state.buildingCornfields) {
+                gameState.buildingCornfields = new Map(Object.entries(state.buildingCornfields));
+            }
+            if (state.replantingCornfields) {
+                gameState.replantingCornfields = new Map(Object.entries(state.replantingCornfields));
             }
             if (updateUI) updateUI();
         }

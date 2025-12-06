@@ -314,7 +314,7 @@ function handleAction(action, x, y) {
             purchaseTile(x, y, updateUI, saveGameState);
             break;
         case 'cut':
-            cutTree(x, y);
+            cutTree(x, y, saveGameState);
             break;
         case 'sellHouse':
             sellHouse(x, y, updateUI, saveGameState);
