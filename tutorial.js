@@ -115,3 +115,4 @@ export function setupTutorialListeners() {
     document.getElementById('tutorialSkip').addEventListener('click', skipTutorial);
 }
 
+
