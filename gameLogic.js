@@ -16,7 +16,7 @@ export function isAdjacentToOwned(x, y) {
     ];
     return directions.some(([dx, dy]) => {
         const adjacent = findTile(x + dx, y + dy);
-        return adjacent && (adjacent.type === 'owned' || adjacent.type === 'tree' || adjacent.type === 'house' || adjacent.type === 'cornfield' || adjacent.type === 'emptycornfield');
+        return adjacent && (adjacent.type === 'owned' || adjacent.type === 'tree' || adjacent.type === 'house' || adjacent.type === 'cornfield' || adjacent.type === 'emptycornfield' || adjacent.type === 'stonecutter');
     });
 }
 
@@ -74,6 +74,17 @@ export function buildTree(x, y, updateUI, saveGameState) {
         updateUI();
         saveGameState();
         playSound('plantTree');
+    }
+}
+
+export function buildStoneCutter(x, y, updateUI, saveGameState) {
+    const tile = findTile(x, y);
+    if (tile && tile.type === 'owned' && gameState.money >= CONFIG.STONECUTTER_BUILD_PRICE) {
+        tile.type = 'stonecutter';
+        gameState.money -= CONFIG.STONECUTTER_BUILD_PRICE;
+        updateUI();
+        saveGameState();
+        playSound('build');
     }
 }
 

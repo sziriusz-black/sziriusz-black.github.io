@@ -1,6 +1,6 @@
 import { CONFIG } from './config.js';
 import { gameState } from './gameState.js';
-import { drawTree, drawHouse, drawCornField, drawEmptyCornField } from './drawing.js';
+import { drawTree, drawHouse, drawCornField, drawEmptyCornField, drawStoneCutter } from './drawing.js';
 
 let canvas = null;
 let ctx = null;
@@ -123,6 +123,11 @@ export function render(updateBubblePosition, findTile) {
                 ctx.fillStyle = 'rgba(100, 100, 100, 0.5)';
                 ctx.fillRect(x, y, CONFIG.TILE_SIZE, CONFIG.TILE_SIZE);
             }
+        } else if (tile.type === 'stonecutter') {
+            // Kővágó
+            ctx.fillStyle = '#2a5a2a';
+            ctx.fillRect(x, y, CONFIG.TILE_SIZE, CONFIG.TILE_SIZE);
+            drawStoneCutter(ctx, x, y);
         }
 
         // Grid vonalak (pixeles)

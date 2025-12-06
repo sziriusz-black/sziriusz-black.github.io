@@ -16,7 +16,8 @@ export const CONFIG = {
     CORNFIELD_BUILD_TIME: 60,
     CORNFIELD_SELL_PRICE: 10,
     CORNFIELD_REPLANT_TIME: 20,
-    CORN_SELL_PRICE:5
+    CORN_SELL_PRICE: 5,
+    STONECUTTER_BUILD_PRICE: 50
 };
 
 // Térkép típusok
@@ -26,6 +27,7 @@ export const TileType = {
     HOUSE: 'house',
     OWNED: 'owned',
     CORNFIELD: 'cornfield',
-    EMPTY_CORNFIELD: 'emptycornfield'
+    EMPTY_CORNFIELD: 'emptycornfield',
+    STONECUTTER: 'stonecutter'
 };
 

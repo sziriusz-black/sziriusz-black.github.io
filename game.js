@@ -4,8 +4,8 @@ import { getZoomLevel, constrainCamera } from './camera.js';
 import { setupScroll } from './scroll.js';
 import { setupZoom } from './zoom.js';
 import { getCanvas, getContext, resizeCanvas, render } from './renderer.js';
-import { findTile, isAdjacentToOwned, purchaseTile, cutTree, sellHouse, buildHouse, buildTree, buildCornField, harvestCornField, replantCornField, sellCornField, updateTimers, saveGameState, loadGameState } from './gameLogic.js';
-import { playSound } from './audio.js';
+import { findTile, isAdjacentToOwned, purchaseTile, cutTree, sellHouse, buildHouse, buildTree, buildStoneCutter, buildCornField, harvestCornField, replantCornField, sellCornField, updateTimers, saveGameState, loadGameState } from './gameLogic.js';
+import { playSound, startBackgroundMusic } from './audio.js';
 
 // Canvas és kontextus
 const canvas = getCanvas();
@@ -38,6 +38,9 @@ function initGame() {
 
     // Event listener-ek
     setupEventListeners();
+
+    // Háttérzene indítása
+    startBackgroundMusic();
 
     // Renderelés indítása
     gameLoop();
@@ -231,10 +234,13 @@ function showBubble(screenX, screenY, tileX, tileY, tile) {
             <button class="bubble-button" ${gameState.money < CONFIG.CORNFIELD_BUILD_PRICE ? 'disabled' : ''} data-action="buildCornField" data-x="${tileX}" data-y="${tileY}">
                 Kukorica föld (${CONFIG.CORNFIELD_BUILD_PRICE} pénz)
             </button>
+            <button class="bubble-button" ${gameState.money < CONFIG.STONECUTTER_BUILD_PRICE ? 'disabled' : ''} data-action="buildStoneCutter" data-x="${tileX}" data-y="${tileY}">
+                Kővágó (${CONFIG.STONECUTTER_BUILD_PRICE} pénz)
+            </button>
         `;
         
-        if (gameState.money < CONFIG.HOUSE_BUILD_PRICE && gameState.money < CONFIG.TREE_BUILD_PRICE && gameState.money < CONFIG.CORNFIELD_BUILD_PRICE) {
-            const needed = Math.min(CONFIG.HOUSE_BUILD_PRICE, CONFIG.TREE_BUILD_PRICE, CONFIG.CORNFIELD_BUILD_PRICE) - gameState.money;
+        if (gameState.money < CONFIG.HOUSE_BUILD_PRICE && gameState.money < CONFIG.TREE_BUILD_PRICE && gameState.money < CONFIG.CORNFIELD_BUILD_PRICE && gameState.money < CONFIG.STONECUTTER_BUILD_PRICE) {
+            const needed = Math.min(CONFIG.HOUSE_BUILD_PRICE, CONFIG.TREE_BUILD_PRICE, CONFIG.CORNFIELD_BUILD_PRICE, CONFIG.STONECUTTER_BUILD_PRICE) - gameState.money;
             showError(`Még ${needed} pénz kell!`);
         }
     } else if (tile.type === 'cornfield') {
@@ -327,6 +333,9 @@ function handleAction(action, x, y) {
             break;
         case 'buildCornField':
             buildCornField(x, y, updateUI, saveGameState);
+            break;
+        case 'buildStoneCutter':
+            buildStoneCutter(x, y, updateUI, saveGameState);
             break;
         case 'harvestCornField':
             harvestCornField(x, y, updateUI, saveGameState);

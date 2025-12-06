@@ -1,3 +1,49 @@
+// Háttérzene
+let backgroundMusic = null;
+
+export function startBackgroundMusic() {
+    if (backgroundMusic) return; // Már játszik
+    
+    backgroundMusic = new Audio('zene.mp3');
+    backgroundMusic.loop = true;
+    backgroundMusic.volume = 0.3; // Halkabb, hogy ne zavarja a játékot
+    
+    // Lejátszás (böngészők miatt user interaction után működik csak)
+    const tryPlay = () => {
+        backgroundMusic.play().catch(err => {
+            console.log('Háttérzene lejátszás várakozik felhasználói interakcióra...');
+        });
+    };
+    
+    tryPlay();
+    
+    // Ha nem sikerült, akkor első kattintásra próbáljuk újra
+    const playOnInteraction = () => {
+        if (backgroundMusic && backgroundMusic.paused) {
+            backgroundMusic.play().catch(() => {});
+        }
+        document.removeEventListener('click', playOnInteraction);
+        document.removeEventListener('keydown', playOnInteraction);
+    };
+    
+    document.addEventListener('click', playOnInteraction);
+    document.addEventListener('keydown', playOnInteraction);
+}
+
+export function stopBackgroundMusic() {
+    if (backgroundMusic) {
+        backgroundMusic.pause();
+        backgroundMusic.currentTime = 0;
+        backgroundMusic = null;
+    }
+}
+
+export function setMusicVolume(volume) {
+    if (backgroundMusic) {
+        backgroundMusic.volume = Math.max(0, Math.min(1, volume));
+    }
+}
+
 // Hangok (8-bites)
 export function playSound(type) {
     // Speciális hang: Minecraft fa vágás (teljes kivágás) - először ellenőrizzük
