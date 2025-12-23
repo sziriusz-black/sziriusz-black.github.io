@@ -473,7 +473,7 @@ function closeDiscordModal() {
 
 // Visszaszámláló december 30. 12:00-ig
 function initCountdown() {
-    const targetDate = new Date('2024-12-30T12:00:00');
+    const targetDate = new Date('2025-12-30T12:00:00');
     
     function updateCountdown() {
         const now = new Date();
