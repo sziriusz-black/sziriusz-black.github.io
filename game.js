@@ -471,6 +471,37 @@ function closeDiscordModal() {
     modal.classList.add('hidden');
 }
 
+// Visszaszámláló december 30. 12:00-ig
+function initCountdown() {
+    const targetDate = new Date('2024-12-30T12:00:00');
+    
+    function updateCountdown() {
+        const now = new Date();
+        const diff = targetDate - now;
+        
+        if (diff <= 0) {
+            document.getElementById('countdownDays').textContent = '00';
+            document.getElementById('countdownHours').textContent = '00';
+            document.getElementById('countdownMinutes').textContent = '00';
+            document.getElementById('countdownSeconds').textContent = '00';
+            return;
+        }
+        
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+        
+        document.getElementById('countdownDays').textContent = String(days).padStart(2, '0');
+        document.getElementById('countdownHours').textContent = String(hours).padStart(2, '0');
+        document.getElementById('countdownMinutes').textContent = String(minutes).padStart(2, '0');
+        document.getElementById('countdownSeconds').textContent = String(seconds).padStart(2, '0');
+    }
+    
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+}
+
 // Játék ciklus
 function gameLoop() {
     updateTimers(updateUI, saveGameState, closeBubble);
@@ -480,3 +511,4 @@ function gameLoop() {
 
 // Indítás
 initGame();
+initCountdown();
