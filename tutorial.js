@@ -1,3 +1,26 @@
+/**
+ * @file tutorial.js
+ * @description Interaktív tutorial rendszer új játékosoknak
+ * 
+ * FELELŐSSÉGI KÖR:
+ * - Tutorial állapot kezelése (tutorialState)
+ * - Új játékos ellenőrzése (isNewPlayer)
+ * - Tutorial indítása és léptetése (startTutorial, nextStep, skipTutorial)
+ * - Tutorial UI elemek (overlay, tooltip, arrow)
+ * - Tutorial események figyelése (onTutorialEvent)
+ * - Nyíl pozícionálása (updateTutorialArrow)
+ * - Tutorial befejezés mentése localStorage-ba
+ * 
+ * ⚠️ FIGYELMEZTETÉS:
+ * Ha új funkcionalitásra van szükség, amely:
+ * - Buborék kezeléssel kapcsolatos → bubble.js
+ * - Modal ablakokkal kapcsolatos → modals.js
+ * - Mentéssel kapcsolatos → save-load.js
+ * - Játék állapottal kapcsolatos → gameState.js
+ * 
+ * Kérjük, a megfelelő modulba fejlessz!
+ */
+
 // Interaktív tutorial rendszer új játékosoknak
 import { gameState } from './gameState.js';
 

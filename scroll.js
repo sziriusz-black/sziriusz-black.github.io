@@ -1,3 +1,23 @@
+/**
+ * @file scroll.js
+ * @description Térkép görgetés/húzás kezelése - egér és touch események
+ * 
+ * FELELŐSSÉGI KÖR:
+ * - Egér drag kezelés (mousedown, mousemove, mouseup)
+ * - Touch drag kezelés mobilon (touchstart, touchmove, touchend)
+ * - Kamera pozíció frissítése húzáskor
+ * - Kattintás vs. húzás megkülönböztetése
+ * - UI elemek kizárása a scroll-ból
+ * 
+ * ⚠️ FIGYELMEZTETÉS:
+ * Ha új funkcionalitásra van szükség, amely:
+ * - Zoom eseményekkel kapcsolatos → zoom.js
+ * - Kamera logikával kapcsolatos → camera.js
+ * - Kattintás kezeléssel kapcsolatos → game.js (handleClick)
+ * 
+ * Kérjük, a megfelelő modulba fejlessz!
+ */
+
 import { gameState } from './gameState.js';
 import { constrainCamera } from './camera.js';
 

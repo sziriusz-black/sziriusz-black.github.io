@@ -1,3 +1,22 @@
+/**
+ * @file zoom.js
+ * @description Zoom kezelés - egér görgő és pinch zoom
+ * 
+ * FELELŐSSÉGI KÖR:
+ * - Egér görgő zoom kezelés (wheel event)
+ * - Pinch zoom kezelés mobilon (touchmove, touchend)
+ * - Zoom szint frissítése és mentése
+ * - setupZoom() - zoom események beállítása
+ * 
+ * ⚠️ FIGYELMEZTETÉS:
+ * Ha új funkcionalitásra van szükség, amely:
+ * - Scroll/húzás eseményekkel kapcsolatos → scroll.js
+ * - Kamera logikával kapcsolatos → camera.js
+ * - Mentéssel kapcsolatos → save-load.js
+ * 
+ * Kérjük, a megfelelő modulba fejlessz!
+ */
+
 import { CONFIG } from './config.js';
 import { gameState } from './gameState.js';
 import { getZoomLevel, constrainCamera } from './camera.js';

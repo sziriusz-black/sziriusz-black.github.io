@@ -1,3 +1,21 @@
+/**
+ * @file audio.js
+ * @description Hangkezelés - háttérzene és hangeffektek
+ * 
+ * FELELŐSSÉGI KÖR:
+ * - Háttérzene generálása és lejátszása (startBackgroundMusic)
+ * - Hangeffektek lejátszása (playSound)
+ * - Hang némítás kezelése (toggleMute, isMusicMuted, loadMuteState)
+ * - Web Audio API kezelés
+ * 
+ * ⚠️ FIGYELMEZTETÉS:
+ * Ha új funkcionalitásra van szükség, amely:
+ * - Beállítások menüvel kapcsolatos → settings.js
+ * - UI elemekkel kapcsolatos → ui.js
+ * 
+ * Kérjük, a megfelelő modulba fejlessz!
+ */
+
 // Háttérzene - Western stílus generálva
 let audioContext = null;
 let isPlaying = false;

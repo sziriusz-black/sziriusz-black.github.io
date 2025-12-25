@@ -1,3 +1,21 @@
+/**
+ * @file camera.js
+ * @description Kamera és zoom kezelés
+ * 
+ * FELELŐSSÉGI KÖR:
+ * - Zoom szintek kezelése (getZoomLevel)
+ * - Kamera pozíció korlátozása (constrainCamera)
+ * - Zoom értékek inicializálása
+ * 
+ * ⚠️ FIGYELMEZTETÉS:
+ * Ha új funkcionalitásra van szükség, amely:
+ * - Zoom eseményekkel kapcsolatos → zoom.js
+ * - Scroll/húzás eseményekkel kapcsolatos → scroll.js
+ * - Renderelésssel kapcsolatos → renderer.js
+ * 
+ * Kérjük, a megfelelő modulba fejlessz!
+ */
+
 import { CONFIG } from './config.js';
 import { gameState } from './gameState.js';
 

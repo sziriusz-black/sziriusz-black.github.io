@@ -1,3 +1,23 @@
+/**
+ * @file renderer.js
+ * @description Renderelés - canvas rajzolás és megjelenítés
+ * 
+ * FELELŐSSÉGI KÖR:
+ * - Canvas inicializálása (getCanvas, getContext, resizeCanvas)
+ * - Játéktér renderelése (render)
+ * - Tile-ok rajzolása típus szerint
+ * - Kamera transzformáció alkalmazása
+ * - Buborék pozíció frissítése rendereléskor
+ * 
+ * ⚠️ FIGYELMEZTETÉS:
+ * Ha új funkcionalitásra van szükség, amely:
+ * - Egyedi tile rajzolással kapcsolatos → drawing.js
+ * - Kamera/zoom kezeléssel kapcsolatos → camera.js
+ * - Játék állapottal kapcsolatos → gameState.js
+ * 
+ * Kérjük, a megfelelő modulba fejlessz!
+ */
+
 import { CONFIG } from './config.js';
 import { gameState } from './gameState.js';
 import { drawTree, drawHouse, drawCornField, drawEmptyCornField, drawStoneCutter } from './drawing.js';

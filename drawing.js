@@ -1,3 +1,24 @@
+/**
+ * @file drawing.js
+ * @description Tile rajzolás - egyedi sprite-ok és grafikák
+ * 
+ * FELELŐSSÉGI KÖR:
+ * - Fa rajzolása (drawTree)
+ * - Ház rajzolása (drawHouse)
+ * - Kukoricaföld rajzolása (drawCornField)
+ * - Üres kukoricaföld rajzolása (drawEmptyCornField)
+ * - Kővágó rajzolása (drawStoneCutter)
+ * - Minecraft stílusú pixelgrafika
+ * 
+ * ⚠️ FIGYELMEZTETÉS:
+ * Ha új funkcionalitásra van szükség, amely:
+ * - Renderelés logikával kapcsolatos → renderer.js
+ * - Animációkkal kapcsolatos → külön animation modul javasolt
+ * - Tile típusokkal kapcsolatos → config.js (TileType)
+ * 
+ * Kérjük, a megfelelő modulba fejlessz!
+ */
+
 import { CONFIG } from './config.js';
 
 export function drawTree(ctx, x, y) {
