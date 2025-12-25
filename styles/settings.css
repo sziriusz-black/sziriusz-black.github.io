@@ -1,0 +1,123 @@
+/**
+ * @file styles/settings.css
+ * @description Settings dropdown stílusok - fogaskerék menü
+ * 
+ * FELELŐSSÉGI KÖR:
+ * - Settings dropdown (.settings-dropdown)
+ * - Settings ikon (.settings-icon)
+ * - Settings menü (.settings-menu, .settings-menu-item)
+ * - Hang és Discord menüpontok
+ * 
+ * ⚠️ FIGYELMEZTETÉS:
+ * Ha új stílusra van szükség, amely:
+ * - Modal-okkal kapcsolatos → components.css
+ * - Tutorial-lal kapcsolatos → tutorial.css
+ */
+
+/* Settings dropdown stílusok */
+.settings-dropdown {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+}
+
+.settings-icon {
+    width: 40px;
+    height: 40px;
+    background: rgba(0, 0, 0, 0.8);
+    border: 3px solid #4a4a4a;
+    border-radius: 0;
+    padding: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 4px 4px 0px #000;
+    color: #aaa;
+    transition: all 0.1s;
+}
+
+.settings-icon:hover {
+    background: rgba(0, 0, 0, 0.9);
+    color: #fff;
+    transform: translate(-1px, -1px);
+    box-shadow: 5px 5px 0px #000;
+}
+
+.settings-icon:active {
+    transform: translate(1px, 1px);
+    box-shadow: 3px 3px 0px #000;
+}
+
+.settings-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+.settings-icon.open {
+    color: #ffcc00;
+}
+
+.settings-menu {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    background: rgba(0, 0, 0, 0.9);
+    border: 3px solid #4a4a4a;
+    box-shadow: 4px 4px 0px #000;
+    min-width: 150px;
+}
+
+.settings-menu.hidden {
+    display: none;
+}
+
+.settings-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 15px;
+    cursor: pointer;
+    color: #fff;
+    font-size: 14px;
+    transition: background 0.1s;
+    border-bottom: 1px solid #4a4a4a;
+}
+
+.settings-menu-item:last-child {
+    border-bottom: none;
+}
+
+.settings-menu-item:hover {
+    background: rgba(74, 158, 255, 0.2);
+}
+
+.settings-menu-item svg {
+    flex-shrink: 0;
+}
+
+.settings-menu-item.muted svg {
+    color: #ff4444;
+}
+
+#soundMenuItem svg {
+    color: #4a9eff;
+}
+
+#soundMenuItem.muted #soundOnIcon {
+    display: none;
+}
+
+#soundMenuItem.muted #soundOffIcon {
+    display: block !important;
+}
+
+#soundMenuItem:not(.muted) #soundOffIcon {
+    display: none;
+}
+
+#discordMenuItem svg {
+    color: #5865F2;
+}
+

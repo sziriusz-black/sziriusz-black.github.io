@@ -1,0 +1,357 @@
+/**
+ * @file styles/components.css
+ * @description Komponens stílusok - bubble, modal, gombok, slider
+ * 
+ * FELELŐSSÉGI KÖR:
+ * - Bubble (#bubble, .bubble-button)
+ * - Modal (.modal, .modal-content, .modal-buttons)
+ * - Slider (#plankSlider, #cornSlider)
+ * - Close gomb (.close-btn)
+ * - Discord modal (#discordModal)
+ * - Upgrade modal (#upgradeModal)
+ * 
+ * ⚠️ FIGYELMEZTETÉS:
+ * Ha új stílusra van szükség, amely:
+ * - Beállításokkal kapcsolatos → settings.css
+ * - Tutorial-lal kapcsolatos → tutorial.css
+ */
+
+/* Bubble és modal komponensek */
+#bubble {
+    position: fixed;
+    background: rgba(0, 0, 0, 0.9);
+    border: 3px solid #4a4a4a;
+    border-radius: 0;
+    padding: 15px;
+    z-index: 2000;
+    min-width: 200px;
+    box-shadow: 4px 4px 0px #000;
+    color: #fff;
+    font-size: 14px;
+}
+
+#bubble.large {
+    min-width: 300px;
+    padding: 20px;
+}
+
+#bubble.hidden {
+    display: none;
+}
+
+.close-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: #ff4444;
+    border: 2px solid #cc0000;
+    color: #fff;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 20px;
+    padding: 0;
+    font-weight: bold;
+    box-shadow: 2px 2px 0px #000;
+}
+
+.close-btn:hover {
+    background: #ff6666;
+}
+
+.close-btn:active {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0px #000;
+}
+
+#bubbleContent {
+    margin-top: 10px;
+}
+
+.bubble-button {
+    display: block;
+    width: 100%;
+    padding: 8px;
+    margin: 5px 0;
+    background: #4a9eff;
+    border: 2px solid #2a7acc;
+    color: #fff;
+    cursor: pointer;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    box-shadow: 2px 2px 0px #000;
+    transition: all 0.1s;
+}
+
+.bubble-button:hover {
+    background: #6ab4ff;
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0px #000;
+}
+
+.bubble-button:active {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0px #000;
+}
+
+.bubble-button:disabled {
+    background: #666;
+    border-color: #444;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Modal alap stílusok */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 3000;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background: #2a2a3e;
+    border: 4px solid #4a4a4a;
+    padding: 20px;
+    min-width: 300px;
+    box-shadow: 6px 6px 0px #000;
+    color: #fff;
+}
+
+.modal-content h2 {
+    margin-bottom: 20px;
+    font-size: 18px;
+    text-align: center;
+}
+
+.slider-container {
+    margin: 20px 0;
+}
+
+.slider-container label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+#plankSlider,
+#cornSlider {
+    width: 100%;
+    height: 8px;
+    background: #4a4a4a;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+#plankSlider::-webkit-slider-thumb,
+#cornSlider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #4a9eff;
+    border: 2px solid #2a7acc;
+    cursor: pointer;
+    box-shadow: 2px 2px 0px #000;
+}
+
+#plankSlider::-moz-range-thumb,
+#cornSlider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: #4a9eff;
+    border: 2px solid #2a7acc;
+    cursor: pointer;
+    box-shadow: 2px 2px 0px #000;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.modal-buttons button {
+    flex: 1;
+    padding: 10px;
+    background: #4a9eff;
+    border: 2px solid #2a7acc;
+    color: #fff;
+    cursor: pointer;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    box-shadow: 2px 2px 0px #000;
+    transition: all 0.1s;
+}
+
+.modal-buttons button:hover {
+    background: #6ab4ff;
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0px #000;
+}
+
+.modal-buttons button:active {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0px #000;
+}
+
+#cancelSell {
+    background: #666;
+    border-color: #444;
+}
+
+#cancelSell:hover {
+    background: #777;
+}
+
+/* Discord modal */
+#discordModal {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+#discordModal .modal-content {
+    position: relative;
+    background: #2a2a3e;
+    border: 4px solid #4a4a4a;
+    padding: 30px;
+    min-width: 400px;
+    box-shadow: 6px 6px 0px #000;
+    color: #fff;
+}
+
+#discordModal .close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.discord-box {
+    background: rgba(0, 0, 0, 0.5);
+    border: 3px solid #4a4a4a;
+    padding: 20px;
+    margin-top: 20px;
+    box-shadow: 2px 2px 0px #000;
+}
+
+.discord-url {
+    font-family: 'Courier New', monospace;
+    font-size: 16px;
+    color: #4a9eff;
+    text-align: center;
+    word-break: break-all;
+    user-select: all;
+    cursor: pointer;
+    text-decoration: none;
+    display: block;
+    transition: color 0.2s;
+}
+
+.discord-url:hover {
+    color: #6ab4ff;
+    text-decoration: underline;
+}
+
+/* Upgrade modal */
+#upgradeModal {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+.upgrade-modal {
+    max-width: 400px;
+    position: relative;
+}
+
+.upgrade-modal h2 {
+    color: #ffcc00;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.upgrade-content {
+    background: rgba(0, 0, 0, 0.4);
+    border: 2px solid #4a4a4a;
+    padding: 15px;
+    margin-bottom: 10px;
+}
+
+.upgrade-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid #4a4a4a;
+}
+
+.upgrade-item:last-child {
+    margin-bottom: 0;
+}
+
+.upgrade-info {
+    flex: 1;
+}
+
+.upgrade-name {
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 5px;
+}
+
+.upgrade-desc {
+    font-size: 12px;
+    color: #aaa;
+}
+
+.upgrade-price {
+    color: #ffcc00;
+    font-size: 12px;
+    margin-top: 3px;
+}
+
+.upgrade-btn {
+    padding: 8px 16px;
+    background: #4a9e4a;
+    border: 2px solid #3a7a3a;
+    color: #fff;
+    cursor: pointer;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    box-shadow: 2px 2px 0px #000;
+    transition: all 0.1s;
+}
+
+.upgrade-btn:hover {
+    background: #5ab85a;
+}
+
+.upgrade-btn:disabled {
+    background: #666;
+    border-color: #444;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.current-level {
+    text-align: center;
+    padding: 10px;
+    background: rgba(74, 158, 255, 0.2);
+    border: 1px solid #4a9eff;
+    margin-bottom: 15px;
+    font-size: 14px;
+}
+
