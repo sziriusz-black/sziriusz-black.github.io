@@ -196,6 +196,9 @@ export function loadMuteState() {
 
 // Hangok (8-bites)
 export function playSound(type) {
+    // Ha le van némítva, nem játszunk le semmit
+    if (isMuted) return;
+    
     // Speciális hang: Minecraft fa vágás (teljes kivágás) - először ellenőrizzük
     if (type === 'minecraftChop') {
         playMinecraftChopMP3();

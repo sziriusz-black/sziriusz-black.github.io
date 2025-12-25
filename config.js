@@ -17,7 +17,15 @@ export const CONFIG = {
     CORNFIELD_SELL_PRICE: 10,
     CORNFIELD_REPLANT_TIME: 20,
     CORN_SELL_PRICE: 5,
-    STONECUTTER_BUILD_PRICE: 50
+    STONECUTTER_BUILD_PRICE: 50,
+    STONECUTTER_SELL_PRICE: 25,
+    // Upgrade árak (alapár + szint * növekmény)
+    UPGRADE_BASE_PRICE: 100,        // Alapár (első upgrade)
+    UPGRADE_INCREMENT: 50,          // Növekmény szintenként
+    // Munkás rendszer
+    STARTER_HOUSE_WORKERS: 3,  // Kezdő ház munkásai
+    NORMAL_HOUSE_WORKERS: 2,   // Normál ház munkásai
+    WORKER_COST_PER_ACTION: 1  // Műveletenkénti munkás költség
 };
 
 // Térkép típusok

@@ -13,6 +13,9 @@ export const gameState = {
     activeBubble: null,
     cuttingTrees: new Map(),
     buildingCornfields: new Map(),
-    replantingCornfields: new Map()
+    replantingCornfields: new Map(),
+    // Munkás rendszer
+    workers: 3,    // Szabad munkások (kezdő ház ad 3-at)
+    maxWorkers: 3  // Összes munkás
 };
 

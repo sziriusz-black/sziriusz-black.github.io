@@ -4,13 +4,17 @@ import { getZoomLevel, constrainCamera } from './camera.js';
 import { setupScroll } from './scroll.js';
 import { setupZoom } from './zoom.js';
 import { getCanvas, getContext, resizeCanvas, render } from './renderer.js';
-import { findTile, isAdjacentToOwned, purchaseTile, cutTree, sellHouse, buildHouse, buildTree, buildStoneCutter, buildCornField, harvestCornField, replantCornField, sellCornField, updateTimers, saveGameState, loadGameState } from './gameLogic.js';
-import { playSound, startBackgroundMusic, toggleMute, loadMuteState } from './audio.js';
-import { isNewPlayer, startTutorial, setupTutorialListeners } from './tutorial.js';
+import { findTile, isAdjacentToOwned, purchaseTile, cutTree, sellHouse, buildHouse, buildTree, buildStoneCutter, buildCornField, harvestCornField, replantCornField, sellCornField, updateTimers, saveGameState, loadGameState, calculateTilePrice, hasAvailableWorker, upgradeHouse, upgradeStoneCutter, sellStoneCutter } from './gameLogic.js';
+import { playSound, startBackgroundMusic, toggleMute, loadMuteState, isMusicMuted } from './audio.js';
+import { isNewPlayer, startTutorial, setupTutorialListeners, onTutorialEvent, updateTutorialArrow, isTutorialActive } from './tutorial.js';
 
 // Canvas és kontextus
 const canvas = getCanvas();
 const ctx = getContext();
+
+// Debug: gameState és mentés elérhetővé tétele konzolból
+window.gameState = gameState;
+window.saveGame = saveGameState;
 
 // Kezdő állapot inicializálása
 function initGame() {
@@ -46,16 +50,6 @@ function initGame() {
     // Háttérzene indítása
     startBackgroundMusic();
 
-    // Zene állapot betöltése és UI frissítése
-    if (loadMuteState()) {
-        const soundOn = document.getElementById('soundOn');
-        const soundOff = document.getElementById('soundOff');
-        const toggle = document.getElementById('soundToggle');
-        soundOn.classList.add('hidden');
-        soundOff.classList.remove('hidden');
-        toggle.classList.add('muted');
-    }
-
     // Tutorial indítása új játékosnak
     if (isNewPlayer()) {
         startTutorial();
@@ -74,6 +68,9 @@ function createInitialMap() {
         { x: 1, y: 1, type: 'owned' }
     ];
     gameState.ownedTiles = 4;
+    // Kezdő ház munkásai (3/3)
+    gameState.workers = CONFIG.STARTER_HOUSE_WORKERS;
+    gameState.maxWorkers = CONFIG.STARTER_HOUSE_WORKERS;
     // Kezdő kamera pozíció a középpontra
     gameState.camera.x = 0;
     gameState.camera.y = 0;
@@ -97,24 +94,7 @@ function setupEventListeners() {
             closeModal();
             closeCornModal();
             closeDiscordModal();
-        }
-    });
-
-    // Hangszóró némítás gomb
-    document.getElementById('soundToggle').addEventListener('click', () => {
-        const isMuted = toggleMute();
-        const soundOn = document.getElementById('soundOn');
-        const soundOff = document.getElementById('soundOff');
-        const toggle = document.getElementById('soundToggle');
-        
-        if (isMuted) {
-            soundOn.classList.add('hidden');
-            soundOff.classList.remove('hidden');
-            toggle.classList.add('muted');
-        } else {
-            soundOn.classList.remove('hidden');
-            soundOff.classList.add('hidden');
-            toggle.classList.remove('muted');
+            closeUpgradeModal();
         }
     });
 
@@ -137,12 +117,14 @@ function setupEventListeners() {
     document.getElementById('confirmSell').addEventListener('click', sellPlanks);
     document.getElementById('plankSlider').addEventListener('input', (e) => {
         document.getElementById('sellAmount').textContent = e.target.value;
+        document.getElementById('plankSellPrice').textContent = e.target.value * CONFIG.PLANK_SELL_PRICE;
     });
 
     document.getElementById('cancelCornSell').addEventListener('click', closeCornModal);
     document.getElementById('confirmCornSell').addEventListener('click', sellCorn);
     document.getElementById('cornSlider').addEventListener('input', (e) => {
         document.getElementById('cornSellAmount').textContent = e.target.value;
+        document.getElementById('cornSellTotalPrice').textContent = e.target.value * CONFIG.CORN_SELL_PRICE;
     });
     document.getElementById('cornModal').addEventListener('click', (e) => {
         if (e.target.id === 'cornModal') {
@@ -151,13 +133,40 @@ function setupEventListeners() {
     });
 
     // Discord modal
-    document.getElementById('discordIcon').addEventListener('click', openDiscordModal);
     document.getElementById('closeDiscordModal').addEventListener('click', closeDiscordModal);
     document.getElementById('discordModal').addEventListener('click', (e) => {
         if (e.target.id === 'discordModal') {
             closeDiscordModal();
         }
     });
+    
+    // Upgrade modal
+    document.getElementById('closeUpgradeModal').addEventListener('click', closeUpgradeModal);
+    document.getElementById('upgradeModal').addEventListener('click', (e) => {
+        if (e.target.id === 'upgradeModal') {
+            closeUpgradeModal();
+        }
+    });
+    
+    // Settings dropdown
+    document.getElementById('settingsIcon').addEventListener('click', toggleSettingsMenu);
+    document.getElementById('soundMenuItem').addEventListener('click', handleSoundToggle);
+    document.getElementById('discordMenuItem').addEventListener('click', () => {
+        closeSettingsMenu();
+        openDiscordModal();
+    });
+    
+    // Kívülre kattintás - settings menü bezárása
+    document.addEventListener('click', (e) => {
+        const dropdown = document.getElementById('settingsDropdown');
+        if (dropdown && !dropdown.contains(e.target)) {
+            closeSettingsMenu();
+        }
+    });
+    
+    // Hang állapot betöltése és ikon frissítése
+    loadMuteState();
+    updateSoundIcon();
 }
 
 export function handleClick(e) {
@@ -171,12 +180,12 @@ export function handleClick(e) {
     const modal = document.getElementById('plankModal');
     const cornModal = document.getElementById('cornModal');
     const discordModal = document.getElementById('discordModal');
-    const discordIcon = document.getElementById('discordIcon');
+    const settingsDropdown = document.getElementById('settingsDropdown');
     if ((bubble && bubble.contains(e.target)) || 
         (modal && modal.contains(e.target)) ||
         (cornModal && cornModal.contains(e.target)) ||
         (discordModal && discordModal.contains(e.target)) ||
-        (discordIcon && discordIcon.contains(e.target))) {
+        (settingsDropdown && settingsDropdown.contains(e.target))) {
         return;
     }
 
@@ -194,7 +203,7 @@ export function handleClick(e) {
     showBubble(e.clientX, e.clientY, tileX, tileY, tile);
 }
 
-function showBubble(screenX, screenY, tileX, tileY, tile) {
+function generateBubbleContent(tileX, tileY, tile) {
     const bubble = document.getElementById('bubble');
     const content = document.getElementById('bubbleContent');
     content.innerHTML = '';
@@ -205,7 +214,7 @@ function showBubble(screenX, screenY, tileX, tileY, tile) {
     if (!tile) {
         // Meg nem vásárolt terület
         if (isAdjacentToOwned(tileX, tileY)) {
-            const price = CONFIG.PURCHASE_PRICE;
+            const price = calculateTilePrice();
             const canAfford = gameState.money >= price;
             
             // Kis buborék terület vásárlásnál
@@ -219,10 +228,7 @@ function showBubble(screenX, screenY, tileX, tileY, tile) {
                 </button>
             `;
             
-            // Hibaüzenet csak ha nincs elég pénz, de a buborék mindig megjelenik
-            if (!canAfford) {
-                setTimeout(() => showError(`Még ${price - gameState.money} pénz kell!`), 100);
-            }
+            return { showError: !canAfford ? `Még ${price - gameState.money} pénz kell!` : null };
         } else {
             content.innerHTML = '<div>Csak a megvásárolt terület mellé lehet vásárolni!</div>';
         }
@@ -230,28 +236,44 @@ function showBubble(screenX, screenY, tileX, tileY, tile) {
         // Fa kivágás
         const isCutting = gameState.cuttingTrees.has(`${tileX},${tileY}`);
         if (isCutting) {
-            const timeLeft = gameState.cuttingTrees.get(`${tileX},${tileY}`).timeLeft;
+            const data = gameState.cuttingTrees.get(`${tileX},${tileY}`);
+            const now = Date.now();
+            const elapsed = (now - data.startTime) / 1000;
+            const timeLeft = Math.max(0, CONFIG.TREE_CUT_TIME - elapsed);
             content.innerHTML = `
                 <div>Fa kivágása folyamatban...</div>
-                <div>Hátralévő idő: ${timeLeft}s</div>
+                <div>Hátralévő idő: ${Math.ceil(timeLeft)}s</div>
             `;
         } else {
+            const canCut = hasAvailableWorker();
             content.innerHTML = `
-                <button class="bubble-button" data-action="cut" data-x="${tileX}" data-y="${tileY}">
-                    Kivágás
+                <button class="bubble-button" ${!canCut ? 'disabled' : ''} data-action="cut" data-x="${tileX}" data-y="${tileY}">
+                    Kivágás ${!canCut ? '(nincs munkás)' : ''}
                 </button>
             `;
         }
     } else if (tile.type === 'house') {
-        // Ház eladása (kivéve a kezdő házat)
+        // Ház - upgrade és eladás
+        const houseLevel = tile.level || 1;
+        
         if (tileX === 0 && tileY === 0) {
-            content.innerHTML = '<div>Ez a kezdő ház, nem lehet eladni!</div>';
+            // Kezdő ház - upgrade lehet, de eladni nem
+            content.innerHTML = `
+                <div style="margin-bottom: 10px;">Kezdő ház (Szint ${houseLevel})</div>
+                <div style="margin-bottom: 5px;">Munkások: +${houseLevel === 1 ? CONFIG.STARTER_HOUSE_WORKERS : CONFIG.STARTER_HOUSE_WORKERS + (houseLevel - 1)}</div>
+                <button class="bubble-button" data-action="openUpgrade" data-x="${tileX}" data-y="${tileY}" data-type="house">
+                    Upgrade
+                </button>
+            `;
         } else {
             content.innerHTML = `
-                <div style="margin-bottom: 10px;">Ház eladása</div>
-                <div style="margin-bottom: 10px;">Ár: ${CONFIG.HOUSE_SELL_PRICE} pénz</div>
+                <div style="margin-bottom: 10px;">Ház (Szint ${houseLevel})</div>
+                <div style="margin-bottom: 5px;">Munkások: +${CONFIG.NORMAL_HOUSE_WORKERS + (houseLevel - 1)}</div>
+                <button class="bubble-button" data-action="openUpgrade" data-x="${tileX}" data-y="${tileY}" data-type="house">
+                    Upgrade
+                </button>
                 <button class="bubble-button" data-action="sellHouse" data-x="${tileX}" data-y="${tileY}">
-                    Eladás
+                    Eladás (${CONFIG.HOUSE_SELL_PRICE} pénz)
                 </button>
             `;
         }
@@ -260,16 +282,18 @@ function showBubble(screenX, screenY, tileX, tileY, tile) {
         // Kis buborék építésnél
         bubble.classList.remove('large');
         
+        const noWorker = !hasAvailableWorker();
+        const workerWarning = noWorker ? ' (nincs munkás)' : '';
         content.innerHTML = `
             <div style="margin-bottom: 10px;">Építés</div>
             <button class="bubble-button" ${gameState.money < CONFIG.HOUSE_BUILD_PRICE ? 'disabled' : ''} data-action="buildHouse" data-x="${tileX}" data-y="${tileY}">
                 Ház építése (${CONFIG.HOUSE_BUILD_PRICE} pénz)
             </button>
-            <button class="bubble-button" ${gameState.money < CONFIG.TREE_BUILD_PRICE ? 'disabled' : ''} data-action="buildTree" data-x="${tileX}" data-y="${tileY}">
-                Fa ültetése (${CONFIG.TREE_BUILD_PRICE} pénz)
+            <button class="bubble-button" ${gameState.money < CONFIG.TREE_BUILD_PRICE || noWorker ? 'disabled' : ''} data-action="buildTree" data-x="${tileX}" data-y="${tileY}">
+                Fa ültetése (${CONFIG.TREE_BUILD_PRICE} pénz)${workerWarning}
             </button>
-            <button class="bubble-button" ${gameState.money < CONFIG.CORNFIELD_BUILD_PRICE ? 'disabled' : ''} data-action="buildCornField" data-x="${tileX}" data-y="${tileY}">
-                Kukorica föld (${CONFIG.CORNFIELD_BUILD_PRICE} pénz)
+            <button class="bubble-button" ${gameState.money < CONFIG.CORNFIELD_BUILD_PRICE || noWorker ? 'disabled' : ''} data-action="buildCornField" data-x="${tileX}" data-y="${tileY}">
+                Kukorica föld (${CONFIG.CORNFIELD_BUILD_PRICE} pénz)${workerWarning}
             </button>
             <button class="bubble-button" ${gameState.money < CONFIG.STONECUTTER_BUILD_PRICE ? 'disabled' : ''} data-action="buildStoneCutter" data-x="${tileX}" data-y="${tileY}">
                 Kővágó (${CONFIG.STONECUTTER_BUILD_PRICE} pénz)
@@ -278,16 +302,19 @@ function showBubble(screenX, screenY, tileX, tileY, tile) {
         
         if (gameState.money < CONFIG.HOUSE_BUILD_PRICE && gameState.money < CONFIG.TREE_BUILD_PRICE && gameState.money < CONFIG.CORNFIELD_BUILD_PRICE && gameState.money < CONFIG.STONECUTTER_BUILD_PRICE) {
             const needed = Math.min(CONFIG.HOUSE_BUILD_PRICE, CONFIG.TREE_BUILD_PRICE, CONFIG.CORNFIELD_BUILD_PRICE, CONFIG.STONECUTTER_BUILD_PRICE) - gameState.money;
-            showError(`Még ${needed} pénz kell!`);
+            return { showError: `Még ${needed} pénz kell!` };
         }
     } else if (tile.type === 'cornfield') {
         // Kukorica föld - learatás vagy eladás
         const isBuilding = gameState.buildingCornfields.has(`${tileX},${tileY}`);
         if (isBuilding) {
-            const timeLeft = gameState.buildingCornfields.get(`${tileX},${tileY}`).timeLeft;
+            const data = gameState.buildingCornfields.get(`${tileX},${tileY}`);
+            const now = Date.now();
+            const elapsed = (now - data.startTime) / 1000;
+            const timeLeft = Math.max(0, CONFIG.CORNFIELD_BUILD_TIME - elapsed);
             content.innerHTML = `
                 <div>Kukorica föld építése folyamatban...</div>
-                <div>Hátralévő idő: ${timeLeft}s</div>
+                <div>Hátralévő idő: ${Math.ceil(timeLeft)}s</div>
             `;
         } else {
             content.innerHTML = `
@@ -303,21 +330,51 @@ function showBubble(screenX, screenY, tileX, tileY, tile) {
         // Üres kukorica föld - újraültetés vagy eladás
         const isReplanting = gameState.replantingCornfields.has(`${tileX},${tileY}`);
         if (isReplanting) {
-            const timeLeft = gameState.replantingCornfields.get(`${tileX},${tileY}`).timeLeft;
+            const data = gameState.replantingCornfields.get(`${tileX},${tileY}`);
+            const now = Date.now();
+            const elapsed = (now - data.startTime) / 1000;
+            const timeLeft = Math.max(0, CONFIG.CORNFIELD_REPLANT_TIME - elapsed);
             content.innerHTML = `
                 <div>Kukorica újraültetése folyamatban...</div>
-                <div>Hátralévő idő: ${timeLeft}s</div>
+                <div>Hátralévő idő: ${Math.ceil(timeLeft)}s</div>
             `;
         } else {
+            const canReplant = hasAvailableWorker();
             content.innerHTML = `
-                <button class="bubble-button" data-action="replantCornField" data-x="${tileX}" data-y="${tileY}">
-                    Újraültetés
+                <button class="bubble-button" ${!canReplant ? 'disabled' : ''} data-action="replantCornField" data-x="${tileX}" data-y="${tileY}">
+                    Újraültetés ${!canReplant ? '(nincs munkás)' : ''}
                 </button>
                 <button class="bubble-button" data-action="sellCornField" data-x="${tileX}" data-y="${tileY}">
                     Eladás (${CONFIG.CORNFIELD_SELL_PRICE} pénz)
                 </button>
             `;
         }
+    } else if (tile.type === 'stonecutter') {
+        // Kővágó - upgrade és eladás
+        const stonecutterLevel = tile.level || 1;
+        
+        content.innerHTML = `
+            <div style="margin-bottom: 10px;">Kővágó (Szint ${stonecutterLevel})</div>
+            <button class="bubble-button" data-action="openUpgrade" data-x="${tileX}" data-y="${tileY}" data-type="stonecutter">
+                Upgrade
+            </button>
+            <button class="bubble-button" data-action="sellStoneCutter" data-x="${tileX}" data-y="${tileY}">
+                Eladás (${CONFIG.STONECUTTER_SELL_PRICE} pénz)
+            </button>
+        `;
+    }
+    
+    return { showError: null };
+}
+
+function showBubble(screenX, screenY, tileX, tileY, tile) {
+    const bubble = document.getElementById('bubble');
+    const content = document.getElementById('bubbleContent');
+    
+    const result = generateBubbleContent(tileX, tileY, tile);
+    
+    if (result.showError) {
+        setTimeout(() => showError(result.showError), 100);
     }
 
     // Buborék pozicionálása térkép koordinátához képest (scroll esetén együtt mozog)
@@ -326,14 +383,47 @@ function showBubble(screenX, screenY, tileX, tileY, tile) {
     gameState.activeBubble = { x: tileX, y: tileY };
 
     // Gomb események (beleértve a skip gombot is)
+    setupBubbleButtons();
+    
+    // Tutorial értesítés
+    onTutorialEvent('bubble_open', { x: tileX, y: tileY, type: tile ? tile.type : null });
+}
+
+function setupBubbleButtons() {
+    const content = document.getElementById('bubbleContent');
     content.querySelectorAll('.bubble-button').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const action = btn.dataset.action;
             const x = parseInt(btn.dataset.x);
             const y = parseInt(btn.dataset.y);
-            handleAction(action, x, y);
+            const type = btn.dataset.type;
+            handleAction(action, x, y, type);
         });
     });
+}
+
+function refreshActiveBubble() {
+    if (!gameState.activeBubble) return;
+    
+    try {
+        const tileX = gameState.activeBubble.x;
+        const tileY = gameState.activeBubble.y;
+        const tile = findTile(tileX, tileY);
+        
+        // Ellenőrizzük, hogy a tile még mindig létezik és megfelelő típusú
+        // Ha a fa kivágódott (owned lett), bezárjuk a buborékot
+        const key = `${tileX},${tileY}`;
+        const isCuttingTree = gameState.cuttingTrees.has(key);
+        const isBuildingCornfield = gameState.buildingCornfields.has(key);
+        const isReplantingCornfield = gameState.replantingCornfields.has(key);
+        
+        // Csak akkor frissítjük, ha folyamatban van valami időzített művelet
+        if (isCuttingTree || isBuildingCornfield || isReplantingCornfield) {
+            generateBubbleContent(tileX, tileY, tile);
+        }
+    } catch (error) {
+        console.error('refreshActiveBubble hiba:', error);
+    }
 }
 
 function updateBubblePosition(tileX, tileY) {
@@ -351,13 +441,14 @@ function updateBubblePosition(tileX, tileY) {
     bubble.style.top = `${screenY + 10}px`;
 }
 
-function handleAction(action, x, y) {
+function handleAction(action, x, y, type) {
     switch (action) {
         case 'purchase':
             purchaseTile(x, y, updateUI, saveGameState);
             break;
         case 'cut':
-            cutTree(x, y, saveGameState);
+            cutTree(x, y, updateUI, saveGameState);
+            onTutorialEvent('tree_cutting', { x, y });
             break;
         case 'sellHouse':
             sellHouse(x, y, updateUI, saveGameState);
@@ -367,6 +458,7 @@ function handleAction(action, x, y) {
             break;
         case 'buildTree':
             buildTree(x, y, updateUI, saveGameState);
+            onTutorialEvent('tree_planted', { x, y });
             break;
         case 'buildCornField':
             buildCornField(x, y, updateUI, saveGameState);
@@ -383,6 +475,18 @@ function handleAction(action, x, y) {
         case 'sellCornField':
             sellCornField(x, y, updateUI, saveGameState);
             break;
+        case 'upgradeHouse':
+            upgradeHouse(x, y, updateUI, saveGameState);
+            break;
+        case 'upgradeStoneCutter':
+            upgradeStoneCutter(x, y, updateUI, saveGameState);
+            break;
+        case 'sellStoneCutter':
+            sellStoneCutter(x, y, updateUI, saveGameState);
+            break;
+        case 'openUpgrade':
+            openUpgradeModal(x, y, type);
+            return; // Ne zárjuk be a buborékot
     }
     closeBubble();
 }
@@ -396,10 +500,42 @@ function updateUI() {
     const moneyEl = document.getElementById('money');
     const planksEl = document.getElementById('planks');
     const cornEl = document.getElementById('corn');
+    const workersEl = document.getElementById('workers');
+    const maxWorkersEl = document.getElementById('maxWorkers');
     
     if (moneyEl) moneyEl.textContent = gameState.money;
     if (planksEl) planksEl.textContent = gameState.planks;
     if (cornEl) cornEl.textContent = gameState.corn;
+    if (workersEl) workersEl.textContent = gameState.workers;
+    if (maxWorkersEl) maxWorkersEl.textContent = gameState.maxWorkers;
+    
+    // Deszka eladás modal frissítése ha nyitva van
+    const plankModal = document.getElementById('plankModal');
+    if (plankModal && !plankModal.classList.contains('hidden')) {
+        const slider = document.getElementById('plankSlider');
+        const currentValue = parseInt(slider.value);
+        slider.max = gameState.planks;
+        // Ha a jelenlegi érték nagyobb mint az új max, csökkentsük
+        if (currentValue > gameState.planks) {
+            slider.value = gameState.planks;
+        }
+        document.getElementById('sellAmount').textContent = slider.value;
+        document.getElementById('plankSellPrice').textContent = slider.value * CONFIG.PLANK_SELL_PRICE;
+    }
+    
+    // Kukorica eladás modal frissítése ha nyitva van
+    const cornModal = document.getElementById('cornModal');
+    if (cornModal && !cornModal.classList.contains('hidden')) {
+        const slider = document.getElementById('cornSlider');
+        const currentValue = parseInt(slider.value);
+        slider.max = gameState.corn;
+        // Ha a jelenlegi érték nagyobb mint az új max, csökkentsük
+        if (currentValue > gameState.corn) {
+            slider.value = gameState.corn;
+        }
+        document.getElementById('cornSellAmount').textContent = slider.value;
+        document.getElementById('cornSellTotalPrice').textContent = slider.value * CONFIG.CORN_SELL_PRICE;
+    }
 }
 
 function openPlankModal() {
@@ -408,7 +544,9 @@ function openPlankModal() {
     slider.max = gameState.planks;
     slider.value = Math.min(1, gameState.planks);
     document.getElementById('sellAmount').textContent = slider.value;
+    document.getElementById('plankSellPrice').textContent = slider.value * CONFIG.PLANK_SELL_PRICE;
     modal.classList.remove('hidden');
+    onTutorialEvent('sell_modal_open');
 }
 
 function closeModal() {
@@ -424,6 +562,7 @@ function sellPlanks() {
         saveGameState();
         closeModal();
         playSound('sell');
+        onTutorialEvent('plank_sold');
     }
 }
 
@@ -433,6 +572,7 @@ function openCornModal() {
     slider.max = gameState.corn;
     slider.value = Math.min(1, gameState.corn);
     document.getElementById('cornSellAmount').textContent = slider.value;
+    document.getElementById('cornSellTotalPrice').textContent = slider.value * CONFIG.CORN_SELL_PRICE;
     modal.classList.remove('hidden');
 }
 
@@ -471,44 +611,133 @@ function closeDiscordModal() {
     modal.classList.add('hidden');
 }
 
-// Visszaszámláló december 30. 12:00-ig
-function initCountdown() {
-    const targetDate = new Date('2025-12-30T12:00:00');
+// Upgrade modal változók
+let currentUpgradeTileX = 0;
+let currentUpgradeTileY = 0;
+let currentUpgradeType = '';
+
+function openUpgradeModal(x, y, type) {
+    closeBubble();
     
-    function updateCountdown() {
-        const now = new Date();
-        const diff = targetDate - now;
+    currentUpgradeTileX = x;
+    currentUpgradeTileY = y;
+    currentUpgradeType = type;
+    
+    const modal = document.getElementById('upgradeModal');
+    const title = document.getElementById('upgradeTitle');
+    const content = document.getElementById('upgradeContent');
+    
+    const tile = findTile(x, y);
+    const level = tile ? (tile.level || 1) : 1;
+    
+    if (type === 'house') {
+        const isStarter = (x === 0 && y === 0);
+        const workers = isStarter ? CONFIG.STARTER_HOUSE_WORKERS + (level - 1) : CONFIG.NORMAL_HOUSE_WORKERS + (level - 1);
+        const upgradePrice = CONFIG.UPGRADE_BASE_PRICE + (level - 1) * CONFIG.UPGRADE_INCREMENT;
+        const canAfford = gameState.money >= upgradePrice;
         
-        if (diff <= 0) {
-            document.getElementById('countdownDays').textContent = '00';
-            document.getElementById('countdownHours').textContent = '00';
-            document.getElementById('countdownMinutes').textContent = '00';
-            document.getElementById('countdownSeconds').textContent = '00';
-            return;
-        }
+        title.textContent = isStarter ? 'Kezdő Ház Upgrade' : 'Ház Upgrade';
+        content.innerHTML = `
+            <div class="current-level">
+                Jelenlegi szint: <strong>${level}</strong> | Munkások: <strong>+${workers}</strong>
+            </div>
+            <div class="upgrade-item">
+                <div class="upgrade-info">
+                    <div class="upgrade-name">Szint ${level + 1}</div>
+                    <div class="upgrade-desc">+1 extra munkás</div>
+                    <div class="upgrade-price">${upgradePrice} 💰</div>
+                </div>
+                <button class="upgrade-btn" ${!canAfford ? 'disabled' : ''} id="doUpgrade">
+                    Upgrade
+                </button>
+            </div>
+        `;
+    } else if (type === 'stonecutter') {
+        const upgradePrice = CONFIG.UPGRADE_BASE_PRICE + (level - 1) * CONFIG.UPGRADE_INCREMENT;
+        const canAfford = gameState.money >= upgradePrice;
         
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-        
-        document.getElementById('countdownDays').textContent = String(days).padStart(2, '0');
-        document.getElementById('countdownHours').textContent = String(hours).padStart(2, '0');
-        document.getElementById('countdownMinutes').textContent = String(minutes).padStart(2, '0');
-        document.getElementById('countdownSeconds').textContent = String(seconds).padStart(2, '0');
+        title.textContent = 'Kővágó Upgrade';
+        content.innerHTML = `
+            <div class="current-level">
+                Jelenlegi szint: <strong>${level}</strong>
+            </div>
+            <div class="upgrade-item">
+                <div class="upgrade-info">
+                    <div class="upgrade-name">Szint ${level + 1}</div>
+                    <div class="upgrade-desc">Gyorsabb kővágás</div>
+                    <div class="upgrade-price">${upgradePrice} 💰</div>
+                </div>
+                <button class="upgrade-btn" ${!canAfford ? 'disabled' : ''} id="doUpgrade">
+                    Upgrade
+                </button>
+            </div>
+        `;
     }
     
-    updateCountdown();
-    setInterval(updateCountdown, 1000);
+    modal.classList.remove('hidden');
+    
+    // Upgrade gomb esemény
+    const upgradeBtn = document.getElementById('doUpgrade');
+    if (upgradeBtn) {
+        upgradeBtn.addEventListener('click', () => {
+            if (currentUpgradeType === 'house') {
+                upgradeHouse(currentUpgradeTileX, currentUpgradeTileY, updateUI, saveGameState);
+            } else if (currentUpgradeType === 'stonecutter') {
+                upgradeStoneCutter(currentUpgradeTileX, currentUpgradeTileY, updateUI, saveGameState);
+            }
+            closeUpgradeModal();
+        });
+    }
+}
+
+function closeUpgradeModal() {
+    const modal = document.getElementById('upgradeModal');
+    modal.classList.add('hidden');
+}
+
+function handleSoundToggle() {
+    toggleMute();
+    updateSoundIcon();
+}
+
+function toggleSettingsMenu() {
+    const menu = document.getElementById('settingsMenu');
+    const icon = document.getElementById('settingsIcon');
+    menu.classList.toggle('hidden');
+    icon.classList.toggle('open');
+}
+
+function closeSettingsMenu() {
+    const menu = document.getElementById('settingsMenu');
+    const icon = document.getElementById('settingsIcon');
+    menu.classList.add('hidden');
+    icon.classList.remove('open');
+}
+
+function updateSoundIcon() {
+    const soundMenuItem = document.getElementById('soundMenuItem');
+    const soundOnIcon = document.getElementById('soundOnIcon');
+    const soundOffIcon = document.getElementById('soundOffIcon');
+    
+    if (isMusicMuted()) {
+        soundMenuItem.classList.add('muted');
+        soundOnIcon.classList.add('hidden');
+        soundOffIcon.classList.remove('hidden');
+    } else {
+        soundMenuItem.classList.remove('muted');
+        soundOnIcon.classList.remove('hidden');
+        soundOffIcon.classList.add('hidden');
+    }
 }
 
 // Játék ciklus
 function gameLoop() {
     updateTimers(updateUI, saveGameState, closeBubble);
+    refreshActiveBubble();
+    updateTutorialArrow();
     render(updateBubblePosition, findTile);
     requestAnimationFrame(gameLoop);
 }
 
 // Indítás
 initGame();
-initCountdown();

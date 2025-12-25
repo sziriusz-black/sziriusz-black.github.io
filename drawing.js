@@ -91,22 +91,6 @@ export function drawHouse(ctx, x, y) {
     const innerHeight = (y + tileSize - borderWidth) - innerY; // az alsó barna keretig
     ctx.fillRect(Math.floor(innerX), Math.floor(innerY), innerWidth, innerHeight);
     
-    // Fekete téglalapok - a szürke téglalap függőleges felénél (közepén) mindkét irányba 20px
-    // A fekete téglalap alja a barna kerethez ér, teteje a szürke téglalap tetejéig ér
-    ctx.fillStyle = blackColor;
-    const blackRectWidth = 20;
-    const blackRectTopY = innerY; // szürke téglalap teteje
-    const blackRectBottomY = y + tileSize - borderWidth; // barna keret alja
-    const blackRectHeight = blackRectBottomY - blackRectTopY;
-    
-    // Bal oldali fekete téglalap (a szürke téglalap közepétől balra 20px)
-    const leftBlackX = innerX - blackRectWidth;
-    ctx.fillRect(Math.floor(leftBlackX), Math.floor(blackRectTopY), blackRectWidth, Math.floor(blackRectHeight));
-    
-    // Jobb oldali fekete téglalap (a szürke téglalap közepétől jobbra 20px)
-    const rightBlackX = innerX + innerWidth;
-    ctx.fillRect(Math.floor(rightBlackX), Math.floor(blackRectTopY), blackRectWidth, Math.floor(blackRectHeight));
-    
     // Fekete ajtó a szürke téglalapon
     ctx.fillStyle = blackColor;
     const doorWidth = 8;

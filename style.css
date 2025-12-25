@@ -15,6 +15,12 @@ body {
     image-rendering: pixelated;
     image-rendering: -moz-crisp-edges;
     image-rendering: crisp-edges;
+    /* Mobil optimalizálás */
+    touch-action: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
 }
 
 #gameCanvas {
@@ -25,6 +31,51 @@ body {
     image-rendering: pixelated;
     image-rendering: -moz-crisp-edges;
     image-rendering: crisp-edges;
+    touch-action: none;
+}
+
+/* Mobil optimalizálás */
+@media (max-width: 768px) {
+    .bubble-button {
+        padding: 12px;
+        font-size: 14px;
+        min-height: 44px;
+    }
+    
+    .modal-buttons button {
+        padding: 14px;
+        font-size: 16px;
+        min-height: 48px;
+    }
+    
+    #statusPanel {
+        font-size: 14px;
+        padding: 8px;
+    }
+    
+    .status-item .icon {
+        font-size: 18px;
+    }
+    
+    #bubble {
+        max-width: calc(100vw - 40px);
+    }
+    
+    .modal-content {
+        max-width: calc(100vw - 40px);
+        max-height: calc(100vh - 40px);
+        overflow-y: auto;
+    }
+    
+    .sound-icon,
+    .discord-icon {
+        width: 44px;
+        height: 44px;
+    }
+    
+    .sound-icon {
+        right: 64px;
+    }
 }
 
 #statusPanel {
@@ -307,65 +358,14 @@ body {
     user-select: none;
 }
 
-.sound-toggle {
-    position: fixed;
-    bottom: 35px;
-    left: 10px;
-    background: rgba(0, 0, 0, 0.6);
-    border: 2px solid #4a4a4a;
-    border-radius: 0;
-    padding: 5px 10px;
-    z-index: 1000;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #aaa;
-    transition: color 0.1s;
-}
-
-.sound-toggle:hover {
-    color: #fff;
-}
-
-.sound-toggle.muted {
-    color: #ff6666;
-}
-
-.sound-toggle svg {
-    width: 16px;
-    height: 16px;
-}
-
-#topRightPanel {
+.settings-dropdown {
     position: fixed;
     top: 10px;
     right: 10px;
     z-index: 1000;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 10px;
 }
 
-.countdown-box {
-    background: rgba(0, 0, 0, 0.8);
-    border: 3px solid #4a4a4a;
-    padding: 8px 12px;
-    box-shadow: 4px 4px 0px #000;
-    color: #ffcc00;
-    font-family: 'Courier New', monospace;
-    font-size: 18px;
-    font-weight: bold;
-    letter-spacing: 2px;
-    white-space: nowrap;
-}
-
-.countdown-box span {
-    color: #fff;
-}
-
-.discord-icon {
+.settings-icon {
     width: 40px;
     height: 40px;
     background: rgba(0, 0, 0, 0.8);
@@ -377,24 +377,91 @@ body {
     align-items: center;
     justify-content: center;
     box-shadow: 4px 4px 0px #000;
-    color: #5865F2;
+    color: #aaa;
     transition: all 0.1s;
 }
 
-.discord-icon:hover {
+.settings-icon:hover {
     background: rgba(0, 0, 0, 0.9);
+    color: #fff;
     transform: translate(-1px, -1px);
     box-shadow: 5px 5px 0px #000;
 }
 
-.discord-icon:active {
+.settings-icon:active {
     transform: translate(1px, 1px);
     box-shadow: 3px 3px 0px #000;
 }
 
-.discord-icon svg {
+.settings-icon svg {
     width: 100%;
     height: 100%;
+}
+
+.settings-icon.open {
+    color: #ffcc00;
+}
+
+.settings-menu {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    background: rgba(0, 0, 0, 0.9);
+    border: 3px solid #4a4a4a;
+    box-shadow: 4px 4px 0px #000;
+    min-width: 150px;
+}
+
+.settings-menu.hidden {
+    display: none;
+}
+
+.settings-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 15px;
+    cursor: pointer;
+    color: #fff;
+    font-size: 14px;
+    transition: background 0.1s;
+    border-bottom: 1px solid #4a4a4a;
+}
+
+.settings-menu-item:last-child {
+    border-bottom: none;
+}
+
+.settings-menu-item:hover {
+    background: rgba(74, 158, 255, 0.2);
+}
+
+.settings-menu-item svg {
+    flex-shrink: 0;
+}
+
+.settings-menu-item.muted svg {
+    color: #ff4444;
+}
+
+#soundMenuItem svg {
+    color: #4a9eff;
+}
+
+#soundMenuItem.muted #soundOnIcon {
+    display: none;
+}
+
+#soundMenuItem.muted #soundOffIcon {
+    display: block !important;
+}
+
+#soundMenuItem:not(.muted) #soundOffIcon {
+    display: none;
+}
+
+#discordMenuItem svg {
+    color: #5865F2;
 }
 
 #discordModal {
@@ -442,6 +509,97 @@ body {
 .discord-url:hover {
     color: #6ab4ff;
     text-decoration: underline;
+}
+
+/* Upgrade modal */
+#upgradeModal {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+.upgrade-modal {
+    max-width: 400px;
+    position: relative;
+}
+
+.upgrade-modal h2 {
+    color: #ffcc00;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.upgrade-content {
+    background: rgba(0, 0, 0, 0.4);
+    border: 2px solid #4a4a4a;
+    padding: 15px;
+    margin-bottom: 10px;
+}
+
+.upgrade-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid #4a4a4a;
+}
+
+.upgrade-item:last-child {
+    margin-bottom: 0;
+}
+
+.upgrade-info {
+    flex: 1;
+}
+
+.upgrade-name {
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 5px;
+}
+
+.upgrade-desc {
+    font-size: 12px;
+    color: #aaa;
+}
+
+.upgrade-price {
+    color: #ffcc00;
+    font-size: 12px;
+    margin-top: 3px;
+}
+
+.upgrade-btn {
+    padding: 8px 16px;
+    background: #4a9e4a;
+    border: 2px solid #3a7a3a;
+    color: #fff;
+    cursor: pointer;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    box-shadow: 2px 2px 0px #000;
+    transition: all 0.1s;
+}
+
+.upgrade-btn:hover {
+    background: #5ab85a;
+}
+
+.upgrade-btn:disabled {
+    background: #666;
+    border-color: #444;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.current-level {
+    text-align: center;
+    padding: 10px;
+    background: rgba(74, 158, 255, 0.2);
+    border: 1px solid #4a9eff;
+    margin-bottom: 15px;
+    font-size: 14px;
 }
 
 /* Tutorial modal */
@@ -524,5 +682,141 @@ body {
 
 #tutorialNext:hover {
     background: #5ab85a;
+}
+
+/* Interaktív tutorial elemek */
+.tutorial-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 2000;
+    pointer-events: none;
+}
+
+.tutorial-overlay.full {
+    pointer-events: auto;
+}
+
+.tutorial-overlay.hidden {
+    display: none;
+}
+
+.tutorial-tooltip {
+    position: fixed;
+    background: linear-gradient(145deg, #2a2a3e, #1a1a2e);
+    border: 3px solid #ffcc00;
+    box-shadow: 0 0 20px rgba(255, 204, 0, 0.3), 4px 4px 0px #000;
+    padding: 20px;
+    max-width: 350px;
+    min-width: 280px;
+    z-index: 2100;
+    text-align: center;
+}
+
+.tutorial-tooltip.hidden {
+    display: none;
+}
+
+.tutorial-tooltip-title {
+    color: #ffcc00;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 12px;
+    text-shadow: 2px 2px 0px #000;
+}
+
+.tutorial-tooltip-content {
+    color: #fff;
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 15px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 12px;
+    border: 2px solid #4a4a4a;
+}
+
+.tutorial-tooltip-content b {
+    color: #ffcc00;
+}
+
+.tutorial-tooltip-next {
+    background: #4a9e4a;
+    border: 3px solid #3a7a3a;
+    color: #fff;
+    padding: 10px 25px;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 3px 3px 0px #000;
+    margin-right: 10px;
+    transition: all 0.1s;
+}
+
+.tutorial-tooltip-next:hover {
+    background: #5ab85a;
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0px #000;
+}
+
+.tutorial-tooltip-next.hidden {
+    display: none;
+}
+
+.tutorial-tooltip-skip {
+    background: #555;
+    border: 3px solid #444;
+    color: #aaa;
+    padding: 8px 15px;
+    font-size: 12px;
+    cursor: pointer;
+    box-shadow: 2px 2px 0px #000;
+    transition: all 0.1s;
+}
+
+.tutorial-tooltip-skip:hover {
+    background: #666;
+    color: #fff;
+}
+
+.tutorial-arrow {
+    position: fixed;
+    font-size: 28px;
+    color: #ffcc00;
+    z-index: 2050;
+    animation: tutorialArrowBounce 0.6s ease-in-out infinite;
+    text-shadow: 2px 2px 0px #000, -1px -1px 0px #000;
+    pointer-events: none;
+}
+
+.tutorial-arrow.hidden {
+    display: none;
+}
+
+@keyframes tutorialArrowBounce {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    50% {
+        transform: translateX(10px);
+    }
+}
+
+/* Tutorial alatt a kiemelt elem */
+.tutorial-highlight {
+    position: relative;
+    z-index: 2010;
+    box-shadow: 0 0 0 4px #ffcc00, 0 0 20px rgba(255, 204, 0, 0.5);
+    animation: tutorialPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes tutorialPulse {
+    0%, 100% {
+        box-shadow: 0 0 0 4px #ffcc00, 0 0 20px rgba(255, 204, 0, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 0 6px #ffcc00, 0 0 30px rgba(255, 204, 0, 0.8);
+    }
 }
 

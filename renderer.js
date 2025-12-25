@@ -128,6 +128,10 @@ export function render(updateBubblePosition, findTile) {
             ctx.fillStyle = '#2a5a2a';
             ctx.fillRect(x, y, CONFIG.TILE_SIZE, CONFIG.TILE_SIZE);
             drawStoneCutter(ctx, x, y);
+        } else {
+            // Ismeretlen típus - zöld háttér (owned-ként kezeljük)
+            ctx.fillStyle = '#2a5a2a';
+            ctx.fillRect(x, y, CONFIG.TILE_SIZE, CONFIG.TILE_SIZE);
         }
 
         // Grid vonalak (pixeles)

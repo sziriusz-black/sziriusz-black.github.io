@@ -2,27 +2,47 @@ import { gameState } from './gameState.js';
 import { constrainCamera } from './camera.js';
 
 let isDragging = false;
-let lastMouseX = 0;
-let lastMouseY = 0;
+let lastX = 0;
+let lastY = 0;
 let dragStartX = 0;
 let dragStartY = 0;
 
+// Touch és mouse közös kezelése
+function getEventPosition(e) {
+    if (e.touches && e.touches.length > 0) {
+        return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    }
+    return { x: e.clientX, y: e.clientY };
+}
+
+function isInsideUI(target) {
+    const bubble = document.getElementById('bubble');
+    const modal = document.getElementById('plankModal');
+    const cornModal = document.getElementById('cornModal');
+    const discordModal = document.getElementById('discordModal');
+    const tutorialModal = document.getElementById('tutorialModal');
+    const statusPanel = document.getElementById('statusPanel');
+    const settingsDropdown = document.getElementById('settingsDropdown');
+    
+    return (bubble && bubble.contains(target)) ||
+           (modal && modal.contains(target)) ||
+           (cornModal && cornModal.contains(target)) ||
+           (discordModal && discordModal.contains(target)) ||
+           (tutorialModal && tutorialModal.contains(target)) ||
+           (statusPanel && statusPanel.contains(target)) ||
+           (settingsDropdown && settingsDropdown.contains(target));
+}
+
 export function setupScroll(canvas, saveGameState, handleClick) {
+    // === MOUSE ESEMÉNYEK ===
     canvas.addEventListener('mousedown', (e) => {
-        // Csak akkor kezdjünk el húzni, ha nincs buborék és nem a buborékon kattintottunk
-        const bubble = document.getElementById('bubble');
-        const modal = document.getElementById('plankModal');
-        const cornModal = document.getElementById('cornModal');
-        if (e.button === 0 && 
-            !bubble.contains(e.target) && 
-            !modal.contains(e.target) &&
-            !cornModal.contains(e.target) &&
-            !gameState.activeBubble) {
+        if (e.button === 0 && !isInsideUI(e.target) && !gameState.activeBubble) {
             isDragging = true;
-            lastMouseX = e.clientX;
-            lastMouseY = e.clientY;
-            dragStartX = e.clientX;
-            dragStartY = e.clientY;
+            const pos = getEventPosition(e);
+            lastX = pos.x;
+            lastY = pos.y;
+            dragStartX = pos.x;
+            dragStartY = pos.y;
             canvas.style.cursor = 'grabbing';
             e.preventDefault();
             e.stopPropagation();
@@ -31,15 +51,14 @@ export function setupScroll(canvas, saveGameState, handleClick) {
 
     canvas.addEventListener('mousemove', (e) => {
         if (isDragging) {
-            const deltaX = (e.clientX - lastMouseX) / gameState.camera.zoom;
-            const deltaY = (e.clientY - lastMouseY) / gameState.camera.zoom;
-            // Ha balra húzok (egér balra megy, deltaX negatív), a térkép balra mozog (kamera x nő)
-            // Ha jobbra húzok (egér jobbra megy, deltaX pozitív), a térkép jobbra mozog (kamera x csökken)
+            const pos = getEventPosition(e);
+            const deltaX = (pos.x - lastX) / gameState.camera.zoom;
+            const deltaY = (pos.y - lastY) / gameState.camera.zoom;
             gameState.camera.x -= deltaX;
             gameState.camera.y -= deltaY;
             constrainCamera(canvas);
-            lastMouseX = e.clientX;
-            lastMouseY = e.clientY;
+            lastX = pos.x;
+            lastY = pos.y;
         }
     });
 
@@ -48,10 +67,10 @@ export function setupScroll(canvas, saveGameState, handleClick) {
         let dragDistance = 0;
         
         if (isDragging) {
-            // Számoljuk a húzás távolságát
+            const pos = getEventPosition(e);
             dragDistance = Math.sqrt(
-                Math.pow(e.clientX - dragStartX, 2) + 
-                Math.pow(e.clientY - dragStartY, 2)
+                Math.pow(pos.x - dragStartX, 2) + 
+                Math.pow(pos.y - dragStartY, 2)
             );
             saveGameState();
         }
@@ -59,9 +78,7 @@ export function setupScroll(canvas, saveGameState, handleClick) {
         isDragging = false;
         canvas.style.cursor = 'crosshair';
         
-        // Csak akkor kezeljük kattintásnak, ha nem volt húzás VAGY nagyon rövid volt (< 3px)
         if (!wasDragging || dragDistance < 3) {
-            // Rövid húzás vagy nincs húzás = kattintás
             setTimeout(() => handleClick(e), 10);
         }
     });
@@ -73,5 +90,69 @@ export function setupScroll(canvas, saveGameState, handleClick) {
         isDragging = false;
         canvas.style.cursor = 'crosshair';
     });
-}
 
+    // === TOUCH ESEMÉNYEK ===
+    let touchStartTime = 0;
+    let isTouchDragging = false;
+    
+    canvas.addEventListener('touchstart', (e) => {
+        // Csak egy ujj esetén kezeljük a húzást (pinch zoom külön van)
+        if (e.touches.length === 1 && !isInsideUI(e.target) && !gameState.activeBubble) {
+            isTouchDragging = true;
+            const pos = getEventPosition(e);
+            lastX = pos.x;
+            lastY = pos.y;
+            dragStartX = pos.x;
+            dragStartY = pos.y;
+            touchStartTime = Date.now();
+            e.preventDefault();
+        }
+    }, { passive: false });
+
+    canvas.addEventListener('touchmove', (e) => {
+        // Csak egy ujj esetén húzás
+        if (e.touches.length === 1 && isTouchDragging) {
+            const pos = getEventPosition(e);
+            const deltaX = (pos.x - lastX) / gameState.camera.zoom;
+            const deltaY = (pos.y - lastY) / gameState.camera.zoom;
+            gameState.camera.x -= deltaX;
+            gameState.camera.y -= deltaY;
+            constrainCamera(canvas);
+            lastX = pos.x;
+            lastY = pos.y;
+            e.preventDefault();
+        }
+    }, { passive: false });
+
+    canvas.addEventListener('touchend', (e) => {
+        if (isTouchDragging) {
+            const touchDuration = Date.now() - touchStartTime;
+            const dragDistance = Math.sqrt(
+                Math.pow(lastX - dragStartX, 2) + 
+                Math.pow(lastY - dragStartY, 2)
+            );
+            
+            saveGameState();
+            
+            // Rövid érintés és kis mozgás = tap (kattintás)
+            if (touchDuration < 300 && dragDistance < 10) {
+                // Szimulálunk egy click eseményt
+                const fakeEvent = {
+                    clientX: dragStartX,
+                    clientY: dragStartY,
+                    target: e.target
+                };
+                setTimeout(() => handleClick(fakeEvent), 10);
+            }
+        }
+        
+        isTouchDragging = false;
+    });
+
+    canvas.addEventListener('touchcancel', () => {
+        if (isTouchDragging) {
+            saveGameState();
+        }
+        isTouchDragging = false;
+    });
+}
