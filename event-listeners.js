@@ -27,7 +27,8 @@ import { setupZoom } from './zoom.js';
 import { saveGameState } from './save-load.js';
 import { loadMuteState } from './audio.js';
 import { closeBubble } from './bubble.js';
-import { updateSoundIcon, handleSoundToggle, toggleSettingsMenu, closeSettingsMenu } from './settings.js';
+import { updateSoundIcon, handleSoundToggle, toggleSettingsMenu, closeSettingsMenu, handleLanguageToggle, updateLanguageFlag } from './settings.js';
+import { translateDOM } from './i18n.js';
 import { handleClick } from './click-handler.js';
 import { 
     openPlankModal, closeModal, sellPlanks, 
@@ -133,6 +134,7 @@ export function setupSettingsEvents() {
         closeSettingsMenu();
         openDiscordModal();
     });
+    document.getElementById('languageMenuItem').addEventListener('click', handleLanguageToggle);
     
     // Kívülre kattintás - settings menü bezárása
     document.addEventListener('click', (e) => {
@@ -145,6 +147,14 @@ export function setupSettingsEvents() {
     // Hang állapot betöltése és ikon frissítése
     loadMuteState();
     updateSoundIcon();
+    updateLanguageFlag();
+    
+    // Nyelvváltás esemény - UI frissítése
+    window.addEventListener('languageChanged', () => {
+        translateDOM();
+        updateLanguageFlag();
+        closeBubble(); // Bezárjuk a buborékot, mert a szövegek változtak
+    });
 }
 
 // Minden eseménykezelő beállítása egyben

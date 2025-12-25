@@ -23,6 +23,7 @@
 
 // Interaktív tutorial rendszer új játékosoknak
 import { gameState } from './gameState.js';
+import { t } from './i18n.js';
 
 // Tutorial állapot
 export const tutorialState = {
@@ -32,86 +33,88 @@ export const tutorialState = {
     highlightedElement: null
 };
 
-// Tutorial lépések definíciója
-const tutorialSteps = [
-    {
-        id: 'welcome',
-        title: "Üdvözöllek a Skyblock játékban!",
-        content: "Ez egy retro stílusú építős játék. Végigvezetlek az alapokon!",
-        type: 'modal',
-        nextButton: true
-    },
-    {
-        id: 'click_owned_tile',
-        title: "Ültess egy fát!",
-        content: "Kattints a zöld területre a házad mellett!",
-        type: 'highlight_tile',
-        targetTile: { x: 1, y: 0 },
-        waitFor: 'bubble_open',
-        arrow: true
-    },
-    {
-        id: 'plant_tree',
-        title: "Válaszd a fa ültetést!",
-        content: "Kattints a \"Fa ültetés\" gombra!",
-        type: 'highlight_button',
-        targetAction: 'buildTree',
-        waitFor: 'tree_planted',
-        arrow: true
-    },
-    {
-        id: 'click_tree',
-        title: "Vágd ki a fát!",
-        content: "Kattints a fára!",
-        type: 'highlight_tile',
-        targetTile: { x: 1, y: 0 },
-        waitFor: 'bubble_open',
-        arrow: true
-    },
-    {
-        id: 'cut_tree',
-        title: "Kezdd el a kivágást!",
-        content: "Kattints a \"Kivágás\" gombra!",
-        type: 'highlight_button',
-        targetAction: 'cutTree',
-        waitFor: 'tree_cutting',
-        arrow: true
-    },
-    {
-        id: 'wait_cut',
-        title: "Várd meg amíg kivágódik!",
-        content: "A fa kivágása időbe telik. Figyelj a folyamatra!",
-        type: 'wait',
-        waitFor: 'tree_cut',
-        showOnTile: { x: 1, y: 0 }
-    },
-    {
-        id: 'click_plank',
-        title: "Add el a deszkát!",
-        content: "Kattints a 🪵 deszka ikonra a bal felső sarokban!",
-        type: 'highlight_element',
-        targetElement: '#plankDisplay',
-        waitFor: 'sell_modal_open',
-        arrow: true
-    },
-    {
-        id: 'sell_plank',
-        title: "Adj el deszkát!",
-        content: "Állítsd be a mennyiséget és kattints az \"Eladás\" gombra!",
-        type: 'highlight_element',
-        targetElement: '#sellModal',
-        waitFor: 'plank_sold',
-        arrow: false
-    },
-    {
-        id: 'complete',
-        title: "Gratulálok!",
-        content: "Most már tudod az alapokat! 🎉<br><br>Folytasd az építkezést, vásárolj új területeket, és építsd fel a birodalmadat!<br><br>💡 <b>Tipp:</b> A játék automatikusan mentődik!",
-        type: 'modal',
-        nextButton: true,
-        isLast: true
-    }
-];
+// Tutorial lépések definíciója - a szövegek dinamikusan töltődnek be a t() függvénnyel
+function getTutorialSteps() {
+    return [
+        {
+            id: 'welcome',
+            titleKey: 'tutorial.welcome.title',
+            contentKey: 'tutorial.welcome.content',
+            type: 'modal',
+            nextButton: true
+        },
+        {
+            id: 'click_owned_tile',
+            titleKey: 'tutorial.clickTile.title',
+            contentKey: 'tutorial.clickTile.content',
+            type: 'highlight_tile',
+            targetTile: { x: 1, y: 0 },
+            waitFor: 'bubble_open',
+            arrow: true
+        },
+        {
+            id: 'plant_tree',
+            titleKey: 'tutorial.plantTree.title',
+            contentKey: 'tutorial.plantTree.content',
+            type: 'highlight_button',
+            targetAction: 'buildTree',
+            waitFor: 'tree_planted',
+            arrow: true
+        },
+        {
+            id: 'click_tree',
+            titleKey: 'tutorial.clickTree.title',
+            contentKey: 'tutorial.clickTree.content',
+            type: 'highlight_tile',
+            targetTile: { x: 1, y: 0 },
+            waitFor: 'bubble_open',
+            arrow: true
+        },
+        {
+            id: 'cut_tree',
+            titleKey: 'tutorial.cutTree.title',
+            contentKey: 'tutorial.cutTree.content',
+            type: 'highlight_button',
+            targetAction: 'cutTree',
+            waitFor: 'tree_cutting',
+            arrow: true
+        },
+        {
+            id: 'wait_cut',
+            titleKey: 'tutorial.waitCut.title',
+            contentKey: 'tutorial.waitCut.content',
+            type: 'wait',
+            waitFor: 'tree_cut',
+            showOnTile: { x: 1, y: 0 }
+        },
+        {
+            id: 'click_plank',
+            titleKey: 'tutorial.clickPlank.title',
+            contentKey: 'tutorial.clickPlank.content',
+            type: 'highlight_element',
+            targetElement: '#plankDisplay',
+            waitFor: 'sell_modal_open',
+            arrow: true
+        },
+        {
+            id: 'sell_plank',
+            titleKey: 'tutorial.sellPlank.title',
+            contentKey: 'tutorial.sellPlank.content',
+            type: 'highlight_element',
+            targetElement: '#sellModal',
+            waitFor: 'plank_sold',
+            arrow: false
+        },
+        {
+            id: 'complete',
+            titleKey: 'tutorial.complete.title',
+            contentKey: 'tutorial.complete.content',
+            type: 'modal',
+            nextButton: true,
+            isLast: true
+        }
+    ];
+}
 
 let overlayElement = null;
 let tooltipElement = null;
@@ -174,6 +177,7 @@ function createTutorialElements() {
 }
 
 function showCurrentStep() {
+    const tutorialSteps = getTutorialSteps();
     const step = tutorialSteps[tutorialState.currentStep];
     if (!step) {
         completeTutorial();
@@ -187,18 +191,20 @@ function showCurrentStep() {
     const nextBtn = tooltipElement.querySelector('.tutorial-tooltip-next');
     const skipBtn = tooltipElement.querySelector('.tutorial-tooltip-skip');
     
-    titleEl.textContent = step.title;
-    contentEl.innerHTML = step.content;
+    // Fordított szövegek használata
+    titleEl.textContent = t(step.titleKey);
+    contentEl.innerHTML = t(step.contentKey);
     
     // Next gomb kezelése
     if (step.nextButton) {
         nextBtn.classList.remove('hidden');
-        nextBtn.textContent = step.isLast ? 'Kezdés!' : 'Következő';
+        nextBtn.textContent = step.isLast ? t('tutorial.start') : t('tutorial.next');
     } else {
         nextBtn.classList.add('hidden');
     }
     
     // Skip gomb kezelése
+    skipBtn.textContent = t('tutorial.skip');
     skipBtn.style.display = step.isLast ? 'none' : 'block';
     
     // Típus alapján megjelenítés
@@ -328,6 +334,7 @@ function positionArrowOnElement(element) {
 
 export function nextStep() {
     tutorialState.currentStep++;
+    const tutorialSteps = getTutorialSteps();
     if (tutorialState.currentStep >= tutorialSteps.length) {
         completeTutorial();
     } else {
@@ -366,6 +373,7 @@ function completeTutorial() {
 export function onTutorialEvent(eventType, data = {}) {
     if (!tutorialState.active) return;
     
+    const tutorialSteps = getTutorialSteps();
     const step = tutorialSteps[tutorialState.currentStep];
     if (!step || !step.waitFor) return;
     
@@ -387,6 +395,7 @@ export function onTutorialEvent(eventType, data = {}) {
 export function isTileAllowedInTutorial(x, y) {
     if (!tutorialState.active) return true;
     
+    const tutorialSteps = getTutorialSteps();
     const step = tutorialSteps[tutorialState.currentStep];
     if (!step || !step.targetTile) return true;
     
@@ -397,6 +406,7 @@ export function isTileAllowedInTutorial(x, y) {
 export function isActionAllowedInTutorial(action) {
     if (!tutorialState.active) return true;
     
+    const tutorialSteps = getTutorialSteps();
     const step = tutorialSteps[tutorialState.currentStep];
     if (!step || !step.targetAction) return true;
     
@@ -407,6 +417,7 @@ export function isActionAllowedInTutorial(action) {
 export function updateTutorialArrow() {
     if (!tutorialState.active) return;
     
+    const tutorialSteps = getTutorialSteps();
     const step = tutorialSteps[tutorialState.currentStep];
     if (!step || step.type !== 'highlight_tile' || !step.targetTile) return;
     
@@ -431,5 +442,6 @@ export function isTutorialActive() {
 // Aktuális lépés lekérdezése
 export function getCurrentTutorialStep() {
     if (!tutorialState.active) return null;
+    const tutorialSteps = getTutorialSteps();
     return tutorialSteps[tutorialState.currentStep];
 }

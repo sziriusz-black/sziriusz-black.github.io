@@ -23,6 +23,7 @@ import { findTile } from '../tile-operations.js';
 import { upgradeHouse, upgradeStoneCutter } from '../building-actions.js';
 import { saveGameState } from '../save-load.js';
 import { updateUI } from '../ui.js';
+import { t } from '../i18n.js';
 
 // Aktuális upgrade állapot
 let currentUpgradeTileX = 0;
@@ -49,19 +50,19 @@ export function openUpgradeModal(x, y, type, closeBubbleFn) {
         const upgradePrice = CONFIG.UPGRADE_BASE_PRICE + (level - 1) * CONFIG.UPGRADE_INCREMENT;
         const canAfford = gameState.money >= upgradePrice;
         
-        title.textContent = isStarter ? 'Kezdő Ház Upgrade' : 'Ház Upgrade';
+        title.textContent = isStarter ? t('modal.starterHouseUpgrade') : t('modal.houseUpgrade');
         content.innerHTML = `
             <div class="current-level">
-                Jelenlegi szint: <strong>${level}</strong> | Munkások: <strong>+${workers}</strong>
+                ${t('modal.currentLevel')} <strong>${level}</strong> | ${t('modal.workers')} <strong>+${workers}</strong>
             </div>
             <div class="upgrade-item">
                 <div class="upgrade-info">
-                    <div class="upgrade-name">Szint ${level + 1}</div>
-                    <div class="upgrade-desc">+1 extra munkás</div>
+                    <div class="upgrade-name">${t('modal.level', level + 1)}</div>
+                    <div class="upgrade-desc">${t('modal.extraWorker')}</div>
                     <div class="upgrade-price">${upgradePrice} 💰</div>
                 </div>
                 <button class="upgrade-btn" ${!canAfford ? 'disabled' : ''} id="doUpgrade">
-                    Upgrade
+                    ${t('bubble.upgrade')}
                 </button>
             </div>
         `;
@@ -69,19 +70,19 @@ export function openUpgradeModal(x, y, type, closeBubbleFn) {
         const upgradePrice = CONFIG.UPGRADE_BASE_PRICE + (level - 1) * CONFIG.UPGRADE_INCREMENT;
         const canAfford = gameState.money >= upgradePrice;
         
-        title.textContent = 'Kővágó Upgrade';
+        title.textContent = t('modal.stonecutterUpgrade');
         content.innerHTML = `
             <div class="current-level">
-                Jelenlegi szint: <strong>${level}</strong>
+                ${t('modal.currentLevel')} <strong>${level}</strong>
             </div>
             <div class="upgrade-item">
                 <div class="upgrade-info">
-                    <div class="upgrade-name">Szint ${level + 1}</div>
-                    <div class="upgrade-desc">Gyorsabb kővágás</div>
+                    <div class="upgrade-name">${t('modal.level', level + 1)}</div>
+                    <div class="upgrade-desc">${t('modal.fasterCutting')}</div>
                     <div class="upgrade-price">${upgradePrice} 💰</div>
                 </div>
                 <button class="upgrade-btn" ${!canAfford ? 'disabled' : ''} id="doUpgrade">
-                    Upgrade
+                    ${t('bubble.upgrade')}
                 </button>
             </div>
         `;

@@ -28,6 +28,7 @@ import { saveGameState } from './save-load.js';
 import { onTutorialEvent } from './tutorial.js';
 import { showError, updateUI } from './ui.js';
 import { openUpgradeModal } from './modals.js';
+import { t } from './i18n.js';
 
 let canvas = null;
 
@@ -53,16 +54,16 @@ export function generateBubbleContent(tileX, tileY, tile) {
             bubble.classList.remove('large');
             
             content.innerHTML = `
-                <div style="margin-bottom: 10px;">Terület vásárlása</div>
-                <div style="margin-bottom: 10px;">Ár: ${price} pénz</div>
+                <div style="margin-bottom: 10px;">${t('bubble.buyTile')}</div>
+                <div style="margin-bottom: 10px;">${t('bubble.price', price)}</div>
                 <button class="bubble-button" ${!canAfford ? 'disabled' : ''} data-action="purchase" data-x="${tileX}" data-y="${tileY}">
-                    Vásárlás
+                    ${t('bubble.buy')}
                 </button>
             `;
             
-            return { showError: !canAfford ? `Még ${price - gameState.money} pénz kell!` : null };
+            return { showError: !canAfford ? t('bubble.needMoney', price - gameState.money) : null };
         } else {
-            content.innerHTML = '<div>Csak a megvásárolt terület mellé lehet vásárolni!</div>';
+            content.innerHTML = `<div>${t('bubble.onlyAdjacent')}</div>`;
         }
     } else if (tile.type === 'tree') {
         // Fa kivágás
@@ -73,14 +74,14 @@ export function generateBubbleContent(tileX, tileY, tile) {
             const elapsed = (now - data.startTime) / 1000;
             const timeLeft = Math.max(0, CONFIG.TREE_CUT_TIME - elapsed);
             content.innerHTML = `
-                <div>Fa kivágása folyamatban...</div>
-                <div>Hátralévő idő: ${Math.ceil(timeLeft)}s</div>
+                <div>${t('bubble.cutting')}</div>
+                <div>${t('bubble.timeLeft', Math.ceil(timeLeft))}</div>
             `;
         } else {
             const canCut = hasAvailableWorker();
             content.innerHTML = `
                 <button class="bubble-button" ${!canCut ? 'disabled' : ''} data-action="cut" data-x="${tileX}" data-y="${tileY}">
-                    Kivágás ${!canCut ? '(nincs munkás)' : ''}
+                    ${t('bubble.cut')} ${!canCut ? t('bubble.noWorker') : ''}
                 </button>
             `;
         }
@@ -90,22 +91,24 @@ export function generateBubbleContent(tileX, tileY, tile) {
         
         if (tileX === 0 && tileY === 0) {
             // Kezdő ház - upgrade lehet, de eladni nem
+            const workers = houseLevel === 1 ? CONFIG.STARTER_HOUSE_WORKERS : CONFIG.STARTER_HOUSE_WORKERS + (houseLevel - 1);
             content.innerHTML = `
-                <div style="margin-bottom: 10px;">Kezdő ház (Szint ${houseLevel})</div>
-                <div style="margin-bottom: 5px;">Munkások: +${houseLevel === 1 ? CONFIG.STARTER_HOUSE_WORKERS : CONFIG.STARTER_HOUSE_WORKERS + (houseLevel - 1)}</div>
+                <div style="margin-bottom: 10px;">${t('bubble.starterHouse', houseLevel)}</div>
+                <div style="margin-bottom: 5px;">${t('bubble.workers', workers)}</div>
                 <button class="bubble-button" data-action="openUpgrade" data-x="${tileX}" data-y="${tileY}" data-type="house">
-                    Upgrade
+                    ${t('bubble.upgrade')}
                 </button>
             `;
         } else {
+            const workers = CONFIG.NORMAL_HOUSE_WORKERS + (houseLevel - 1);
             content.innerHTML = `
-                <div style="margin-bottom: 10px;">Ház (Szint ${houseLevel})</div>
-                <div style="margin-bottom: 5px;">Munkások: +${CONFIG.NORMAL_HOUSE_WORKERS + (houseLevel - 1)}</div>
+                <div style="margin-bottom: 10px;">${t('bubble.house', houseLevel)}</div>
+                <div style="margin-bottom: 5px;">${t('bubble.workers', workers)}</div>
                 <button class="bubble-button" data-action="openUpgrade" data-x="${tileX}" data-y="${tileY}" data-type="house">
-                    Upgrade
+                    ${t('bubble.upgrade')}
                 </button>
                 <button class="bubble-button" data-action="sellHouse" data-x="${tileX}" data-y="${tileY}">
-                    Eladás (${CONFIG.HOUSE_SELL_PRICE} pénz)
+                    ${t('bubble.sell', CONFIG.HOUSE_SELL_PRICE)}
                 </button>
             `;
         }
@@ -115,26 +118,26 @@ export function generateBubbleContent(tileX, tileY, tile) {
         bubble.classList.remove('large');
         
         const noWorker = !hasAvailableWorker();
-        const workerWarning = noWorker ? ' (nincs munkás)' : '';
+        const workerWarning = noWorker ? ' ' + t('bubble.noWorker') : '';
         content.innerHTML = `
-            <div style="margin-bottom: 10px;">Építés</div>
+            <div style="margin-bottom: 10px;">${t('bubble.build')}</div>
             <button class="bubble-button" ${gameState.money < CONFIG.HOUSE_BUILD_PRICE ? 'disabled' : ''} data-action="buildHouse" data-x="${tileX}" data-y="${tileY}">
-                Ház építése (${CONFIG.HOUSE_BUILD_PRICE} pénz)
+                ${t('bubble.buildHouse', CONFIG.HOUSE_BUILD_PRICE)}
             </button>
             <button class="bubble-button" ${gameState.money < CONFIG.TREE_BUILD_PRICE || noWorker ? 'disabled' : ''} data-action="buildTree" data-x="${tileX}" data-y="${tileY}">
-                Fa ültetése (${CONFIG.TREE_BUILD_PRICE} pénz)${workerWarning}
+                ${t('bubble.plantTree', CONFIG.TREE_BUILD_PRICE)}${workerWarning}
             </button>
             <button class="bubble-button" ${gameState.money < CONFIG.CORNFIELD_BUILD_PRICE || noWorker ? 'disabled' : ''} data-action="buildCornField" data-x="${tileX}" data-y="${tileY}">
-                Kukorica föld (${CONFIG.CORNFIELD_BUILD_PRICE} pénz)${workerWarning}
+                ${t('bubble.buildCornField', CONFIG.CORNFIELD_BUILD_PRICE)}${workerWarning}
             </button>
             <button class="bubble-button" ${gameState.money < CONFIG.STONECUTTER_BUILD_PRICE ? 'disabled' : ''} data-action="buildStoneCutter" data-x="${tileX}" data-y="${tileY}">
-                Kővágó (${CONFIG.STONECUTTER_BUILD_PRICE} pénz)
+                ${t('bubble.buildStoneCutter', CONFIG.STONECUTTER_BUILD_PRICE)}
             </button>
         `;
         
         if (gameState.money < CONFIG.HOUSE_BUILD_PRICE && gameState.money < CONFIG.TREE_BUILD_PRICE && gameState.money < CONFIG.CORNFIELD_BUILD_PRICE && gameState.money < CONFIG.STONECUTTER_BUILD_PRICE) {
             const needed = Math.min(CONFIG.HOUSE_BUILD_PRICE, CONFIG.TREE_BUILD_PRICE, CONFIG.CORNFIELD_BUILD_PRICE, CONFIG.STONECUTTER_BUILD_PRICE) - gameState.money;
-            return { showError: `Még ${needed} pénz kell!` };
+            return { showError: t('bubble.needMoney', needed) };
         }
     } else if (tile.type === 'cornfield') {
         // Kukorica föld - learatás vagy eladás
@@ -145,16 +148,16 @@ export function generateBubbleContent(tileX, tileY, tile) {
             const elapsed = (now - data.startTime) / 1000;
             const timeLeft = Math.max(0, CONFIG.CORNFIELD_BUILD_TIME - elapsed);
             content.innerHTML = `
-                <div>Kukorica föld építése folyamatban...</div>
-                <div>Hátralévő idő: ${Math.ceil(timeLeft)}s</div>
+                <div>${t('bubble.cornfieldBuilding')}</div>
+                <div>${t('bubble.timeLeft', Math.ceil(timeLeft))}</div>
             `;
         } else {
             content.innerHTML = `
                 <button class="bubble-button" data-action="harvestCornField" data-x="${tileX}" data-y="${tileY}">
-                    Learatás
+                    ${t('bubble.harvest')}
                 </button>
                 <button class="bubble-button" data-action="sellCornField" data-x="${tileX}" data-y="${tileY}">
-                    Eladás (${CONFIG.CORNFIELD_SELL_PRICE} pénz)
+                    ${t('bubble.sell', CONFIG.CORNFIELD_SELL_PRICE)}
                 </button>
             `;
         }
@@ -167,17 +170,17 @@ export function generateBubbleContent(tileX, tileY, tile) {
             const elapsed = (now - data.startTime) / 1000;
             const timeLeft = Math.max(0, CONFIG.CORNFIELD_REPLANT_TIME - elapsed);
             content.innerHTML = `
-                <div>Kukorica újraültetése folyamatban...</div>
-                <div>Hátralévő idő: ${Math.ceil(timeLeft)}s</div>
+                <div>${t('bubble.replanting')}</div>
+                <div>${t('bubble.timeLeft', Math.ceil(timeLeft))}</div>
             `;
         } else {
             const canReplant = hasAvailableWorker();
             content.innerHTML = `
                 <button class="bubble-button" ${!canReplant ? 'disabled' : ''} data-action="replantCornField" data-x="${tileX}" data-y="${tileY}">
-                    Újraültetés ${!canReplant ? '(nincs munkás)' : ''}
+                    ${t('bubble.replant')} ${!canReplant ? t('bubble.noWorker') : ''}
                 </button>
                 <button class="bubble-button" data-action="sellCornField" data-x="${tileX}" data-y="${tileY}">
-                    Eladás (${CONFIG.CORNFIELD_SELL_PRICE} pénz)
+                    ${t('bubble.sell', CONFIG.CORNFIELD_SELL_PRICE)}
                 </button>
             `;
         }
@@ -186,12 +189,12 @@ export function generateBubbleContent(tileX, tileY, tile) {
         const stonecutterLevel = tile.level || 1;
         
         content.innerHTML = `
-            <div style="margin-bottom: 10px;">Kővágó (Szint ${stonecutterLevel})</div>
+            <div style="margin-bottom: 10px;">${t('bubble.stonecutter', stonecutterLevel)}</div>
             <button class="bubble-button" data-action="openUpgrade" data-x="${tileX}" data-y="${tileY}" data-type="stonecutter">
-                Upgrade
+                ${t('bubble.upgrade')}
             </button>
             <button class="bubble-button" data-action="sellStoneCutter" data-x="${tileX}" data-y="${tileY}">
-                Eladás (${CONFIG.STONECUTTER_SELL_PRICE} pénz)
+                ${t('bubble.sell', CONFIG.STONECUTTER_SELL_PRICE)}
             </button>
         `;
     }

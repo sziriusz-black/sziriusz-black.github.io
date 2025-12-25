@@ -121,3 +121,26 @@
     color: #5865F2;
 }
 
+/* Nyelvváltó zászló */
+.language-flag {
+    font-size: 24px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+}
+
+#languageMenuItem {
+    transition: background 0.1s;
+}
+
+#languageMenuItem:hover {
+    background: rgba(74, 158, 255, 0.2);
+}
+
+#languageMenuItem:active .language-flag {
+    transform: scale(0.95);
+}
+

@@ -28,6 +28,7 @@ import { isNewPlayer, startTutorial, setupTutorialListeners } from './tutorial.j
 import { updateUI } from './ui.js';
 import { initBubble } from './bubble.js';
 import { getCanvas } from './renderer.js';
+import { initI18n } from './i18n.js';
 
 // Modulok
 import { createInitialMap } from './initialization.js';
@@ -41,6 +42,9 @@ window.saveGame = saveGameState;
 // Játék inicializálása
 function initGame() {
     const canvas = getCanvas();
+    
+    // Nyelvesítés inicializálása
+    initI18n();
     
     // Canvas méretezése
     resizeCanvas();
