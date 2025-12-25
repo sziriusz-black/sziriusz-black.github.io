@@ -7,6 +7,7 @@ import { getCanvas, getContext, resizeCanvas, render } from './renderer.js';
 import { findTile, isAdjacentToOwned, purchaseTile, cutTree, sellHouse, buildHouse, buildTree, buildStoneCutter, buildCornField, harvestCornField, replantCornField, sellCornField, updateTimers, saveGameState, loadGameState } from './gameLogic.js';
 import { playSound, startBackgroundMusic, toggleMute, loadMuteState } from './audio.js';
 import { isNewPlayer, startTutorial, setupTutorialListeners } from './tutorial.js';
+import { initSecretAccess } from './secret-access.js';
 
 // Canvas és kontextus
 const canvas = getCanvas();
@@ -14,6 +15,11 @@ const ctx = getContext();
 
 // Kezdő állapot inicializálása
 function initGame() {
+    // Titkos hozzáférés ellenőrzése - ha nincs, csak visszaszámláló jelenik meg
+    const hasAccess = initSecretAccess();
+    if (!hasAccess) {
+        return; // Visszaszámláló mód - játék nem indul
+    }
     // Canvas méretezése
     resizeCanvas();
     window.addEventListener('resize', () => {

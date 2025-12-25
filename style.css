@@ -526,3 +526,74 @@ body {
     background: #5ab85a;
 }
 
+/* Visszaszámláló overlay (titkos hozzáférés nélkül) */
+.countdown-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.countdown-overlay.hidden {
+    display: none;
+}
+
+.countdown-content {
+    text-align: center;
+    color: #fff;
+    font-family: 'Courier New', monospace;
+}
+
+.countdown-title {
+    font-size: 48px;
+    margin-bottom: 40px;
+    text-shadow: 0 0 20px rgba(255, 200, 100, 0.5);
+    animation: titlePulse 2s ease-in-out infinite;
+}
+
+.countdown-timer {
+    font-size: 72px;
+    font-weight: bold;
+    color: #ffd700;
+    text-shadow: 0 0 30px rgba(255, 215, 0, 0.7);
+    margin-bottom: 40px;
+    letter-spacing: 4px;
+}
+
+.countdown-subtitle {
+    font-size: 24px;
+    color: #aaa;
+    opacity: 0.8;
+}
+
+@keyframes titlePulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.02);
+    }
+}
+
+@media (max-width: 768px) {
+    .countdown-title {
+        font-size: 28px;
+        margin-bottom: 24px;
+    }
+    
+    .countdown-timer {
+        font-size: 36px;
+        margin-bottom: 24px;
+    }
+    
+    .countdown-subtitle {
+        font-size: 16px;
+    }
+}
+
