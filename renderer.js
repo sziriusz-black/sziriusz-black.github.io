@@ -1,165 +1,57 @@
 /**
  * @file renderer.js
- * @description Renderelés - canvas rajzolás és megjelenítés
+ * @description Renderelés - fő render modul (újra-export és render függvény)
  * 
  * FELELŐSSÉGI KÖR:
- * - Canvas inicializálása (getCanvas, getContext, resizeCanvas)
- * - Játéktér renderelése (render)
- * - Tile-ok rajzolása típus szerint
- * - Kamera transzformáció alkalmazása
- * - Buborék pozíció frissítése rendereléskor
+ * - Canvas függvények újra-exportálása
+ * - Fő render függvény koordinálása
  * 
  * ⚠️ FIGYELMEZTETÉS:
  * Ha új funkcionalitásra van szükség, amely:
- * - Egyedi tile rajzolással kapcsolatos → drawing.js
- * - Kamera/zoom kezeléssel kapcsolatos → camera.js
- * - Játék állapottal kapcsolatos → gameState.js
+ * - Canvas inicializálással kapcsolatos → canvas.js
+ * - Kamera transzformációval kapcsolatos → camera-transform.js
+ * - Tile renderelésssel kapcsolatos → tile-renderer.js
+ * - Buborék pozícióval kapcsolatos → bubble-position.js
+ * - Sprite rajzolással kapcsolatos → sprites/*.js
  * 
  * Kérjük, a megfelelő modulba fejlessz!
  */
 
-import { CONFIG } from './config.js';
-import { gameState } from './gameState.js';
-import { drawTree, drawHouse, drawCornField, drawEmptyCornField, drawStoneCutter } from './drawing.js';
+// Canvas függvények újra-exportálása
+export { getCanvas, getContext, resizeCanvas, clearCanvas } from './canvas.js';
 
-let canvas = null;
-let ctx = null;
+// Kamera transzformáció
+import { applyCameraTransform, restoreCameraTransform, getVisibleArea } from './camera-transform.js';
 
-function initCanvas() {
-    if (!canvas) {
-        canvas = document.getElementById('gameCanvas');
-        if (canvas) {
-            ctx = canvas.getContext('2d', { 
-                imageSmoothingEnabled: false,
-                pixelated: true
-            });
-            ctx.imageSmoothingEnabled = false;
-        }
-    }
-    return canvas && ctx;
-}
+// Tile renderelés
+import { renderGrid, renderTiles } from './tile-renderer.js';
 
-export function getCanvas() {
-    if (!canvas) {
-        initCanvas();
-    }
-    return canvas;
-}
+// Buborék pozíció
+import { updateBubblePositionIfActive } from './bubble-position.js';
 
-export function getContext() {
-    if (!ctx) {
-        initCanvas();
-    }
-    return ctx;
-}
+// Canvas törlés
+import { clearCanvas } from './canvas.js';
 
-export function resizeCanvas() {
-    if (!initCanvas()) return;
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    // Canvas pixeles renderelés beállítása
-    ctx.imageSmoothingEnabled = false;
-}
-
+// Fő render függvény
 export function render(updateBubblePosition, findTile) {
-    if (!initCanvas()) return;
-    
-    // Canvas háttérszín beállítása (sötét kék, mint a body) - transzformáció előtt
-    ctx.fillStyle = '#1a1a2e';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Canvas törlése
+    clearCanvas();
     
     // Buborék pozíció frissítése ha aktív
-    if (gameState.activeBubble) {
-        updateBubblePosition(gameState.activeBubble.x, gameState.activeBubble.y);
-    }
+    updateBubblePositionIfActive(updateBubblePosition);
     
-    // Kamera transzformáció
-    ctx.save();
-    ctx.translate(canvas.width / 2, canvas.height / 2);
-    ctx.scale(gameState.camera.zoom, gameState.camera.zoom);
-    ctx.translate(-gameState.camera.x, -gameState.camera.y);
-
+    // Kamera transzformáció alkalmazása
+    applyCameraTransform();
+    
     // Látható terület számítása
-    const viewLeft = (0 - canvas.width / 2) / gameState.camera.zoom + gameState.camera.x;
-    const viewTop = (0 - canvas.height / 2) / gameState.camera.zoom + gameState.camera.y;
-    const viewRight = (canvas.width - canvas.width / 2) / gameState.camera.zoom + gameState.camera.x;
-    const viewBottom = (canvas.height - canvas.height / 2) / gameState.camera.zoom + gameState.camera.y;
-
-    const tileStartX = Math.floor(viewLeft / CONFIG.TILE_SIZE) - 1;
-    const tileEndX = Math.ceil(viewRight / CONFIG.TILE_SIZE) + 1;
-    const tileStartY = Math.floor(viewTop / CONFIG.TILE_SIZE) - 1;
-    const tileEndY = Math.ceil(viewBottom / CONFIG.TILE_SIZE) + 1;
-
-    // Grid renderelése (meg nem vásárolt területek) - pixeles
-    ctx.strokeStyle = '#333';
-    ctx.lineWidth = Math.max(1, 1 / gameState.camera.zoom);
-    for (let x = tileStartX; x <= tileEndX; x++) {
-        for (let y = tileStartY; y <= tileEndY; y++) {
-            const tile = findTile(x, y);
-            if (!tile) {
-                // Meg nem vásárolt terület - szürke (pixeles)
-                ctx.fillStyle = '#444';
-                const tileX = Math.floor(x * CONFIG.TILE_SIZE);
-                const tileY = Math.floor(y * CONFIG.TILE_SIZE);
-                ctx.fillRect(tileX, tileY, CONFIG.TILE_SIZE, CONFIG.TILE_SIZE);
-            }
-        }
-    }
-
-    // Térkép pontok renderelése - pixeles
-    gameState.map.forEach(tile => {
-        const x = Math.floor(tile.x * CONFIG.TILE_SIZE);
-        const y = Math.floor(tile.y * CONFIG.TILE_SIZE);
-
-        if (tile.type === 'owned') {
-            // Üres megvásárolt terület - zöld (pixeles)
-            ctx.fillStyle = '#2a5a2a';
-            ctx.fillRect(x, y, CONFIG.TILE_SIZE, CONFIG.TILE_SIZE);
-        } else if (tile.type === 'tree') {
-            // Fa
-            ctx.fillStyle = '#2a5a2a';
-            ctx.fillRect(x, y, CONFIG.TILE_SIZE, CONFIG.TILE_SIZE);
-            drawTree(ctx, x, y);
-        } else if (tile.type === 'house') {
-            // Ház
-            ctx.fillStyle = '#2a5a2a';
-            ctx.fillRect(x, y, CONFIG.TILE_SIZE, CONFIG.TILE_SIZE);
-            drawHouse(ctx, x, y);
-        } else if (tile.type === 'cornfield') {
-            // Kukorica föld
-            ctx.fillStyle = '#2a5a2a';
-            ctx.fillRect(x, y, CONFIG.TILE_SIZE, CONFIG.TILE_SIZE);
-            drawCornField(ctx, x, y);
-        } else if (tile.type === 'emptycornfield') {
-            // Üres kukorica föld
-            ctx.fillStyle = '#2a5a2a';
-            ctx.fillRect(x, y, CONFIG.TILE_SIZE, CONFIG.TILE_SIZE);
-            drawEmptyCornField(ctx, x, y);
-            
-            // Ha építés alatt van, jelenjen meg valami jelzés
-            const isBuilding = gameState.buildingCornfields.has(`${tile.x},${tile.y}`);
-            if (isBuilding) {
-                // Féláttetsző szürke réteg az építés jelzésére
-                ctx.fillStyle = 'rgba(100, 100, 100, 0.5)';
-                ctx.fillRect(x, y, CONFIG.TILE_SIZE, CONFIG.TILE_SIZE);
-            }
-        } else if (tile.type === 'stonecutter') {
-            // Kővágó
-            ctx.fillStyle = '#2a5a2a';
-            ctx.fillRect(x, y, CONFIG.TILE_SIZE, CONFIG.TILE_SIZE);
-            drawStoneCutter(ctx, x, y);
-        } else {
-            // Ismeretlen típus - zöld háttér (owned-ként kezeljük)
-            ctx.fillStyle = '#2a5a2a';
-            ctx.fillRect(x, y, CONFIG.TILE_SIZE, CONFIG.TILE_SIZE);
-        }
-
-        // Grid vonalak (pixeles)
-        ctx.strokeStyle = '#555';
-        ctx.lineWidth = Math.max(1, 1 / gameState.camera.zoom);
-        ctx.strokeRect(x, y, CONFIG.TILE_SIZE, CONFIG.TILE_SIZE);
-    });
-
-    ctx.restore();
+    const visibleArea = getVisibleArea();
+    
+    // Grid renderelése (meg nem vásárolt területek)
+    renderGrid(visibleArea, findTile);
+    
+    // Tile-ok renderelése
+    renderTiles();
+    
+    // Kamera transzformáció visszaállítása
+    restoreCameraTransform();
 }
-
