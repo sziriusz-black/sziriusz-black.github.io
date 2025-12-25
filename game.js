@@ -29,6 +29,7 @@ import { updateUI } from './ui.js';
 import { initBubble } from './bubble.js';
 import { getCanvas } from './renderer.js';
 import { initI18n } from './i18n.js';
+import { initSecretAccess } from './secret-access.js';
 
 // Modulok
 import { createInitialMap } from './initialization.js';
@@ -41,6 +42,12 @@ window.saveGame = saveGameState;
 
 // Játék inicializálása
 function initGame() {
+    // Titkos hozzáférés ellenőrzése - ha nincs, csak visszaszámláló jelenik meg
+    const hasAccess = initSecretAccess();
+    if (!hasAccess) {
+        return; // Visszaszámláló mód - játék nem indul
+    }
+
     const canvas = getCanvas();
     
     // Nyelvesítés inicializálása
