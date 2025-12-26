@@ -51,24 +51,50 @@
         .version-header {
             background: rgba(74, 158, 255, 0.2);
             padding: 15px 20px;
-            border-bottom: 2px solid #4a4a4a;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .version-header:hover {
+            background: rgba(74, 158, 255, 0.4);
         }
         .version-name {
             font-size: 22px;
             color: #4a9eff;
             font-weight: bold;
         }
+        .version-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
         .version-date {
             font-size: 14px;
             color: #888;
         }
+        .version-arrow {
+            font-size: 18px;
+            color: #4a9eff;
+            transition: transform 0.3s;
+        }
+        .version-card.open .version-arrow {
+            transform: rotate(180deg);
+        }
         .version-changes {
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+            border-top: 0 solid #4a4a4a;
+        }
+        .version-card.open .version-changes {
             padding: 20px;
+            max-height: 1000px;
+            border-top: 2px solid #4a4a4a;
         }
         .version-changes ul {
             list-style: none;
@@ -113,9 +139,12 @@
         <h1>🎮 Frissítési napló</h1>
 
         <div class="version-card">
-            <div class="version-header">
+            <div class="version-header" onclick="toggleVersion(this)">
                 <span class="version-name">V2.0 - Nagy Frissítés</span>
-                <span class="version-date">2025. december 26. 15:00</span>
+                <div class="version-info">
+                    <span class="version-date">2025. december 26. 15:00</span>
+                    <span class="version-arrow">▼</span>
+                </div>
             </div>
             <div class="version-changes">
                 <ul>
@@ -130,6 +159,7 @@
                     <li class="new">Credits oldal</li>
                     <li class="new">Favicon hozzáadva</li>
                     <li class="new">Kijelentkezés gomb a beállításokban</li>
+                    <li class="new">Frissítési napló oldal</li>
                     <li class="improve">Terület ár növekedés 25%-ról 5%-ra csökkentve</li>
                     <li class="improve">Fejlesztések modal háttér világosabb</li>
                     <li class="fix">Buborék bezárás félrekattintáskor</li>
@@ -138,9 +168,12 @@
         </div>
 
         <div class="version-card">
-            <div class="version-header">
+            <div class="version-header" onclick="toggleVersion(this)">
                 <span class="version-name">V1.3.1 - Hibajavítások</span>
-                <span class="version-date">2025. december 24. 18:00</span>
+                <div class="version-info">
+                    <span class="version-date">2025. december 24. 18:00</span>
+                    <span class="version-arrow">▼</span>
+                </div>
             </div>
             <div class="version-changes">
                 <ul>
@@ -152,9 +185,12 @@
         </div>
 
         <div class="version-card">
-            <div class="version-header">
+            <div class="version-header" onclick="toggleVersion(this)">
                 <span class="version-name">V1.3 - Kővágó & Fejlesztések</span>
-                <span class="version-date">2025. december 22. 12:00</span>
+                <div class="version-info">
+                    <span class="version-date">2025. december 22. 12:00</span>
+                    <span class="version-arrow">▼</span>
+                </div>
             </div>
             <div class="version-changes">
                 <ul>
@@ -167,9 +203,12 @@
         </div>
 
         <div class="version-card">
-            <div class="version-header">
+            <div class="version-header" onclick="toggleVersion(this)">
                 <span class="version-name">V1.2 - Kukorica</span>
-                <span class="version-date">2025. december 20. 10:00</span>
+                <div class="version-info">
+                    <span class="version-date">2025. december 20. 10:00</span>
+                    <span class="version-arrow">▼</span>
+                </div>
             </div>
             <div class="version-changes">
                 <ul>
@@ -181,9 +220,12 @@
         </div>
 
         <div class="version-card">
-            <div class="version-header">
+            <div class="version-header" onclick="toggleVersion(this)">
                 <span class="version-name">V1.1 - Fa ültetés</span>
-                <span class="version-date">2025. december 18. 14:00</span>
+                <div class="version-info">
+                    <span class="version-date">2025. december 18. 14:00</span>
+                    <span class="version-arrow">▼</span>
+                </div>
             </div>
             <div class="version-changes">
                 <ul>
@@ -196,9 +238,12 @@
         </div>
 
         <div class="version-card">
-            <div class="version-header">
+            <div class="version-header" onclick="toggleVersion(this)">
                 <span class="version-name">V1.0 - Első kiadás</span>
-                <span class="version-date">2025. december 15. 09:00</span>
+                <div class="version-info">
+                    <span class="version-date">2025. december 15. 09:00</span>
+                    <span class="version-arrow">▼</span>
+                </div>
             </div>
             <div class="version-changes">
                 <ul>
@@ -211,6 +256,12 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function toggleVersion(header) {
+            const card = header.parentElement;
+            card.classList.toggle('open');
+        }
+    </script>
 </body>
 </html>
-
