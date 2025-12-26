@@ -134,13 +134,15 @@
     </div>
 
     <script>
-        const ADMIN_USERNAMES = ['Szíriusz', 'Szirius', 'szíriusz', 'szirius'];
-        
-        function isAdmin(username) {
-            return ADMIN_USERNAMES.some(admin => 
-                admin.toLowerCase() === username.toLowerCase()
-            );
-        }
+        // =====================================================
+        // JÁTÉKOSOK LISTÁJA - IDE ADD HOZZÁ AZ ÚJ JÁTÉKOSOKAT!
+        // =====================================================
+        const PLAYERS = [
+            { username: 'Szíriusz', role: 'admin', joinDate: '2025-12-15' }
+            // Új játékos hozzáadása:
+            // { username: 'JátékosNeve', role: 'player', joinDate: '2025-12-26' },
+        ];
+        // =====================================================
         
         function formatDate(dateStr) {
             const date = new Date(dateStr);
@@ -151,49 +153,38 @@
             const playerList = document.getElementById('playerList');
             const playerCount = document.getElementById('playerCount');
             
-            try {
-                const users = JSON.parse(localStorage.getItem('retroSkyblockUsers') || '[]');
-                
-                if (users.length === 0) {
-                    playerList.innerHTML = '<div class="no-players">Még nincsenek regisztrált játékosok.</div>';
-                    playerCount.textContent = '0 játékos';
-                    return;
-                }
-                
-                // Rendezés regisztráció dátuma szerint (legrégebbi elöl)
-                users.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-                
-                playerCount.textContent = `${users.length} regisztrált játékos`;
-                
-                playerList.innerHTML = users.map((user, index) => {
-                    const rank = index + 1;
-                    let rankClass = '';
-                    if (rank === 1) rankClass = 'first';
-                    else if (rank === 2) rankClass = 'second';
-                    else if (rank === 3) rankClass = 'third';
-                    
-                    const admin = isAdmin(user.username);
-                    const badgeClass = admin ? 'admin' : 'player';
-                    const badgeText = admin ? '👑 Admin' : '👤 Játékos';
-                    
-                    return `
-                        <div class="player-card">
-                            <div class="player-rank ${rankClass}">#${rank}</div>
-                            <div class="player-info">
-                                <div class="player-name">
-                                    ${escapeHtml(user.username)}
-                                    <span class="player-badge ${badgeClass}">${badgeText}</span>
-                                </div>
-                                <div class="player-date">📅 Csatlakozott: ${formatDate(user.createdAt)}</div>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-                
-            } catch (error) {
-                playerList.innerHTML = '<div class="no-players">Hiba a játékosok betöltésekor.</div>';
-                playerCount.textContent = '';
+            if (PLAYERS.length === 0) {
+                playerList.innerHTML = '<div class="no-players">Még nincsenek regisztrált játékosok.</div>';
+                playerCount.textContent = '0 játékos';
+                return;
             }
+            
+            playerCount.textContent = `${PLAYERS.length} regisztrált játékos`;
+            
+            playerList.innerHTML = PLAYERS.map((user, index) => {
+                const rank = index + 1;
+                let rankClass = '';
+                if (rank === 1) rankClass = 'first';
+                else if (rank === 2) rankClass = 'second';
+                else if (rank === 3) rankClass = 'third';
+                
+                const isAdmin = user.role === 'admin';
+                const badgeClass = isAdmin ? 'admin' : 'player';
+                const badgeText = isAdmin ? '👑 Admin' : '👤 Játékos';
+                
+                return `
+                    <div class="player-card">
+                        <div class="player-rank ${rankClass}">#${rank}</div>
+                        <div class="player-info">
+                            <div class="player-name">
+                                ${escapeHtml(user.username)}
+                                <span class="player-badge ${badgeClass}">${badgeText}</span>
+                            </div>
+                            <div class="player-date">📅 Csatlakozott: ${formatDate(user.joinDate)}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
         
         function escapeHtml(text) {
