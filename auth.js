@@ -40,6 +40,28 @@ function isValidEmail(email) {
     return emailRegex.test(email);
 }
 
+// Trágár szavak listája (kisbetűs)
+const PROFANITY_LIST = [
+    // Magyar
+    'kurva', 'fasz', 'faszom', 'geci', 'gecis', 'pina', 'pinas', 'csöcs', 'segg', 'segges',
+    'buzi', 'buzis', 'köcsög', 'ribanc', 'szar', 'szaros', 'baszd', 'basz', 'kibasz',
+    'megbasz', 'anyad', 'anyád', 'picsa', 'picsába', 'fasza', 'bazmeg', 'baszdmeg',
+    // Angol
+    'fuck', 'shit', 'bitch', 'ass', 'asshole', 'dick', 'cock', 'pussy', 'cunt',
+    'nigger', 'nigga', 'faggot', 'retard', 'whore', 'slut'
+];
+
+// Trágár szó ellenőrzése
+function containsProfanity(text) {
+    const lowerText = text.toLowerCase();
+    for (const word of PROFANITY_LIST) {
+        if (lowerText.includes(word)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 // Regisztráció
 function register(username, email, password) {
     if (!username || !email || !password) {
@@ -48,6 +70,11 @@ function register(username, email, password) {
 
     if (username.length < 3) {
         return { success: false, message: 'A felhasználónév legalább 3 karakter legyen!' };
+    }
+
+    // Trágár szó ellenőrzése
+    if (containsProfanity(username)) {
+        return { success: false, message: 'Trágár szavak nem megengedettek!', clearUsername: true };
     }
 
     if (!isValidEmail(email)) {
@@ -264,6 +291,12 @@ function initAuthUI() {
                 authError.textContent = result.message;
                 authError.classList.remove('hidden');
                 authSuccess.classList.add('hidden');
+                
+                // Ha trágár szó volt, töröljük a felhasználónév mezőt
+                if (result.clearUsername) {
+                    document.getElementById('registerUsername').value = '';
+                    document.getElementById('registerUsername').focus();
+                }
             }
         });
 
