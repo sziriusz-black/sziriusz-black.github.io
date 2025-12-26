@@ -580,16 +580,14 @@ function sendMessage() {
         return;
     }
     
-    // Cooldown ellenőrzése (adminokra nem vonatkozik)
-    if (!isAdmin(currentUser.username)) {
-        const now = Date.now();
-        const timeSinceLastMessage = now - lastMessageTime;
-        
-        if (timeSinceLastMessage < MESSAGE_COOLDOWN_MS) {
-            const remainingSeconds = Math.ceil((MESSAGE_COOLDOWN_MS - timeSinceLastMessage) / 1000);
-            addSystemMessage(`⏳ Várj még ${remainingSeconds} másodpercet a következő üzenet előtt!`);
-            return;
-        }
+    // Cooldown ellenőrzése
+    const now = Date.now();
+    const timeSinceLastMessage = now - lastMessageTime;
+    
+    if (timeSinceLastMessage < MESSAGE_COOLDOWN_MS) {
+        const remainingSeconds = Math.ceil((MESSAGE_COOLDOWN_MS - timeSinceLastMessage) / 1000);
+        addSystemMessage(`⏳ Várj még ${remainingSeconds} másodpercet a következő üzenet előtt!`);
+        return;
     }
     
     // Mute ellenőrzése
