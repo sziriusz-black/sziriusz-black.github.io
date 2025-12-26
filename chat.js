@@ -228,7 +228,7 @@ function renderMessages() {
                     <span class="chat-message-user">${escapeHtml(msg.username)}${adminBadge}</span>
                     <span class="chat-message-time">${formatTime(msg.timestamp)}</span>
                 </div>
-                <div class="chat-message-text">${escapeHtml(msg.text)}</div>
+                <div class="chat-message-text">${escapeHtml(msg.text).replace(/\n/g, '<br>')}</div>
             </div>
         `;
     }).join('');
