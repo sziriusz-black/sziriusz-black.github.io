@@ -30,6 +30,7 @@ import { initBubble } from './bubble.js';
 import { getCanvas } from './renderer.js';
 import { initI18n } from './i18n.js';
 import { initSecretAccess } from './secret-access.js';
+import { initDiscordStatus } from './discord-status.js';
 
 // Modulok
 import { createInitialMap } from './initialization.js';
@@ -73,6 +74,9 @@ function initGame() {
 
     // Event listener-ek beállítása
     setupAllEventListeners();
+
+    // Discord online státusz ellenőrzése
+    initDiscordStatus();
 
     // Tutorial listener-ek
     setupTutorialListeners();

@@ -121,6 +121,30 @@
     color: #5865F2;
 }
 
+/* Discord ikon wrapper és online jelző */
+.discord-icon-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.discord-online-indicator {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 10px;
+    height: 10px;
+    background: #43b581;
+    border-radius: 50%;
+    border: 2px solid rgba(0, 0, 0, 0.9);
+    box-shadow: 0 0 4px #43b581;
+}
+
+.discord-online-indicator.hidden {
+    display: none;
+}
+
 /* Nyelvváltó zászló */
 .language-flag {
     font-size: 24px;
