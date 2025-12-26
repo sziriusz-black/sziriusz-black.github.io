@@ -150,14 +150,19 @@ function login(username, password) {
     }
 
     const users = getUsers();
-    const user = users.find(u => 
-        u.username.toLowerCase() === username.toLowerCase() && 
-        u.password === password
-    );
-
-    if (!user) {
-        return { success: false, message: 'Hibás felhasználónév vagy jelszó!' };
+    
+    // Ellenőrzés: létezik-e a felhasználónév
+    const existingUser = users.find(u => u.username.toLowerCase() === username.toLowerCase());
+    if (!existingUser) {
+        return { success: false, message: 'Nem létezik ilyen felhasználó!' };
     }
+    
+    // Jelszó ellenőrzése
+    if (existingUser.password !== password) {
+        return { success: false, message: 'Hibás jelszó!' };
+    }
+    
+    const user = existingUser;
 
     // Bejelentkezés mentése
     localStorage.setItem(CURRENT_USER_KEY, JSON.stringify({
