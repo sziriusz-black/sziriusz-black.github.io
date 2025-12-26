@@ -140,7 +140,8 @@ function processCommand(text, currentUser) {
                 '/help - Parancsok listája\n' +
                 '/clear - Chat törlése\n' +
                 '/broadcast [üzenet] - Rendszer üzenet küldése\n' +
-                '/reset - Játék újrakezdése'
+                '/reset - Játék újrakezdése\n' +
+                '/reports - Káromkodás jelentések'
             );
             break;
             
@@ -162,6 +163,24 @@ function processCommand(text, currentUser) {
             if (confirm('Biztosan újra akarod kezdeni a játékot?')) {
                 localStorage.removeItem('retroSkyblockSave');
                 window.location.reload();
+            }
+            break;
+            
+        case 'reports':
+            const reports = getReports();
+            const unseenReports = reports.filter(r => !r.seen);
+            if (reports.length === 0) {
+                addSystemMessage('📋 Nincsenek jelentések.');
+            } else {
+                let reportText = `📋 Jelentések (${unseenReports.length} új):\n`;
+                reports.slice(-10).forEach(r => {
+                    const date = new Date(r.timestamp);
+                    const timeStr = `${date.getMonth()+1}.${date.getDate()} ${date.getHours()}:${date.getMinutes().toString().padStart(2,'0')}`;
+                    const newMark = r.seen ? '' : '🆕 ';
+                    reportText += `${newMark}[${timeStr}] ${r.username}: "${r.message}" (${r.detectedWord})\n`;
+                });
+                addSystemMessage(reportText);
+                markReportsAsSeen();
             }
             break;
             
