@@ -19,6 +19,7 @@
  */
 import { toggleMute, isMusicMuted } from './audio.js';
 import { cycleLanguage, getLanguage, FLAGS, getNextLanguage, t } from './i18n.js';
+import { logout } from './auth.js';
 
 export function toggleSettingsMenu() {
     const menu = document.getElementById('settingsMenu');
@@ -78,5 +79,10 @@ export function updateLanguageFlag() {
         const nextLang = getNextLanguage();
         languageMenuItem.title = `${t('settings.language')} (${nextLang.toUpperCase()})`;
     }
+}
+
+export function handleLogout() {
+    logout();
+    window.location.reload();
 }
 

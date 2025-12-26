@@ -144,3 +144,23 @@
     transform: scale(0.95);
 }
 
+/* Menü elválasztó vonal */
+.settings-menu-divider {
+    height: 1px;
+    background: #4a4a4a;
+    margin: 5px 0;
+}
+
+/* Kijelentkezés gomb */
+.logout-item {
+    color: #ff6666 !important;
+}
+
+.logout-item:hover {
+    background: rgba(255, 68, 68, 0.2) !important;
+}
+
+.logout-item svg {
+    color: #ff6666;
+}
+

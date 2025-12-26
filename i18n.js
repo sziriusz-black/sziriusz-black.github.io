@@ -35,6 +35,7 @@ const translations = {
         'settings.sound': 'Hang',
         'settings.discord': 'Discord',
         'settings.language': 'Nyelv',
+        'settings.logout': 'Kijelentkezés',
         
         // Státusz panel
         'status.money': 'Pénz',
@@ -131,6 +132,7 @@ const translations = {
         'settings.sound': 'Sound',
         'settings.discord': 'Discord',
         'settings.language': 'Language',
+        'settings.logout': 'Logout',
         
         // Status panel
         'status.money': 'Money',
@@ -227,6 +229,7 @@ const translations = {
         'settings.sound': 'Ton',
         'settings.discord': 'Discord',
         'settings.language': 'Sprache',
+        'settings.logout': 'Abmelden',
         
         // Status panel
         'status.money': 'Geld',
