@@ -40,9 +40,10 @@ export function handleClick(e) {
         return;
     }
 
-    // Ha van aktív buborék, bezárjuk
+    // Ha van aktív buborék, bezárjuk és kilépünk (nem nyitunk újat)
     if (gameState.activeBubble) {
         closeBubble();
+        return;
     }
 
     const rect = canvas.getBoundingClientRect();
