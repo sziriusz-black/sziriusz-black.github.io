@@ -1,0 +1,52 @@
+/**
+ * @file styles/status-panel.css
+ * @description Státusz panel stílusok - pénz, deszka, kukorica, munkások
+ * 
+ * FELELŐSSÉGI KÖR:
+ * - #statusPanel konténer
+ * - .status-item elemek
+ * - Ikonok stílusai
+ * 
+ * ⚠️ FIGYELMEZTETÉS:
+ * Ha új stílusra van szükség, amely:
+ * - Komponensekkel kapcsolatos → components.css
+ * - Alap stílusokkal kapcsolatos → base.css
+ */
+
+/* Status panel stílusok */
+#statusPanel {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    background: rgba(0, 0, 0, 0.8);
+    border: 3px solid #4a4a4a;
+    border-radius: 0;
+    padding: 10px;
+    z-index: 1000;
+    font-size: 16px;
+    color: #fff;
+    box-shadow: 4px 4px 0px #000;
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    cursor: default;
+}
+
+.status-item:last-child {
+    margin-bottom: 0;
+}
+
+.status-item .icon {
+    font-size: 20px;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+
+.status-item .icon:hover {
+    transform: scale(1.2);
+}
+

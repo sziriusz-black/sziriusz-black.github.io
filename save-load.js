@@ -1,0 +1,101 @@
+/**
+ * @file save-load.js
+ * @description Játékállapot mentése és betöltése - localStorage kezelés
+ * 
+ * FELELŐSSÉGI KÖR:
+ * - Játékállapot mentése localStorage-ba (saveGameState)
+ * - Játékállapot betöltése localStorage-ból (loadGameState)
+ * - Tutorial állapot megőrzése mentéskor
+ * - Folyamatban lévő műveletek (Map) szerializálása/deszerializálása
+ * 
+ * ⚠️ FIGYELMEZTETÉS:
+ * Ha új funkcionalitásra van szükség, amely:
+ * - Játék állapottal kapcsolatos → gameState.js
+ * - Kamera/zoom kezeléssel kapcsolatos → camera.js
+ * - Időzítőkkel kapcsolatos → timers.js
+ * 
+ * Kérjük, a megfelelő modulba fejlessz!
+ */
+import { gameState } from './gameState.js';
+import { getZoomLevel } from './camera.js';
+
+// Játékállapot mentése
+export function saveGameState() {
+    try {
+        // Előző mentés beolvasása a tutorialCompleted flag megőrzéséhez
+        const previousSave = localStorage.getItem('skyblockGame');
+        let tutorialCompleted = false;
+        if (previousSave) {
+            try {
+                const prev = JSON.parse(previousSave);
+                tutorialCompleted = prev.tutorialCompleted || false;
+            } catch (e) {
+                console.error('Tutorial állapot olvasási hiba:', e);
+            }
+        }
+        
+        const state = {
+            money: gameState.money,
+            planks: gameState.planks,
+            corn: gameState.corn,
+            ownedTiles: gameState.ownedTiles,
+            map: gameState.map,
+            camera: gameState.camera,
+            // Folyamatban lévő műveletek mentése
+            cuttingTrees: Object.fromEntries(gameState.cuttingTrees),
+            buildingCornfields: Object.fromEntries(gameState.buildingCornfields),
+            replantingCornfields: Object.fromEntries(gameState.replantingCornfields),
+            // Munkás rendszer
+            workers: gameState.workers,
+            maxWorkers: gameState.maxWorkers,
+            // Tutorial állapot megőrzése
+            tutorialCompleted: tutorialCompleted
+        };
+        localStorage.setItem('skyblockGame', JSON.stringify(state));
+    } catch (e) {
+        console.error('Mentés hiba:', e);
+    }
+}
+
+// Játékállapot betöltése
+export function loadGameState(createInitialMap, updateUI) {
+    try {
+        const saved = localStorage.getItem('skyblockGame');
+        if (saved) {
+            const state = JSON.parse(saved);
+            gameState.money = state.money || 10;
+            gameState.planks = state.planks || 0;
+            gameState.corn = state.corn || 0;
+            gameState.ownedTiles = state.ownedTiles || 0;
+            gameState.map = state.map || [];
+            if (state.camera) {
+                gameState.camera.x = state.camera.x || 0;
+                gameState.camera.y = state.camera.y || 0;
+                gameState.camera.zoomLevel = state.camera.zoomLevel || 1;
+                gameState.camera.zoom = getZoomLevel(gameState.camera.zoomLevel);
+            }
+            // Folyamatban lévő műveletek visszaállítása
+            if (state.cuttingTrees) {
+                gameState.cuttingTrees = new Map(Object.entries(state.cuttingTrees));
+            }
+            if (state.buildingCornfields) {
+                gameState.buildingCornfields = new Map(Object.entries(state.buildingCornfields));
+            }
+            if (state.replantingCornfields) {
+                gameState.replantingCornfields = new Map(Object.entries(state.replantingCornfields));
+            }
+            // Munkás rendszer visszaállítása
+            if (state.workers !== undefined) {
+                gameState.workers = state.workers;
+            }
+            if (state.maxWorkers !== undefined) {
+                gameState.maxWorkers = state.maxWorkers;
+            }
+            if (updateUI) updateUI();
+        }
+    } catch (e) {
+        console.error('Betöltés hiba:', e);
+        createInitialMap();
+    }
+}
+

@@ -9,7 +9,7 @@
  */
 
 // A céldátum amire visszaszámolunk (módosítható)
-const TARGET_DATE = new Date('2025-12-30T12:00:00');
+const TARGET_DATE = new Date('2025-01-01T00:00:00');
 
 // Titkos kód ellenőrzése
 function hasSecretAccess() {
@@ -61,5 +61,4 @@ function initSecretAccess() {
 }
 
 export { initSecretAccess, hasSecretAccess };
-
 
