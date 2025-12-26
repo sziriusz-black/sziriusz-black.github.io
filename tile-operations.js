@@ -38,7 +38,7 @@ export function isAdjacentToOwned(x, y) {
     });
 }
 
-// Terület ár kiszámítása - 14 terület felett 25%-kal nő minden vásárlásnál
+// Terület ár kiszámítása - 14 terület felett 5%-kal nő minden vásárlásnál
 export function calculateTilePrice() {
     const basePrice = CONFIG.PURCHASE_PRICE;
     const threshold = 14;
@@ -47,8 +47,8 @@ export function calculateTilePrice() {
         return basePrice;
     }
     
-    // 14-től kezdve minden terület 25%-kal drágább az előzőnél
-    const multiplier = Math.pow(1.25, gameState.ownedTiles - threshold + 1);
+    // 14-től kezdve minden terület 5%-kal drágább az előzőnél
+    const multiplier = Math.pow(1.05, gameState.ownedTiles - threshold + 1);
     return Math.floor(basePrice * multiplier);
 }
 
