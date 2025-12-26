@@ -42,6 +42,7 @@ const translations = {
         'settings.sound': 'Hang',
         'settings.discord': 'Discord',
         'settings.language': 'Nyelv',
+        'settings.chat': 'Chat',
         'settings.credits': 'Credits',
         'settings.logout': 'Kijelentkezés',
         
@@ -140,6 +141,7 @@ const translations = {
         'settings.sound': 'Sound',
         'settings.discord': 'Discord',
         'settings.language': 'Language',
+        'settings.chat': 'Chat',
         'settings.credits': 'Credits',
         'settings.logout': 'Logout',
         
@@ -238,6 +240,7 @@ const translations = {
         'settings.sound': 'Ton',
         'settings.discord': 'Discord',
         'settings.language': 'Sprache',
+        'settings.chat': 'Chat',
         'settings.credits': 'Credits',
         'settings.logout': 'Abmelden',
         

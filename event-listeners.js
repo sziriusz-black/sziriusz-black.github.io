@@ -29,6 +29,13 @@ import { loadMuteState } from './audio.js';
 import { closeBubble } from './bubble.js';
 import { updateSoundIcon, handleSoundToggle, toggleSettingsMenu, closeSettingsMenu, handleLanguageToggle, updateLanguageFlag, handleLogout, handleCredits } from './settings.js';
 import { translateDOM } from './i18n.js';
+import { openChat, initChat } from './chat.js';
+
+// Chat megnyitása
+function handleChat() {
+    closeSettingsMenu();
+    openChat();
+}
 import { handleClick } from './click-handler.js';
 import { 
     openPlankModal, closeModal, sellPlanks, 
@@ -153,6 +160,7 @@ export function setupSettingsEvents() {
         openDiscordModal();
     });
     document.getElementById('languageMenuItem').addEventListener('click', handleLanguageToggle);
+    document.getElementById('chatMenuItem').addEventListener('click', handleChat);
     document.getElementById('creditsMenuItem').addEventListener('click', handleCredits);
     document.getElementById('logoutMenuItem').addEventListener('click', handleLogout);
     
@@ -171,6 +179,9 @@ export function setupSettingsEvents() {
     
     // Hang állapot betöltése és ikon frissítése
     loadMuteState();
+    
+    // Chat inicializálása
+    initChat();
     updateSoundIcon();
     updateLanguageFlag();
     
