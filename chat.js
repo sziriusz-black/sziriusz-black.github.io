@@ -222,7 +222,14 @@ function processCommand(text, currentUser) {
     const command = parts[0].toLowerCase();
     const args = parts.slice(1);
     
-    // Admin ellenőrzés
+    // Publikus parancsok (mindenki használhatja)
+    if (command === 'player' || command === 'players') {
+        window.open('player.html', '_blank');
+        addSystemMessage('📋 Játékosok oldal megnyitva!');
+        return true;
+    }
+    
+    // Admin ellenőrzés (a többi parancshoz)
     if (!isAdmin(currentUser.username)) {
         addSystemMessage('❌ Nincs jogosultságod parancsok használatához!');
         return true;
@@ -232,12 +239,17 @@ function processCommand(text, currentUser) {
         case 'help':
             addSystemMessage(
                 '📋 Elérhető parancsok:\n' +
+                '━━━━━━━━━━━━━━━━━━━━\n' +
+                '👥 Publikus:\n' +
+                '/player - Játékosok listája\n' +
+                '━━━━━━━━━━━━━━━━━━━━\n' +
+                '👑 Admin:\n' +
                 '/help - Parancsok listája\n' +
                 '/clear - Chat törlése\n' +
-                '/broadcast [üzenet] - Rendszer üzenet küldése\n' +
+                '/broadcast [üzenet] - Rendszer üzenet\n' +
                 '/reset - Játék újrakezdése\n' +
-                '/reports - Káromkodás jelentések\n' +
-                '/mute [név] [idő] - Játékos némítása (pl: /mute Teszt 30m)\n' +
+                '/reports - Jelentések\n' +
+                '/mute [név] [idő] - Némítás\n' +
                 '/unmute [név] - Némítás feloldása\n' +
                 '/info [név] - Játékos adatai'
             );

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Játékosok - Retro Skyblock</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            font-family: 'Courier New', monospace;
+            color: #fff;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #ffd700;
+            font-size: 36px;
+            margin-bottom: 40px;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+        .back-link {
+            display: inline-block;
+            color: #4a9eff;
+            text-decoration: none;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .back-link:hover {
+            color: #6ab4ff;
+            text-decoration: underline;
+        }
+        .player-count {
+            text-align: center;
+            color: #888;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .player-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .player-card {
+            background: rgba(0, 0, 0, 0.6);
+            border: 3px solid #4a4a4a;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 4px 4px 0px #000;
+        }
+        .player-rank {
+            font-size: 24px;
+            min-width: 40px;
+            text-align: center;
+            color: #888;
+        }
+        .player-rank.first {
+            color: #ffd700;
+        }
+        .player-rank.second {
+            color: #c0c0c0;
+        }
+        .player-rank.third {
+            color: #cd7f32;
+        }
+        .player-info {
+            flex: 1;
+        }
+        .player-name {
+            font-size: 18px;
+            color: #fff;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .player-badge {
+            font-size: 14px;
+            padding: 2px 8px;
+            border-radius: 0;
+            font-weight: normal;
+        }
+        .player-badge.admin {
+            background: rgba(255, 107, 107, 0.3);
+            border: 1px solid #ff6b6b;
+            color: #ff6b6b;
+        }
+        .player-badge.player {
+            background: rgba(74, 158, 255, 0.3);
+            border: 1px solid #4a9eff;
+            color: #4a9eff;
+        }
+        .player-date {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .no-players {
+            text-align: center;
+            color: #666;
+            padding: 40px;
+            font-size: 16px;
+        }
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 24px;
+            }
+            .player-name {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Vissza a játékhoz</a>
+        <h1>👥 Játékosok</h1>
+        <div id="playerCount" class="player-count">Betöltés...</div>
+        <div id="playerList" class="player-list"></div>
+    </div>
+
+    <script>
+        const ADMIN_USERNAMES = ['Szíriusz', 'Szirius', 'szíriusz', 'szirius'];
+        
+        function isAdmin(username) {
+            return ADMIN_USERNAMES.some(admin => 
+                admin.toLowerCase() === username.toLowerCase()
+            );
+        }
+        
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return `${date.getFullYear()}.${(date.getMonth()+1).toString().padStart(2,'0')}.${date.getDate().toString().padStart(2,'0')}`;
+        }
+        
+        function loadPlayers() {
+            const playerList = document.getElementById('playerList');
+            const playerCount = document.getElementById('playerCount');
+            
+            try {
+                const users = JSON.parse(localStorage.getItem('retroSkyblockUsers') || '[]');
+                
+                if (users.length === 0) {
+                    playerList.innerHTML = '<div class="no-players">Még nincsenek regisztrált játékosok.</div>';
+                    playerCount.textContent = '0 játékos';
+                    return;
+                }
+                
+                // Rendezés regisztráció dátuma szerint (legrégebbi elöl)
+                users.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+                
+                playerCount.textContent = `${users.length} regisztrált játékos`;
+                
+                playerList.innerHTML = users.map((user, index) => {
+                    const rank = index + 1;
+                    let rankClass = '';
+                    if (rank === 1) rankClass = 'first';
+                    else if (rank === 2) rankClass = 'second';
+                    else if (rank === 3) rankClass = 'third';
+                    
+                    const admin = isAdmin(user.username);
+                    const badgeClass = admin ? 'admin' : 'player';
+                    const badgeText = admin ? '👑 Admin' : '👤 Játékos';
+                    
+                    return `
+                        <div class="player-card">
+                            <div class="player-rank ${rankClass}">#${rank}</div>
+                            <div class="player-info">
+                                <div class="player-name">
+                                    ${escapeHtml(user.username)}
+                                    <span class="player-badge ${badgeClass}">${badgeText}</span>
+                                </div>
+                                <div class="player-date">📅 Csatlakozott: ${formatDate(user.createdAt)}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+            } catch (error) {
+                playerList.innerHTML = '<div class="no-players">Hiba a játékosok betöltésekor.</div>';
+                playerCount.textContent = '';
+            }
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Oldal betöltésekor
+        loadPlayers();
+    </script>
+</body>
+</html>
+
