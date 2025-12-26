@@ -62,6 +62,33 @@ function containsProfanity(text) {
     return false;
 }
 
+// Jelszó erősség ellenőrzése
+function validatePassword(password) {
+    const missing = [];
+    
+    if (password.length < 8) {
+        missing.push('legalább 8 karakter');
+    }
+    
+    if (!/[a-zA-ZáéíóöőúüűÁÉÍÓÖŐÚÜŰ]/.test(password)) {
+        missing.push('betű');
+    }
+    
+    if (!/[0-9]/.test(password)) {
+        missing.push('szám');
+    }
+    
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]/.test(password)) {
+        missing.push('speciális karakter (!@#$%^&* stb.)');
+    }
+    
+    if (missing.length > 0) {
+        return { valid: false, message: `A jelszóból hiányzik: ${missing.join(', ')}` };
+    }
+    
+    return { valid: true };
+}
+
 // Regisztráció
 function register(username, email, password) {
     if (!username || !email || !password) {
@@ -81,8 +108,10 @@ function register(username, email, password) {
         return { success: false, message: 'Érvénytelen email cím!' };
     }
 
-    if (password.length < 4) {
-        return { success: false, message: 'A jelszó legalább 4 karakter legyen!' };
+    // Jelszó erősség ellenőrzése
+    const passwordCheck = validatePassword(password);
+    if (!passwordCheck.valid) {
+        return { success: false, message: passwordCheck.message };
     }
 
     const users = getUsers();
