@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frissítések - Retro Skyblock</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            font-family: 'Courier New', monospace;
+            color: #fff;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #ffd700;
+            font-size: 36px;
+            margin-bottom: 40px;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+        }
+        .back-link {
+            display: inline-block;
+            color: #4a9eff;
+            text-decoration: none;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .back-link:hover {
+            color: #6ab4ff;
+            text-decoration: underline;
+        }
+        .version-card {
+            background: rgba(0, 0, 0, 0.6);
+            border: 3px solid #4a4a4a;
+            margin-bottom: 20px;
+            box-shadow: 4px 4px 0px #000;
+        }
+        .version-header {
+            background: rgba(74, 158, 255, 0.2);
+            padding: 15px 20px;
+            border-bottom: 2px solid #4a4a4a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .version-name {
+            font-size: 22px;
+            color: #4a9eff;
+            font-weight: bold;
+        }
+        .version-date {
+            font-size: 14px;
+            color: #888;
+        }
+        .version-changes {
+            padding: 20px;
+        }
+        .version-changes ul {
+            list-style: none;
+            padding: 0;
+        }
+        .version-changes li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+            border-bottom: 1px solid rgba(74, 74, 74, 0.5);
+        }
+        .version-changes li:last-child {
+            border-bottom: none;
+        }
+        .version-changes li::before {
+            content: "✨";
+            position: absolute;
+            left: 0;
+        }
+        .version-changes li.fix::before {
+            content: "🔧";
+        }
+        .version-changes li.new::before {
+            content: "🆕";
+        }
+        .version-changes li.improve::before {
+            content: "⬆️";
+        }
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 24px;
+            }
+            .version-name {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Vissza a játékhoz</a>
+        <h1>🎮 Frissítési napló</h1>
+
+        <div class="version-card">
+            <div class="version-header">
+                <span class="version-name">V2.0 - Nagy Frissítés</span>
+                <span class="version-date">2025. december 26. 15:00</span>
+            </div>
+            <div class="version-changes">
+                <ul>
+                    <li class="new">Bejelentkezési és regisztrációs rendszer</li>
+                    <li class="new">Elfelejtett jelszó funkció</li>
+                    <li class="new">Jelszó erősség ellenőrzés (8 karakter, szám, betű, speciális)</li>
+                    <li class="new">Trágár szavak szűrése regisztrációnál</li>
+                    <li class="new">Titkos URL hozzáférés (?secret=67)</li>
+                    <li class="new">Visszaszámláló oldal december 30-ig</li>
+                    <li class="new">Többnyelvűség (Magyar, English, Deutsch)</li>
+                    <li class="new">Discord online státusz jelző (zöld pötty)</li>
+                    <li class="new">Credits oldal</li>
+                    <li class="new">Favicon hozzáadva</li>
+                    <li class="new">Kijelentkezés gomb a beállításokban</li>
+                    <li class="improve">Terület ár növekedés 25%-ról 5%-ra csökkentve</li>
+                    <li class="improve">Fejlesztések modal háttér világosabb</li>
+                    <li class="fix">Buborék bezárás félrekattintáskor</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="version-card">
+            <div class="version-header">
+                <span class="version-name">V1.3.1 - Hibajavítások</span>
+                <span class="version-date">2025. december 24. 18:00</span>
+            </div>
+            <div class="version-changes">
+                <ul>
+                    <li class="fix">Tutorial javítások</li>
+                    <li class="fix">Discord link frissítve</li>
+                    <li class="improve">Visszaszámláló hozzáadva</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="version-card">
+            <div class="version-header">
+                <span class="version-name">V1.3 - Kővágó & Fejlesztések</span>
+                <span class="version-date">2025. december 22. 12:00</span>
+            </div>
+            <div class="version-changes">
+                <ul>
+                    <li class="new">Kővágó épület</li>
+                    <li class="new">Ház és kővágó fejlesztések (upgrade)</li>
+                    <li class="new">Munkás rendszer</li>
+                    <li class="improve">Jobb UI elemek</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="version-card">
+            <div class="version-header">
+                <span class="version-name">V1.2 - Kukorica</span>
+                <span class="version-date">2025. december 20. 10:00</span>
+            </div>
+            <div class="version-changes">
+                <ul>
+                    <li class="new">Kukorica föld építése</li>
+                    <li class="new">Kukorica learatás és eladás</li>
+                    <li class="new">Kukorica újraültetés</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="version-card">
+            <div class="version-header">
+                <span class="version-name">V1.1 - Fa ültetés</span>
+                <span class="version-date">2025. december 18. 14:00</span>
+            </div>
+            <div class="version-changes">
+                <ul>
+                    <li class="new">Fa ültetés funkció</li>
+                    <li class="new">Deszka eladás slider</li>
+                    <li class="new">Háttérzene</li>
+                    <li class="new">Hang ki/be kapcsolás</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="version-card">
+            <div class="version-header">
+                <span class="version-name">V1.0 - Első kiadás</span>
+                <span class="version-date">2025. december 15. 09:00</span>
+            </div>
+            <div class="version-changes">
+                <ul>
+                    <li class="new">Alap játékmenet</li>
+                    <li class="new">Terület vásárlás</li>
+                    <li class="new">Fa kivágás</li>
+                    <li class="new">Ház építés</li>
+                    <li class="new">Mentés/betöltés</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

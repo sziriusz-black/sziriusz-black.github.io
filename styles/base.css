@@ -67,8 +67,15 @@ body {
     font-size: 12px;
     color: #aaa;
     font-family: 'Courier New', monospace;
-    pointer-events: none;
+    cursor: pointer;
     user-select: none;
+    transition: all 0.1s;
+}
+
+#version:hover {
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    border-color: #4a9eff;
 }
 
 .error-message {
