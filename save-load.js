@@ -18,6 +18,37 @@
  */
 import { gameState } from './gameState.js';
 import { getZoomLevel } from './camera.js';
+import { getCurrentUser } from './auth.js';
+
+const REPORTS_STORAGE_KEY = 'retroSkyblockChatReports';
+const OWNER_USERNAMES = ['Szíriusz', 'Szirius', 'szíriusz', 'szirius'];
+const SUSPICIOUS_MONEY_INCREASE = 1000;
+
+// Tulajdonos-e a felhasználó
+function isOwner(username) {
+    if (!username) return false;
+    return OWNER_USERNAMES.some(owner => 
+        owner.toLowerCase() === username.toLowerCase()
+    );
+}
+
+// Gyanús pénznövekedés jelentése
+function reportSuspiciousMoney(username, previousMoney, currentMoney) {
+    try {
+        const reports = JSON.parse(localStorage.getItem(REPORTS_STORAGE_KEY) || '[]');
+        reports.push({
+            id: crypto.randomUUID(),
+            username: username,
+            message: `Gyanús pénznövekedés: ${previousMoney} → ${currentMoney} (+${currentMoney - previousMoney})`,
+            detectedWord: 'SUSPICIOUS_MONEY',
+            timestamp: Date.now(),
+            seen: false
+        });
+        localStorage.setItem(REPORTS_STORAGE_KEY, JSON.stringify(reports));
+    } catch (e) {
+        console.error('Jelentés mentése sikertelen:', e);
+    }
+}
 
 // Játékállapot mentése
 export function saveGameState() {
@@ -25,13 +56,27 @@ export function saveGameState() {
         // Előző mentés beolvasása a tutorialCompleted flag megőrzéséhez
         const previousSave = localStorage.getItem('skyblockGame');
         let tutorialCompleted = false;
+        let previousMoney = 0;
+        
         if (previousSave) {
             try {
                 const prev = JSON.parse(previousSave);
                 tutorialCompleted = prev.tutorialCompleted || false;
+                previousMoney = prev.money || 0;
             } catch (e) {
-                console.error('Tutorial állapot olvasási hiba:', e);
+                console.error('Előző mentés olvasási hiba:', e);
             }
+        }
+        
+        // Gyanús pénznövekedés ellenőrzése
+        const currentUser = getCurrentUser();
+        const moneyIncrease = gameState.money - previousMoney;
+        
+        if (currentUser && !isOwner(currentUser.username) && moneyIncrease > SUSPICIOUS_MONEY_INCREASE) {
+            // Jelentés küldése
+            reportSuspiciousMoney(currentUser.username, previousMoney, gameState.money);
+            // Pénz visszaállítása az előző értékre
+            gameState.money = previousMoney;
         }
         
         const state = {

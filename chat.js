@@ -53,20 +53,6 @@ function addPendingGift(recipientUsername, resourceType, amount, senderUsername)
     savePendingGifts(gifts);
 }
 
-// Gyanús tranzakció jelentése
-function reportSuspiciousTransaction(username, amount, type, senderUsername) {
-    const reports = getReports();
-    reports.push({
-        id: crypto.randomUUID(),
-        username: username,
-        message: `Gyanús tranzakció: ${amount} ${type} érkezett tőle: ${senderUsername}`,
-        detectedWord: 'SUSPICIOUS_TRANSACTION',
-        timestamp: Date.now(),
-        seen: false
-    });
-    localStorage.setItem(REPORTS_STORAGE_KEY, JSON.stringify(reports));
-}
-
 // Pending ajándékok feldolgozása a jelenlegi felhasználó számára
 function processPendingGifts(currentUser) {
     if (!currentUser) return;
@@ -77,19 +63,8 @@ function processPendingGifts(currentUser) {
     
     if (myGifts.length === 0) return;
     
-    // Ellenőrizzük, hogy a felhasználó tulajdonos-e (Szíriusz)
-    const isOwner = isAdmin(currentUser.username);
-    
     // Ajándékok feldolgozása
     myGifts.forEach(gift => {
-        // Ha nem tulajdonos és 1000-nél több aranyat kap, gyanús
-        if (!isOwner && gift.resourceType === 'arany' && gift.amount > 1000) {
-            // Jelentés küldése
-            reportSuspiciousTransaction(currentUser.username, gift.amount, gift.resourceType, gift.senderUsername);
-            // Az ajándékot NEM adjuk hozzá - levonás
-            return;
-        }
-        
         switch (gift.resourceType) {
             case 'arany':
                 gameState.money += gift.amount;
