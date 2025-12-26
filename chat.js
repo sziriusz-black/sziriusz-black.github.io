@@ -15,11 +15,77 @@ import { gameState } from './gameState.js';
 const CHAT_STORAGE_KEY = 'retroSkyblockChat';
 const REPORTS_STORAGE_KEY = 'retroSkyblockChatReports';
 const MUTES_STORAGE_KEY = 'retroSkyblockChatMutes';
+const PENDING_GIFTS_KEY = 'retroSkyblockPendingGifts';
 const MAX_MESSAGES = 50;
 const ADMIN_USERNAMES = ['Szíriusz', 'Szirius', 'szíriusz', 'szirius'];
 const MESSAGE_COOLDOWN_MS = 5000; // 5 másodperc cooldown
 
 let lastMessageTime = 0;
+
+// === PENDING GIFTS RENDSZER ===
+
+// Pending gifts betöltése
+function getPendingGifts() {
+    try {
+        const gifts = localStorage.getItem(PENDING_GIFTS_KEY);
+        return gifts ? JSON.parse(gifts) : [];
+    } catch (error) {
+        return [];
+    }
+}
+
+// Pending gifts mentése
+function savePendingGifts(gifts) {
+    localStorage.setItem(PENDING_GIFTS_KEY, JSON.stringify(gifts));
+}
+
+// Ajándék hozzáadása a pending listához
+function addPendingGift(recipientUsername, resourceType, amount, senderUsername) {
+    const gifts = getPendingGifts();
+    gifts.push({
+        id: crypto.randomUUID(),
+        recipientUsername: recipientUsername.toLowerCase(),
+        resourceType: resourceType,
+        amount: amount,
+        senderUsername: senderUsername,
+        timestamp: Date.now()
+    });
+    savePendingGifts(gifts);
+}
+
+// Pending ajándékok feldolgozása a jelenlegi felhasználó számára
+function processPendingGifts(currentUser) {
+    if (!currentUser) return;
+    
+    const gifts = getPendingGifts();
+    const myGifts = gifts.filter(g => g.recipientUsername === currentUser.username.toLowerCase());
+    const otherGifts = gifts.filter(g => g.recipientUsername !== currentUser.username.toLowerCase());
+    
+    if (myGifts.length === 0) return;
+    
+    // Ajándékok feldolgozása
+    myGifts.forEach(gift => {
+        switch (gift.resourceType) {
+            case 'arany':
+                gameState.money += gift.amount;
+                break;
+            case 'deszka':
+                gameState.planks += gift.amount;
+                break;
+            case 'kukorica':
+                gameState.corn += gift.amount;
+                break;
+        }
+    });
+    
+    // Feldolgozott ajándékok törlése
+    savePendingGifts(otherGifts);
+    
+    // Játék mentése
+    if (typeof window.saveGame === 'function') {
+        window.saveGame();
+    }
+}
 
 // Trágár szavak listája
 const PROFANITY_LIST = [
@@ -284,6 +350,9 @@ function processCommand(text, currentUser) {
                 if (!hasEnough) {
                     addSystemMessage(`❌ Nincs elég ${resourceName} készleted! (Szükséges: ${amount})`);
                 } else {
+                    // Pending gift hozzáadása (a fogadó majd megkapja amikor megnyitja a chatot)
+                    addPendingGift(recipient.username, resourceName, amount, currentUser.username);
+                    
                     // Ajándék üzenet mentése
                     const messages = getChatMessages();
                     messages.push({
@@ -302,7 +371,7 @@ function processCommand(text, currentUser) {
                     // Megerősítés a küldőnek
                     addSystemMessage(`🎁 Sikeresen küldtél ${amount} ${resourceName}t ${recipient.username} számára!`);
                     
-                    // Játék mentése
+                    // Játék mentése (a küldő készletéből már le lett vonva)
                     if (typeof window.saveGame === 'function') {
                         window.saveGame();
                     }
@@ -632,6 +701,13 @@ function sendMessage() {
 function openChat() {
     const chatWindow = document.getElementById('chatWindow');
     chatWindow.classList.remove('hidden');
+    
+    // Pending ajándékok feldolgozása
+    const currentUser = getCurrentUser();
+    if (currentUser) {
+        processPendingGifts(currentUser);
+    }
+    
     renderMessages();
     
     // Input fókuszálása
