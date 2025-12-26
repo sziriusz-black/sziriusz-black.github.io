@@ -19,17 +19,12 @@
 import { CONFIG } from './config.js';
 import { gameState } from './gameState.js';
 import { findTile } from './tile-operations.js';
-import { showBubble } from './bubble.js';
+import { showBubble, closeBubble } from './bubble.js';
 import { getCanvas } from './renderer.js';
 
 // Kattintás kezelése
 export function handleClick(e) {
     const canvas = getCanvas();
-    
-    // Ne kezeljük a kattintást ha buborék van
-    if (gameState.activeBubble) {
-        return;
-    }
 
     // Ne kezeljük ha a buborékon vagy modalon kattintottunk
     const bubble = document.getElementById('bubble');
@@ -43,6 +38,11 @@ export function handleClick(e) {
         (discordModal && discordModal.contains(e.target)) ||
         (settingsDropdown && settingsDropdown.contains(e.target))) {
         return;
+    }
+
+    // Ha van aktív buborék, bezárjuk
+    if (gameState.activeBubble) {
+        closeBubble();
     }
 
     const rect = canvas.getBoundingClientRect();

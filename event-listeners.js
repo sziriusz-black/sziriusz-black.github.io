@@ -74,6 +74,24 @@ export function setupInputEvents() {
 // Buborék események
 export function setupBubbleEvents() {
     document.getElementById('closeBubble').addEventListener('click', closeBubble);
+    
+    // Kívülre kattintás - buborék bezárása
+    document.addEventListener('click', (e) => {
+        const bubble = document.getElementById('bubble');
+        const canvas = document.getElementById('gameCanvas');
+        
+        // Ha a buborék látható és nem a buborékon belül kattintottak
+        if (bubble && !bubble.classList.contains('hidden')) {
+            // Ha a canvas-on kattintottak (új tile kiválasztás), azt a click-handler kezeli
+            if (canvas && canvas.contains(e.target)) {
+                return;
+            }
+            // Ha a buborékon kívül kattintottak (de nem a canvas-on)
+            if (!bubble.contains(e.target)) {
+                closeBubble();
+            }
+        }
+    });
 }
 
 // Modal események
