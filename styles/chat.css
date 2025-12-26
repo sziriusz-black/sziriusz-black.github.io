@@ -104,6 +104,19 @@
     color: #ffd700;
 }
 
+.chat-message.admin {
+    border-left-color: #ff6b6b;
+}
+
+.chat-message.admin .chat-message-user {
+    color: #ff6b6b;
+}
+
+.admin-badge {
+    font-size: 12px;
+    margin-left: 3px;
+}
+
 .chat-input-container {
     display: flex;
     padding: 10px;
