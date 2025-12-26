@@ -10,9 +10,6 @@
  */
 
 import { getCurrentUser } from './auth.js';
-import { gameState } from './gameState.js';
-import { saveGameState } from './save-load.js';
-import { updateUI } from './ui.js';
 
 const CHAT_STORAGE_KEY = 'retroSkyblockChat';
 const REPORTS_STORAGE_KEY = 'retroSkyblockChatReports';
@@ -142,62 +139,14 @@ function processCommand(text, currentUser) {
                 '📋 Elérhető parancsok:\n' +
                 '/help - Parancsok listája\n' +
                 '/clear - Chat törlése\n' +
-                '/gold [mennyiség] - Arany hozzáadása\n' +
-                '/wood [mennyiség] - Deszka hozzáadása\n' +
-                '/stone [mennyiség] - Kő hozzáadása\n' +
-                '/corn [mennyiség] - Kukorica hozzáadása\n' +
-                '/workers [mennyiség] - Munkás hozzáadása\n' +
                 '/broadcast [üzenet] - Rendszer üzenet küldése\n' +
-                '/reset - Játék újrakezdése\n' +
-                '/god - Végtelen erőforrások\n' +
-                '/reports - Káromkodás jelentések\n' +
-                '/clearreports - Jelentések törlése'
+                '/reset - Játék újrakezdése'
             );
             break;
             
         case 'clear':
             saveChatMessages([]);
             addSystemMessage('🗑️ Chat törölve!');
-            break;
-            
-        case 'gold':
-            const goldAmount = parseInt(args[0]) || 1000;
-            gameState.gold += goldAmount;
-            updateUI();
-            saveGameState();
-            addSystemMessage(`💰 +${goldAmount} arany hozzáadva!`);
-            break;
-            
-        case 'wood':
-            const woodAmount = parseInt(args[0]) || 100;
-            gameState.wood += woodAmount;
-            updateUI();
-            saveGameState();
-            addSystemMessage(`🪵 +${woodAmount} deszka hozzáadva!`);
-            break;
-            
-        case 'stone':
-            const stoneAmount = parseInt(args[0]) || 100;
-            gameState.stone += stoneAmount;
-            updateUI();
-            saveGameState();
-            addSystemMessage(`🪨 +${stoneAmount} kő hozzáadva!`);
-            break;
-            
-        case 'corn':
-            const cornAmount = parseInt(args[0]) || 100;
-            gameState.corn += cornAmount;
-            updateUI();
-            saveGameState();
-            addSystemMessage(`🌽 +${cornAmount} kukorica hozzáadva!`);
-            break;
-            
-        case 'workers':
-            const workersAmount = parseInt(args[0]) || 10;
-            gameState.workers += workersAmount;
-            updateUI();
-            saveGameState();
-            addSystemMessage(`👷 +${workersAmount} munkás hozzáadva!`);
             break;
             
         case 'broadcast':
@@ -214,40 +163,6 @@ function processCommand(text, currentUser) {
                 localStorage.removeItem('retroSkyblockSave');
                 window.location.reload();
             }
-            break;
-            
-        case 'god':
-            gameState.gold += 999999;
-            gameState.wood += 99999;
-            gameState.stone += 99999;
-            gameState.corn += 99999;
-            gameState.workers += 999;
-            updateUI();
-            saveGameState();
-            addSystemMessage('⚡ GOD MODE aktiválva! Végtelen erőforrások!');
-            break;
-            
-        case 'reports':
-            const reports = getReports();
-            const unseenReports = reports.filter(r => !r.seen);
-            if (reports.length === 0) {
-                addSystemMessage('📋 Nincsenek jelentések.');
-            } else {
-                let reportText = `📋 Jelentések (${unseenReports.length} új):\n`;
-                reports.slice(-10).forEach(r => {
-                    const date = new Date(r.timestamp);
-                    const timeStr = `${date.getMonth()+1}.${date.getDate()} ${date.getHours()}:${date.getMinutes().toString().padStart(2,'0')}`;
-                    const newMark = r.seen ? '' : '🆕 ';
-                    reportText += `${newMark}[${timeStr}] ${r.username}: "${r.message}" (${r.detectedWord})\n`;
-                });
-                addSystemMessage(reportText);
-                markReportsAsSeen();
-            }
-            break;
-            
-        case 'clearreports':
-            localStorage.removeItem(REPORTS_STORAGE_KEY);
-            addSystemMessage('🗑️ Jelentések törölve!');
             break;
             
         default:
