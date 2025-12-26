@@ -14,35 +14,216 @@
             box-sizing: border-box;
         }
         body {
-            background: #ffffff;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 50%, #0f3460 100%);
             min-height: 100vh;
-            display: flex;
+            font-family: 'Courier New', monospace;
+            color: #fff;
+            padding: 40px 20px;
         }
-        .left-panel {
-            width: 50%;
-            min-height: 100vh;
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .back-link {
+            display: inline-block;
+            color: #4a9eff;
+            text-decoration: none;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .back-link:hover {
+            color: #6ab4ff;
+            text-decoration: underline;
+        }
+        h1 {
+            text-align: center;
+            color: #ffd700;
+            font-size: 42px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
+        }
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 50px;
+            font-size: 16px;
+        }
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+        .member-card {
+            background: rgba(0, 0, 0, 0.7);
+            border: 3px solid #4a4a4a;
+            box-shadow: 8px 8px 0px #000;
+            overflow: hidden;
+        }
+        .member-header {
+            background: linear-gradient(135deg, rgba(74, 158, 255, 0.3), rgba(255, 107, 107, 0.2));
+            padding: 25px;
+            text-align: center;
+            border-bottom: 3px solid #4a4a4a;
+        }
+        .member-avatar {
+            width: 120px;
+            height: 120px;
+            border: 4px solid #ffd700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+            margin-bottom: 15px;
+            object-fit: cover;
+        }
+        .member-name {
+            font-size: 24px;
+            color: #ffd700;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+        .member-role {
+            color: #4a9eff;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        .member-body {
+            padding: 25px;
+        }
+        .member-section {
+            margin-bottom: 20px;
+        }
+        .member-section:last-child {
+            margin-bottom: 0;
+        }
+        .section-title {
+            color: #ff6b6b;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+        .section-content {
+            color: #ddd;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .skills {
             display: flex;
-            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .skill-tag {
+            background: rgba(74, 158, 255, 0.2);
+            border: 1px solid #4a9eff;
+            color: #4a9eff;
+            padding: 5px 12px;
+            font-size: 12px;
+        }
+        .birthday {
+            display: flex;
             align-items: center;
-            background: #ffffff;
+            gap: 10px;
         }
-        .right-panel {
-            width: 50%;
-            min-height: 100vh;
-            background: #ffffff;
+        .birthday-icon {
+            font-size: 24px;
         }
-        .logo-image {
-            max-width: 90%;
-            max-height: 90vh;
-            object-fit: contain;
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(74, 74, 74, 0.5);
+        }
+        .footer-logo {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 15px;
+            opacity: 0.8;
+        }
+        .footer-text {
+            color: #666;
+            font-size: 12px;
+        }
+        .footer-year {
+            color: #4a9eff;
+        }
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 28px;
+            }
+            .team-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="left-panel">
-        <img src="images/retro-skyblock-logo.png" alt="Retro Skyblock" class="logo-image">
-    </div>
-    <div class="right-panel">
+    <div class="container">
+        <a href="index.html" class="back-link">← Vissza a játékhoz</a>
+        
+        <h1>✨ Credits ✨</h1>
+        <p class="subtitle">A Retro Skyblock mögött álló csapat</p>
+
+        <div class="team-grid">
+            <!-- Szíriusz Black -->
+            <div class="member-card">
+                <div class="member-header">
+                    <img src="images/retro-skyblock-logo.png" alt="Szíriusz Black" class="member-avatar">
+                    <div class="member-name">Szíriusz Black</div>
+                    <div class="member-role">👑 Alapító & Fejlesztő</div>
+                </div>
+                <div class="member-body">
+                    <div class="member-section">
+                        <div class="section-title">💪 Erősségek</div>
+                        <div class="skills">
+                            <span class="skill-tag">⛏️ Minecraft</span>
+                            <span class="skill-tag">🎮 Discord Moderátor</span>
+                            <span class="skill-tag">💻 Játékfejlesztés</span>
+                        </div>
+                    </div>
+                    <div class="member-section">
+                        <div class="section-title">🎂 Született</div>
+                        <div class="section-content">
+                            <div class="birthday">
+                                <span class="birthday-icon">🎈</span>
+                                <span>2012. január 17.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sarkiróka -->
+            <div class="member-card">
+                <div class="member-header">
+                    <img src="images/sarkiroka-avatar.png" alt="Sarkiróka" class="member-avatar" onerror="this.src='images/retro-skyblock-logo.png'">
+                    <div class="member-name">Sarkiróka</div>
+                    <div class="member-role">🦊 Társfejlesztő</div>
+                </div>
+                <div class="member-body">
+                    <div class="member-section">
+                        <div class="section-title">💪 Erősségek</div>
+                        <div class="skills">
+                            <span class="skill-tag">🧠 Ész</span>
+                            <span class="skill-tag">💪 Izom</span>
+                            <span class="skill-tag">🎯 Rafináltság</span>
+                        </div>
+                    </div>
+                    <div class="member-section">
+                        <div class="section-title">🎂 Született</div>
+                        <div class="section-content">
+                            <div class="birthday">
+                                <span class="birthday-icon">🎈</span>
+                                <span>1994. január 15.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <img src="images/retro-skyblock-logo.png" alt="Logo" class="footer-logo">
+            <p class="footer-text">Retro Skyblock © <span class="footer-year">2025</span></p>
+            <p class="footer-text">Készült ❤️-vel Magyarországon</p>
+        </div>
     </div>
 </body>
 </html>
