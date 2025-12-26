@@ -229,6 +229,88 @@ function processCommand(text, currentUser) {
         return true;
     }
     
+    if (command === 'gift') {
+        if (args.length < 3) {
+            addSystemMessage('❌ Használat: /gift [kinek] [mit] [mennyit]\nPélda: /gift Teszt arany 100\nLehetséges típusok: arany, deszka, kukorica');
+        } else {
+            const recipientName = args[0];
+            const resourceType = args[1].toLowerCase();
+            const amount = parseInt(args[2]);
+            
+            // Ellenőrzések
+            const users = getUsers();
+            const recipient = users.find(u => u.username.toLowerCase() === recipientName.toLowerCase());
+            
+            if (!recipient) {
+                addSystemMessage(`❌ Nincs "${recipientName}" nevű regisztrált játékos!`);
+            } else if (recipient.username.toLowerCase() === currentUser.username.toLowerCase()) {
+                addSystemMessage('❌ Magadnak nem küldhetsz ajándékot!');
+            } else if (isNaN(amount) || amount <= 0) {
+                addSystemMessage('❌ Érvénytelen mennyiség! Pozitív számot adj meg.');
+            } else {
+                // Erőforrás típus ellenőrzése és levonása
+                let resourceName = '';
+                let hasEnough = false;
+                
+                switch (resourceType) {
+                    case 'arany':
+                    case 'gold':
+                    case 'pénz':
+                    case 'money':
+                        resourceName = 'arany';
+                        hasEnough = gameState.money >= amount;
+                        if (hasEnough) gameState.money -= amount;
+                        break;
+                    case 'deszka':
+                    case 'fa':
+                    case 'planks':
+                    case 'wood':
+                        resourceName = 'deszka';
+                        hasEnough = gameState.planks >= amount;
+                        if (hasEnough) gameState.planks -= amount;
+                        break;
+                    case 'kukorica':
+                    case 'corn':
+                        resourceName = 'kukorica';
+                        hasEnough = gameState.corn >= amount;
+                        if (hasEnough) gameState.corn -= amount;
+                        break;
+                    default:
+                        addSystemMessage('❌ Ismeretlen erőforrás típus!\nLehetséges típusok: arany, deszka, kukorica');
+                        return true;
+                }
+                
+                if (!hasEnough) {
+                    addSystemMessage(`❌ Nincs elég ${resourceName} készleted! (Szükséges: ${amount})`);
+                } else {
+                    // Ajándék üzenet mentése
+                    const messages = getChatMessages();
+                    messages.push({
+                        id: crypto.randomUUID(),
+                        userId: currentUser.id,
+                        username: currentUser.username,
+                        recipientId: recipient.id,
+                        recipientUsername: recipient.username,
+                        resourceType: resourceName,
+                        amount: amount,
+                        timestamp: Date.now(),
+                        type: 'gift'
+                    });
+                    saveChatMessages(messages);
+                    
+                    // Megerősítés a küldőnek
+                    addSystemMessage(`🎁 Sikeresen küldtél ${amount} ${resourceName}t ${recipient.username} számára!`);
+                    
+                    // Játék mentése
+                    if (typeof window.saveGame === 'function') {
+                        window.saveGame();
+                    }
+                }
+            }
+        }
+        return true;
+    }
+    
     if (command === 'help') {
         if (isAdmin(currentUser.username)) {
             // Admin help - összes parancs
@@ -238,6 +320,7 @@ function processCommand(text, currentUser) {
                 '👥 Publikus:\n' +
                 '/help - Parancsok listája\n' +
                 '/player - Játékosok listája\n' +
+                '/gift [kinek] [mit] [mennyit] - Ajándék küldése\n' +
                 '━━━━━━━━━━━━━━━━━━━━\n' +
                 '👑 Admin:\n' +
                 '/clear - Chat törlése\n' +
@@ -254,7 +337,8 @@ function processCommand(text, currentUser) {
                 '📋 Elérhető parancsok:\n' +
                 '━━━━━━━━━━━━━━━━━━━━\n' +
                 '/help - Parancsok listája\n' +
-                '/player - Játékosok listája'
+                '/player - Játékosok listája\n' +
+                '/gift [kinek] [mit] [mennyit] - Ajándék küldése'
             );
         }
         return true;
@@ -423,6 +507,24 @@ function renderMessages() {
     }
     
     messagesContainer.innerHTML = messages.map(msg => {
+        // Gift üzenetek csak a fogadónak jelennek meg
+        if (msg.type === 'gift') {
+            // Ha én vagyok a fogadó
+            if (currentUser && msg.recipientUsername.toLowerCase() === currentUser.username.toLowerCase()) {
+                return `
+                    <div class="chat-message gift">
+                        <div class="chat-message-header">
+                            <span class="chat-message-user">🎁 Ajándék!</span>
+                            <span class="chat-message-time">${formatTime(msg.timestamp)}</span>
+                        </div>
+                        <div class="chat-message-text">Ajándékot kaptál tőle: <strong>${escapeHtml(msg.username)}</strong><br>💎 ${msg.amount} ${msg.resourceType}</div>
+                    </div>
+                `;
+            }
+            // Ha nem nekem szól, nem jelenítjük meg
+            return '';
+        }
+        
         const isOwn = currentUser && msg.userId === currentUser.id;
         const isSystem = msg.type === 'system';
         const isAdminUser = msg.type === 'user' && isAdmin(msg.username);
