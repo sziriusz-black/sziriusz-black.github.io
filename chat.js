@@ -229,22 +229,17 @@ function processCommand(text, currentUser) {
         return true;
     }
     
-    // Admin ellenőrzés (a többi parancshoz)
-    if (!isAdmin(currentUser.username)) {
-        addSystemMessage('❌ Nincs jogosultságod parancsok használatához!');
-        return true;
-    }
-    
-    switch (command) {
-        case 'help':
+    if (command === 'help') {
+        if (isAdmin(currentUser.username)) {
+            // Admin help - összes parancs
             addSystemMessage(
                 '📋 Elérhető parancsok:\n' +
                 '━━━━━━━━━━━━━━━━━━━━\n' +
                 '👥 Publikus:\n' +
+                '/help - Parancsok listája\n' +
                 '/player - Játékosok listája\n' +
                 '━━━━━━━━━━━━━━━━━━━━\n' +
                 '👑 Admin:\n' +
-                '/help - Parancsok listája\n' +
                 '/clear - Chat törlése\n' +
                 '/broadcast [üzenet] - Rendszer üzenet\n' +
                 '/reset - Játék újrakezdése\n' +
@@ -253,8 +248,25 @@ function processCommand(text, currentUser) {
                 '/unmute [név] - Némítás feloldása\n' +
                 '/info [név] - Játékos adatai'
             );
-            break;
-            
+        } else {
+            // Normál help - csak publikus parancsok
+            addSystemMessage(
+                '📋 Elérhető parancsok:\n' +
+                '━━━━━━━━━━━━━━━━━━━━\n' +
+                '/help - Parancsok listája\n' +
+                '/player - Játékosok listája'
+            );
+        }
+        return true;
+    }
+    
+    // Admin ellenőrzés (a többi parancshoz)
+    if (!isAdmin(currentUser.username)) {
+        addSystemMessage('❌ Nincs jogosultságod ehhez a parancshoz!');
+        return true;
+    }
+    
+    switch (command) {
         case 'clear':
             saveChatMessages([]);
             addSystemMessage('🗑️ Chat törölve!');
