@@ -347,11 +347,10 @@ function processCommand(text, currentUser) {
                 // Saját játékadatok (csak ha saját magát nézi)
                 if (isSelf) {
                     infoText += `━━━━━━━━━━━━━━━━━━━━\n`;
-                    infoText += `💰 Arany: ${gameState.gold.toLocaleString()}\n`;
+                    infoText += `💰 Arany: ${gameState.money.toLocaleString()}\n`;
                     infoText += `🪵 Deszka: ${gameState.planks.toLocaleString()}\n`;
-                    infoText += `🪨 Kő: ${gameState.stone.toLocaleString()}\n`;
                     infoText += `🌽 Kukorica: ${gameState.corn.toLocaleString()}\n`;
-                    infoText += `👷 Munkások: ${gameState.workers}\n`;
+                    infoText += `👷 Munkások: ${gameState.workers}/${gameState.maxWorkers}\n`;
                     infoText += `🗺️ Területek: ${gameState.map.length} db\n`;
                     
                     // Épületek számolása
