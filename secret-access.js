@@ -1,12 +1,15 @@
 /**
  * @file secret-access.js
- * @description Titkos hozzáférés kezelése - visszaszámláló vagy játék megjelenítése
+ * @description Titkos hozzáférés és auth kezelése - visszaszámláló vagy játék megjelenítése
  * 
  * FELELŐSSÉGI KÖR:
  * - URL paraméter ellenőrzése (secret=67)
+ * - Auth állapot ellenőrzése
  * - Visszaszámláló megjelenítése és frissítése
  * - Játék tartalom megjelenítése/elrejtése
  */
+
+import { isLoggedIn, initAuthUI } from './auth.js';
 
 // A céldátum amire visszaszámolunk (módosítható)
 const TARGET_DATE = new Date('2025-12-30T12:00:00');
@@ -40,8 +43,23 @@ function updateCountdown() {
 
 // Inicializálás
 function initSecretAccess() {
+    const authOverlay = document.getElementById('authOverlay');
     const gameContent = document.getElementById('gameContent');
     const countdownOverlay = document.getElementById('countdownOverlay');
+
+    // Ha nincs bejelentkezve, auth form megjelenítése
+    if (!isLoggedIn()) {
+        if (authOverlay) authOverlay.classList.remove('hidden');
+        if (gameContent) gameContent.classList.add('hidden');
+        if (countdownOverlay) countdownOverlay.classList.add('hidden');
+        
+        // Auth UI inicializálása
+        initAuthUI();
+        return false;
+    }
+
+    // Bejelentkezett felhasználó
+    if (authOverlay) authOverlay.classList.add('hidden');
 
     if (hasSecretAccess()) {
         // Van titkos hozzáférés - játék megjelenítése
@@ -61,5 +79,3 @@ function initSecretAccess() {
 }
 
 export { initSecretAccess, hasSecretAccess };
-
-

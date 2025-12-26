@@ -7,8 +7,51 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Visszaszámláló overlay - alapból látszik -->
-    <div id="countdownOverlay" class="countdown-overlay">
+    <!-- Bejelentkezés/Regisztráció overlay - alapból látszik -->
+    <div id="authOverlay" class="auth-overlay">
+        <div class="auth-container">
+            <h1 class="auth-title">🎮 Retro Skyblock</h1>
+            
+            <!-- Bejelentkezés form -->
+            <div id="loginForm" class="auth-form">
+                <h2>Bejelentkezés</h2>
+                <div class="auth-input-group">
+                    <label for="loginUsername">Felhasználónév</label>
+                    <input type="text" id="loginUsername" maxlength="20" placeholder="Add meg a neved">
+                </div>
+                <div class="auth-input-group">
+                    <label for="loginPassword">Jelszó</label>
+                    <input type="password" id="loginPassword" maxlength="30" placeholder="Add meg a jelszavad">
+                </div>
+                <button id="loginBtn" class="auth-btn">Bejelentkezés</button>
+                <p class="auth-switch">Nincs még fiókod? <a href="#" id="showRegister">Regisztrálj!</a></p>
+            </div>
+
+            <!-- Regisztráció form -->
+            <div id="registerForm" class="auth-form hidden">
+                <h2>Regisztráció</h2>
+                <div class="auth-input-group">
+                    <label for="registerUsername">Felhasználónév</label>
+                    <input type="text" id="registerUsername" maxlength="20" placeholder="Válassz egy nevet">
+                </div>
+                <div class="auth-input-group">
+                    <label for="registerPassword">Jelszó</label>
+                    <input type="password" id="registerPassword" maxlength="30" placeholder="Válassz egy jelszót">
+                </div>
+                <div class="auth-input-group">
+                    <label for="registerPasswordConfirm">Jelszó megerősítése</label>
+                    <input type="password" id="registerPasswordConfirm" maxlength="30" placeholder="Írd be újra a jelszót">
+                </div>
+                <button id="registerBtn" class="auth-btn">Regisztráció</button>
+                <p class="auth-switch">Van már fiókod? <a href="#" id="showLogin">Jelentkezz be!</a></p>
+            </div>
+
+            <div id="authError" class="auth-error hidden"></div>
+        </div>
+    </div>
+
+    <!-- Visszaszámláló overlay - bejelentkezés után látszik -->
+    <div id="countdownOverlay" class="countdown-overlay hidden">
         <div class="countdown-content">
             <h1 class="countdown-title">🎮 Hamarosan érkezik!</h1>
             <div id="countdownTimer" class="countdown-timer">Betöltés...</div>
