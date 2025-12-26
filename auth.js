@@ -375,4 +375,4 @@ function initAuthUI() {
     }
 }
 
-export { isLoggedIn, getCurrentUser, logout, initAuthUI };
+export { isLoggedIn, getCurrentUser, logout, initAuthUI, getUsers };

@@ -9,7 +9,8 @@
  * - Admin parancsok kezelése
  */
 
-import { getCurrentUser } from './auth.js';
+import { getCurrentUser, getUsers } from './auth.js';
+import { gameState } from './gameState.js';
 
 const CHAT_STORAGE_KEY = 'retroSkyblockChat';
 const REPORTS_STORAGE_KEY = 'retroSkyblockChatReports';
@@ -237,7 +238,8 @@ function processCommand(text, currentUser) {
                 '/reset - Játék újrakezdése\n' +
                 '/reports - Káromkodás jelentések\n' +
                 '/mute [név] [idő] - Játékos némítása (pl: /mute Teszt 30m)\n' +
-                '/unmute [név] - Némítás feloldása'
+                '/unmute [név] - Némítás feloldása\n' +
+                '/info [név] - Játékos adatai'
             );
             break;
             
@@ -314,6 +316,60 @@ function processCommand(text, currentUser) {
                     saveMutes(mutes);
                     addSystemMessage(`🔊 ${unmuteUsername} némítása feloldva!`);
                 }
+            }
+            break;
+            
+        case 'info':
+            const infoUsername = args.length > 0 ? args[0] : currentUser.username;
+            const isSelf = infoUsername.toLowerCase() === currentUser.username.toLowerCase();
+            
+            // Regisztrált felhasználó keresése
+            const users = getUsers();
+            const targetUser = users.find(u => u.username.toLowerCase() === infoUsername.toLowerCase());
+            
+            if (!targetUser) {
+                addSystemMessage(`❌ Nincs "${infoUsername}" nevű regisztrált játékos!`);
+            } else {
+                const regDate = new Date(targetUser.createdAt);
+                const regDateStr = `${regDate.getFullYear()}.${(regDate.getMonth()+1).toString().padStart(2,'0')}.${regDate.getDate().toString().padStart(2,'0')} ${regDate.getHours().toString().padStart(2,'0')}:${regDate.getMinutes().toString().padStart(2,'0')}`;
+                
+                let infoText = `📊 ${targetUser.username} adatai:\n`;
+                infoText += `━━━━━━━━━━━━━━━━━━━━\n`;
+                infoText += `📅 Regisztráció: ${regDateStr}\n`;
+                infoText += `👑 Admin: ${isAdmin(targetUser.username) ? 'Igen' : 'Nem'}\n`;
+                
+                // Mute állapot
+                const targetMute = checkMute(targetUser.username);
+                if (targetMute) {
+                    infoText += `🔇 Némítva: ${formatRemainingTime(targetMute)}\n`;
+                }
+                
+                // Saját játékadatok (csak ha saját magát nézi)
+                if (isSelf) {
+                    infoText += `━━━━━━━━━━━━━━━━━━━━\n`;
+                    infoText += `💰 Arany: ${gameState.gold.toLocaleString()}\n`;
+                    infoText += `🪵 Deszka: ${gameState.planks.toLocaleString()}\n`;
+                    infoText += `🪨 Kő: ${gameState.stone.toLocaleString()}\n`;
+                    infoText += `🌽 Kukorica: ${gameState.corn.toLocaleString()}\n`;
+                    infoText += `👷 Munkások: ${gameState.workers}\n`;
+                    infoText += `🗺️ Területek: ${gameState.map.length} db\n`;
+                    
+                    // Épületek számolása
+                    const houses = gameState.map.filter(t => t.type === 'house').length;
+                    const trees = gameState.map.filter(t => t.type === 'tree').length;
+                    const stonecutters = gameState.map.filter(t => t.type === 'stoneCutter').length;
+                    const cornfields = gameState.map.filter(t => t.type === 'corn' || t.type === 'cornEmpty').length;
+                    
+                    infoText += `━━━━━━━━━━━━━━━━━━━━\n`;
+                    infoText += `🏠 Házak: ${houses}\n`;
+                    infoText += `🌲 Fák: ${trees}\n`;
+                    infoText += `⛏️ Kővágók: ${stonecutters}\n`;
+                    infoText += `🌾 Kukoricaföldek: ${cornfields}`;
+                } else {
+                    infoText += `\n⚠️ Részletes játékadatok csak saját profilnál láthatók.`;
+                }
+                
+                addSystemMessage(infoText);
             }
             break;
             
