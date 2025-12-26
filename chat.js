@@ -17,6 +17,9 @@ const REPORTS_STORAGE_KEY = 'retroSkyblockChatReports';
 const MUTES_STORAGE_KEY = 'retroSkyblockChatMutes';
 const MAX_MESSAGES = 50;
 const ADMIN_USERNAMES = ['Szíriusz', 'Szirius', 'szíriusz', 'szirius'];
+const MESSAGE_COOLDOWN_MS = 5000; // 5 másodperc cooldown
+
+let lastMessageTime = 0;
 
 // Trágár szavak listája
 const PROFANITY_LIST = [
@@ -571,10 +574,22 @@ function sendMessage() {
     
     input.value = '';
     
-    // Parancs ellenőrzése
+    // Parancs ellenőrzése (parancsokra nem vonatkozik a cooldown)
     if (text.startsWith('/')) {
         processCommand(text, currentUser);
         return;
+    }
+    
+    // Cooldown ellenőrzése (adminokra nem vonatkozik)
+    if (!isAdmin(currentUser.username)) {
+        const now = Date.now();
+        const timeSinceLastMessage = now - lastMessageTime;
+        
+        if (timeSinceLastMessage < MESSAGE_COOLDOWN_MS) {
+            const remainingSeconds = Math.ceil((MESSAGE_COOLDOWN_MS - timeSinceLastMessage) / 1000);
+            addSystemMessage(`⏳ Várj még ${remainingSeconds} másodpercet a következő üzenet előtt!`);
+            return;
+        }
     }
     
     // Mute ellenőrzése
@@ -610,6 +625,9 @@ function sendMessage() {
     messages.push(newMessage);
     saveChatMessages(messages);
     renderMessages();
+    
+    // Cooldown frissítése
+    lastMessageTime = Date.now();
 }
 
 // Chat megnyitása
