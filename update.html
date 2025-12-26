@@ -93,7 +93,7 @@
         }
         .version-card.open .version-changes {
             padding: 20px;
-            max-height: 1000px;
+            max-height: 2000px;
             border-top: 2px solid #4a4a4a;
         }
         .version-changes ul {
@@ -123,6 +123,33 @@
         .version-changes li.improve::before {
             content: "⬆️";
         }
+        /* Kattintható elemek */
+        .change-item {
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .change-item:hover {
+            color: #4a9eff;
+        }
+        .change-item::after {
+            content: " ℹ️";
+            font-size: 12px;
+            opacity: 0.5;
+        }
+        .change-detail {
+            display: none;
+            background: rgba(74, 158, 255, 0.1);
+            border-left: 3px solid #4a9eff;
+            padding: 10px 15px;
+            margin-top: 8px;
+            margin-left: 25px;
+            font-size: 13px;
+            color: #aaa;
+            line-height: 1.6;
+        }
+        .change-detail.open {
+            display: block;
+        }
         @media (max-width: 600px) {
             h1 {
                 font-size: 24px;
@@ -148,21 +175,96 @@
             </div>
             <div class="version-changes">
                 <ul>
-                    <li class="new">Bejelentkezési és regisztrációs rendszer</li>
-                    <li class="new">Elfelejtett jelszó funkció</li>
-                    <li class="new">Jelszó erősség ellenőrzés (8 karakter, szám, betű, speciális)</li>
-                    <li class="new">Trágár szavak szűrése regisztrációnál</li>
-                    <li class="new">Titkos URL hozzáférés (?secret=67)</li>
-                    <li class="new">Visszaszámláló oldal december 30-ig</li>
-                    <li class="new">Többnyelvűség (Magyar, English, Deutsch)</li>
-                    <li class="new">Discord online státusz jelző (zöld pötty)</li>
-                    <li class="new">Credits oldal</li>
-                    <li class="new">Favicon hozzáadva</li>
-                    <li class="new">Kijelentkezés gomb a beállításokban</li>
-                    <li class="new">Frissítési napló oldal</li>
-                    <li class="improve">Terület ár növekedés 25%-ról 5%-ra csökkentve</li>
-                    <li class="improve">Fejlesztések modal háttér világosabb</li>
-                    <li class="fix">Buborék bezárás félrekattintáskor</li>
+                    <li class="new">
+                        <span class="change-item" onclick="toggleDetail(this)">Bejelentkezési és regisztrációs rendszer</span>
+                        <div class="change-detail">
+                            A játék indításakor egy bejelentkezési felület jelenik meg. Ha nincs még fiókod, regisztrálhatsz felhasználónévvel, email címmel és jelszóval. A bejelentkezés után a titkos URL-en érhető el a játék, a normál URL-en visszaszámláló látható.
+                        </div>
+                    </li>
+                    <li class="new">
+                        <span class="change-item" onclick="toggleDetail(this)">Elfelejtett jelszó funkció</span>
+                        <div class="change-detail">
+                            Ha elfelejtetted a jelszavad, a bejelentkezési oldalon az "Elfelejtettem a jelszavam" linkre kattintva megadhatod az email címed, és a rendszer megjeleníti a hozzá tartozó jelszót (frontend-only demo verzió).
+                        </div>
+                    </li>
+                    <li class="new">
+                        <span class="change-item" onclick="toggleDetail(this)">Jelszó erősség ellenőrzés</span>
+                        <div class="change-detail">
+                            A jelszónak tartalmaznia kell: legalább 8 karaktert, betűt (magyar ékezetes is elfogadott), számot és speciális karaktert (!@#$%^&* stb.). Ha valami hiányzik, a rendszer pontosan kiírja, hogy mi kell még bele.
+                        </div>
+                    </li>
+                    <li class="new">
+                        <span class="change-item" onclick="toggleDetail(this)">Trágár szavak szűrése regisztrációnál</span>
+                        <div class="change-detail">
+                            A regisztrációnál a rendszer ellenőrzi a felhasználónevet. Ha trágár szót tartalmaz (magyar vagy angol), hibaüzenetet kap a felhasználó, és a név mező automatikusan törlődik.
+                        </div>
+                    </li>
+                    <li class="new">
+                        <span class="change-item" onclick="toggleDetail(this)">Titkos URL hozzáférés (?secret=67)</span>
+                        <div class="change-detail">
+                            A játék csak a titkos URL-en érhető el: sziriusz-black.github.io/?secret=67. A normál URL-en bejelentkezett felhasználók visszaszámlálót látnak december 30-ig.
+                        </div>
+                    </li>
+                    <li class="new">
+                        <span class="change-item" onclick="toggleDetail(this)">Visszaszámláló oldal december 30-ig</span>
+                        <div class="change-detail">
+                            A normál URL-en egy valós idejű visszaszámláló jelenik meg, ami december 30. 12:00-ig számol vissza. Napok, órák, percek és másodpercek jelennek meg.
+                        </div>
+                    </li>
+                    <li class="new">
+                        <span class="change-item" onclick="toggleDetail(this)">Többnyelvűség (Magyar, English, Deutsch)</span>
+                        <div class="change-detail">
+                            A beállításokban a zászló ikonra kattintva válthatod a nyelvet. Három nyelv elérhető: Magyar, English és Deutsch. A felület összes szövege automatikusan lefordítódik.
+                        </div>
+                    </li>
+                    <li class="new">
+                        <span class="change-item" onclick="toggleDetail(this)">Discord online státusz jelző (zöld pötty)</span>
+                        <div class="change-detail">
+                            A beállítások menüben a Discord ikon jobb alsó sarkában zöld pötty jelenik meg, ha van online felhasználó a játék Discord szerverén. 60 másodpercenként frissül automatikusan.
+                        </div>
+                    </li>
+                    <li class="new">
+                        <span class="change-item" onclick="toggleDetail(this)">Credits oldal</span>
+                        <div class="change-detail">
+                            A beállítások menüből elérhető egy Credits oldal, ahol a játék készítőivel kapcsolatos információk találhatók. Két oszlopos elrendezésben, bal oldalon a játék logójával.
+                        </div>
+                    </li>
+                    <li class="new">
+                        <span class="change-item" onclick="toggleDetail(this)">Favicon hozzáadva</span>
+                        <div class="change-detail">
+                            A böngésző fülén megjelenik a játék ikonja. Különböző méretekben: 16x16, 32x32, Apple Touch Icon és Android Chrome ikonok is támogatottak.
+                        </div>
+                    </li>
+                    <li class="new">
+                        <span class="change-item" onclick="toggleDetail(this)">Kijelentkezés gomb a beállításokban</span>
+                        <div class="change-detail">
+                            A beállítások menü alján egy piros Kijelentkezés gomb található. Kattintásra kijelentkeztet és újratölti az oldalt, visszatérve a bejelentkező képernyőre.
+                        </div>
+                    </li>
+                    <li class="new">
+                        <span class="change-item" onclick="toggleDetail(this)">Frissítési napló oldal</span>
+                        <div class="change-detail">
+                            A verzió számra kattintva (bal alsó sarok) megnyílik ez az oldal, ahol részletesen láthatod az összes frissítést és változást verziónként.
+                        </div>
+                    </li>
+                    <li class="improve">
+                        <span class="change-item" onclick="toggleDetail(this)">Terület ár növekedés 25%-ról 5%-ra csökkentve</span>
+                        <div class="change-detail">
+                            Az új területek vásárlási ára most lassabban növekszik. A 14. terület után már csak 5%-kal drágul minden újabb terület, a korábbi 25% helyett.
+                        </div>
+                    </li>
+                    <li class="improve">
+                        <span class="change-item" onclick="toggleDetail(this)">Fejlesztések modal háttér világosabb</span>
+                        <div class="change-detail">
+                            A fejlesztések (upgrade) modal háttér átlátszósága 80%-ról 40%-ra csökkent, így a mögötte lévő játéktér jobban látható.
+                        </div>
+                    </li>
+                    <li class="fix">
+                        <span class="change-item" onclick="toggleDetail(this)">Buborék bezárás félrekattintáskor</span>
+                        <div class="change-detail">
+                            Korábban ha egy buborék nyitva volt és félrekattintottál, bezárta a régit de azonnal megnyitott egy újat ha másik mezőre kattintottál. Most már csak bezárja a régit, újat csak a következő kattintásra nyit.
+                        </div>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -177,9 +279,24 @@
             </div>
             <div class="version-changes">
                 <ul>
-                    <li class="fix">Tutorial javítások</li>
-                    <li class="fix">Discord link frissítve</li>
-                    <li class="improve">Visszaszámláló hozzáadva</li>
+                    <li class="fix">
+                        <span class="change-item" onclick="toggleDetail(this)">Tutorial javítások</span>
+                        <div class="change-detail">
+                            A tutorial lépései most helyesen jelennek meg és a megfelelő sorrendben vezetik végig az új játékost az alapokon.
+                        </div>
+                    </li>
+                    <li class="fix">
+                        <span class="change-item" onclick="toggleDetail(this)">Discord link frissítve</span>
+                        <div class="change-detail">
+                            A Discord meghívó link frissítve lett az aktuális, működő linkre.
+                        </div>
+                    </li>
+                    <li class="improve">
+                        <span class="change-item" onclick="toggleDetail(this)">Visszaszámláló hozzáadva</span>
+                        <div class="change-detail">
+                            Előkészítés a nagy frissítéshez: visszaszámláló funkció alapjainak megteremtése.
+                        </div>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -194,10 +311,30 @@
             </div>
             <div class="version-changes">
                 <ul>
-                    <li class="new">Kővágó épület</li>
-                    <li class="new">Ház és kővágó fejlesztések (upgrade)</li>
-                    <li class="new">Munkás rendszer</li>
-                    <li class="improve">Jobb UI elemek</li>
+                    <li class="new">
+                        <span class="change-item" onclick="toggleDetail(this)">Kővágó épület</span>
+                        <div class="change-detail">
+                            Új épülettípus: a kővágó követ termel automatikusan. Építsd meg és a munkások dolgozni kezdenek, a kő mennyisége folyamatosan nő.
+                        </div>
+                    </li>
+                    <li class="new">
+                        <span class="change-item" onclick="toggleDetail(this)">Ház és kővágó fejlesztések (upgrade)</span>
+                        <div class="change-detail">
+                            Az épületekre kattintva megjelenik egy fejlesztés gomb. A fejlesztés növeli a termelési sebességet és a kapacitást.
+                        </div>
+                    </li>
+                    <li class="new">
+                        <span class="change-item" onclick="toggleDetail(this)">Munkás rendszer</span>
+                        <div class="change-detail">
+                            A házakban lakók élnek, akik dolgoznak a kővágóban és más termelő épületekben. Minél több házad van, annál több munkásod.
+                        </div>
+                    </li>
+                    <li class="improve">
+                        <span class="change-item" onclick="toggleDetail(this)">Jobb UI elemek</span>
+                        <div class="change-detail">
+                            A felhasználói felület elemei letisztultabbak és jobban láthatók lettek. Gombok, ikonok és szövegek finomhangolása.
+                        </div>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -212,9 +349,24 @@
             </div>
             <div class="version-changes">
                 <ul>
-                    <li class="new">Kukorica föld építése</li>
-                    <li class="new">Kukorica learatás és eladás</li>
-                    <li class="new">Kukorica újraültetés</li>
+                    <li class="new">
+                        <span class="change-item" onclick="toggleDetail(this)">Kukorica föld építése</span>
+                        <div class="change-detail">
+                            Új mezőtípus: kukoricaföld. A területen kukoricát ültethetsz, ami idővel megérik és learatható.
+                        </div>
+                    </li>
+                    <li class="new">
+                        <span class="change-item" onclick="toggleDetail(this)">Kukorica learatás és eladás</span>
+                        <div class="change-detail">
+                            Az érett kukoricát learathatod a mezőre kattintva. A learatott kukoricát eladhatod aranyért.
+                        </div>
+                    </li>
+                    <li class="new">
+                        <span class="change-item" onclick="toggleDetail(this)">Kukorica újraültetés</span>
+                        <div class="change-detail">
+                            Learatás után automatikusan újraültetheted a kukoricát, vagy hagyd pihenni a földet.
+                        </div>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -229,10 +381,30 @@
             </div>
             <div class="version-changes">
                 <ul>
-                    <li class="new">Fa ültetés funkció</li>
-                    <li class="new">Deszka eladás slider</li>
-                    <li class="new">Háttérzene</li>
-                    <li class="new">Hang ki/be kapcsolás</li>
+                    <li class="new">
+                        <span class="change-item" onclick="toggleDetail(this)">Fa ültetés funkció</span>
+                        <div class="change-detail">
+                            Üres területen fát ültethetsz. A fa idővel megnő és kivágható, deszkát adva.
+                        </div>
+                    </li>
+                    <li class="new">
+                        <span class="change-item" onclick="toggleDetail(this)">Deszka eladás slider</span>
+                        <div class="change-detail">
+                            A deszkákat csúszkával választható mennyiségben adhatod el. Beállíthatod pontosan, mennyit szeretnél eladni.
+                        </div>
+                    </li>
+                    <li class="new">
+                        <span class="change-item" onclick="toggleDetail(this)">Háttérzene</span>
+                        <div class="change-detail">
+                            Nyugtató háttérzene szól játék közben, ami a retro hangulatot erősíti.
+                        </div>
+                    </li>
+                    <li class="new">
+                        <span class="change-item" onclick="toggleDetail(this)">Hang ki/be kapcsolás</span>
+                        <div class="change-detail">
+                            A beállításokban ki- és bekapcsolhatod a háttérzenét a hangszóró ikonnal.
+                        </div>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -247,11 +419,36 @@
             </div>
             <div class="version-changes">
                 <ul>
-                    <li class="new">Alap játékmenet</li>
-                    <li class="new">Terület vásárlás</li>
-                    <li class="new">Fa kivágás</li>
-                    <li class="new">Ház építés</li>
-                    <li class="new">Mentés/betöltés</li>
+                    <li class="new">
+                        <span class="change-item" onclick="toggleDetail(this)">Alap játékmenet</span>
+                        <div class="change-detail">
+                            A játék alapmechanikája: egy szigeten kezdesz, és fokozatosan terjeszkedsz, építkezel és gyűjtögetsz erőforrásokat.
+                        </div>
+                    </li>
+                    <li class="new">
+                        <span class="change-item" onclick="toggleDetail(this)">Terület vásárlás</span>
+                        <div class="change-detail">
+                            Aranyért új területeket vásárolhatsz a szigeted szélén. Minden új terület drágább, mint az előző.
+                        </div>
+                    </li>
+                    <li class="new">
+                        <span class="change-item" onclick="toggleDetail(this)">Fa kivágás</span>
+                        <div class="change-detail">
+                            A fákra kattintva kivághatod őket, és deszkát kapsz cserébe. A deszka alapvető építőanyag.
+                        </div>
+                    </li>
+                    <li class="new">
+                        <span class="change-item" onclick="toggleDetail(this)">Ház építés</span>
+                        <div class="change-detail">
+                            Üres területen házat építhetsz deszkából. A házakban munkások laknak, akik segítenek a termelésben.
+                        </div>
+                    </li>
+                    <li class="new">
+                        <span class="change-item" onclick="toggleDetail(this)">Mentés/betöltés</span>
+                        <div class="change-detail">
+                            A játék automatikusan menti az állapotod a böngésző tárhelyére. Legközelebb onnan folytathatod, ahol abbahagytad.
+                        </div>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -261,6 +458,12 @@
         function toggleVersion(header) {
             const card = header.parentElement;
             card.classList.toggle('open');
+        }
+        
+        function toggleDetail(item) {
+            event.stopPropagation();
+            const detail = item.nextElementSibling;
+            detail.classList.toggle('open');
         }
     </script>
 </body>
