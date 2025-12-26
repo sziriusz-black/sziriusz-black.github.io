@@ -243,8 +243,6 @@ function processCommand(text, currentUser) {
             
             if (!recipient) {
                 addSystemMessage(`❌ Nincs "${recipientName}" nevű regisztrált játékos!`);
-            } else if (recipient.username.toLowerCase() === currentUser.username.toLowerCase()) {
-                addSystemMessage('❌ Magadnak nem küldhetsz ajándékot!');
             } else if (isNaN(amount) || amount <= 0) {
                 addSystemMessage('❌ Érvénytelen mennyiség! Pozitív számot adj meg.');
             } else {
