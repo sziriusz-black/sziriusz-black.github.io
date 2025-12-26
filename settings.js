@@ -18,7 +18,7 @@
  * Kérjük, a megfelelő modulba fejlessz!
  */
 import { toggleMute, isMusicMuted } from './audio.js';
-import { cycleLanguage, getLanguage, FLAGS, getNextLanguage, t } from './i18n.js';
+import { cycleLanguage, getLanguage, FLAGS, LANGUAGE_NAMES, getNextLanguage, t } from './i18n.js';
 import { logout } from './auth.js';
 
 export function toggleSettingsMenu() {
@@ -65,19 +65,18 @@ export function updateLanguageFlag() {
     const languageFlag = document.getElementById('languageFlag');
     const languageText = document.getElementById('languageText');
     const languageMenuItem = document.getElementById('languageMenuItem');
+    const currentLang = getLanguage();
     
     if (languageFlag) {
-        const nextLang = getNextLanguage();
-        languageFlag.textContent = FLAGS[nextLang];
+        languageFlag.textContent = FLAGS[currentLang];
     }
     
     if (languageText) {
-        languageText.textContent = t('settings.language');
+        languageText.textContent = `${t('settings.language')}: ${LANGUAGE_NAMES[currentLang]}`;
     }
     
     if (languageMenuItem) {
-        const nextLang = getNextLanguage();
-        languageMenuItem.title = `${t('settings.language')} (${nextLang.toUpperCase()})`;
+        languageMenuItem.title = `${t('settings.language')}: ${LANGUAGE_NAMES[currentLang]}`;
     }
 }
 

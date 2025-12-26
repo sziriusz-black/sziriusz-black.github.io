@@ -25,6 +25,13 @@ export const FLAGS = {
     de: '🇩🇪'
 };
 
+// Nyelv nevek
+export const LANGUAGE_NAMES = {
+    hu: 'Magyar',
+    en: 'English',
+    de: 'Deutsch'
+};
+
 // Aktuális nyelv
 let currentLanguage = 'hu';
 
