@@ -35,6 +35,7 @@ const translations = {
         'settings.sound': 'Hang',
         'settings.discord': 'Discord',
         'settings.language': 'Nyelv',
+        'settings.credits': 'Credits',
         'settings.logout': 'Kijelentkezés',
         
         // Státusz panel
@@ -132,6 +133,7 @@ const translations = {
         'settings.sound': 'Sound',
         'settings.discord': 'Discord',
         'settings.language': 'Language',
+        'settings.credits': 'Credits',
         'settings.logout': 'Logout',
         
         // Status panel
@@ -229,6 +231,7 @@ const translations = {
         'settings.sound': 'Ton',
         'settings.discord': 'Discord',
         'settings.language': 'Sprache',
+        'settings.credits': 'Credits',
         'settings.logout': 'Abmelden',
         
         // Status panel

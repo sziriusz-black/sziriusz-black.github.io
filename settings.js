@@ -86,3 +86,7 @@ export function handleLogout() {
     window.location.reload();
 }
 
+export function handleCredits() {
+    window.open('https://sziriusz-black.github.io/credits', '_blank');
+}
+

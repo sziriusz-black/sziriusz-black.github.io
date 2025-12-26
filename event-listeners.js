@@ -27,7 +27,7 @@ import { setupZoom } from './zoom.js';
 import { saveGameState } from './save-load.js';
 import { loadMuteState } from './audio.js';
 import { closeBubble } from './bubble.js';
-import { updateSoundIcon, handleSoundToggle, toggleSettingsMenu, closeSettingsMenu, handleLanguageToggle, updateLanguageFlag, handleLogout } from './settings.js';
+import { updateSoundIcon, handleSoundToggle, toggleSettingsMenu, closeSettingsMenu, handleLanguageToggle, updateLanguageFlag, handleLogout, handleCredits } from './settings.js';
 import { translateDOM } from './i18n.js';
 import { handleClick } from './click-handler.js';
 import { 
@@ -153,6 +153,7 @@ export function setupSettingsEvents() {
         openDiscordModal();
     });
     document.getElementById('languageMenuItem').addEventListener('click', handleLanguageToggle);
+    document.getElementById('creditsMenuItem').addEventListener('click', handleCredits);
     document.getElementById('logoutMenuItem').addEventListener('click', handleLogout);
     
     // Kívülre kattintás - settings menü bezárása
