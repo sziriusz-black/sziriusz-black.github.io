@@ -5,6 +5,7 @@
  * FELELŐSSÉGI KÖR:
  * - Felhasználók regisztrációja
  * - Bejelentkezés/Kijelentkezés
+ * - Elfelejtett jelszó kezelése
  * - Felhasználói adatok tárolása (localStorage)
  */
 
@@ -33,14 +34,24 @@ function isLoggedIn() {
     return getCurrentUser() !== null;
 }
 
+// Email validáció
+function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
 // Regisztráció
-function register(username, password) {
-    if (!username || !password) {
-        return { success: false, message: 'Felhasználónév és jelszó megadása kötelező!' };
+function register(username, email, password) {
+    if (!username || !email || !password) {
+        return { success: false, message: 'Minden mező kitöltése kötelező!' };
     }
 
     if (username.length < 3) {
         return { success: false, message: 'A felhasználónév legalább 3 karakter legyen!' };
+    }
+
+    if (!isValidEmail(email)) {
+        return { success: false, message: 'Érvénytelen email cím!' };
     }
 
     if (password.length < 4) {
@@ -55,10 +66,17 @@ function register(username, password) {
         return { success: false, message: 'Ez a felhasználónév már foglalt!' };
     }
 
+    // Ellenőrzés: létezik-e már ilyen email
+    const existingEmail = users.find(u => u.email && u.email.toLowerCase() === email.toLowerCase());
+    if (existingEmail) {
+        return { success: false, message: 'Ez az email cím már regisztrálva van!' };
+    }
+
     // Új felhasználó hozzáadása
     const newUser = {
         id: crypto.randomUUID(),
         username: username,
+        email: email.toLowerCase(),
         password: password, // Valós alkalmazásban hash-elni kellene!
         createdAt: new Date().toISOString()
     };
@@ -99,24 +117,67 @@ function logout() {
     localStorage.removeItem(CURRENT_USER_KEY);
 }
 
-// Auth UI inicializálása
-function initAuthUI() {
-    const authOverlay = document.getElementById('authOverlay');
+// Elfelejtett jelszó - jelszó lekérése email alapján
+function recoverPassword(email) {
+    if (!email) {
+        return { success: false, message: 'Add meg az email címed!' };
+    }
+
+    if (!isValidEmail(email)) {
+        return { success: false, message: 'Érvénytelen email cím!' };
+    }
+
+    const users = getUsers();
+    const user = users.find(u => u.email && u.email.toLowerCase() === email.toLowerCase());
+
+    if (!user) {
+        return { success: false, message: 'Nem található fiók ezzel az email címmel!' };
+    }
+
+    return { 
+        success: true, 
+        message: `A jelszavad: ${user.password}`,
+        username: user.username
+    };
+}
+
+// Összes form elrejtése
+function hideAllForms() {
     const loginForm = document.getElementById('loginForm');
     const registerForm = document.getElementById('registerForm');
+    const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+    const authError = document.getElementById('authError');
+    const authSuccess = document.getElementById('authSuccess');
+
+    if (loginForm) loginForm.classList.add('hidden');
+    if (registerForm) registerForm.classList.add('hidden');
+    if (forgotPasswordForm) forgotPasswordForm.classList.add('hidden');
+    if (authError) authError.classList.add('hidden');
+    if (authSuccess) authSuccess.classList.add('hidden');
+}
+
+// Auth UI inicializálása
+function initAuthUI() {
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+    const forgotPasswordForm = document.getElementById('forgotPasswordForm');
     const showRegisterBtn = document.getElementById('showRegister');
     const showLoginBtn = document.getElementById('showLogin');
+    const showForgotPasswordBtn = document.getElementById('showForgotPassword');
+    const backToLoginBtn = document.getElementById('backToLogin');
     const loginBtn = document.getElementById('loginBtn');
     const registerBtn = document.getElementById('registerBtn');
+    const forgotPasswordBtn = document.getElementById('forgotPasswordBtn');
     const authError = document.getElementById('authError');
+    const authSuccess = document.getElementById('authSuccess');
 
     // Váltás regisztrációra
     if (showRegisterBtn) {
         showRegisterBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            loginForm.classList.add('hidden');
+            hideAllForms();
             registerForm.classList.remove('hidden');
-            authError.classList.add('hidden');
+            document.getElementById('registerUsername').focus();
         });
     }
 
@@ -124,9 +185,29 @@ function initAuthUI() {
     if (showLoginBtn) {
         showLoginBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            registerForm.classList.add('hidden');
+            hideAllForms();
             loginForm.classList.remove('hidden');
-            authError.classList.add('hidden');
+            document.getElementById('loginUsername').focus();
+        });
+    }
+
+    // Váltás elfelejtett jelszóra
+    if (showForgotPasswordBtn) {
+        showForgotPasswordBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            hideAllForms();
+            forgotPasswordForm.classList.remove('hidden');
+            document.getElementById('forgotEmail').focus();
+        });
+    }
+
+    // Vissza a bejelentkezéshez
+    if (backToLoginBtn) {
+        backToLoginBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            hideAllForms();
+            loginForm.classList.remove('hidden');
+            document.getElementById('loginUsername').focus();
         });
     }
 
@@ -144,6 +225,7 @@ function initAuthUI() {
             } else {
                 authError.textContent = result.message;
                 authError.classList.remove('hidden');
+                authSuccess.classList.add('hidden');
             }
         });
 
@@ -159,16 +241,18 @@ function initAuthUI() {
     if (registerBtn) {
         registerBtn.addEventListener('click', () => {
             const username = document.getElementById('registerUsername').value;
+            const email = document.getElementById('registerEmail').value;
             const password = document.getElementById('registerPassword').value;
             const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
 
             if (password !== passwordConfirm) {
                 authError.textContent = 'A jelszavak nem egyeznek!';
                 authError.classList.remove('hidden');
+                authSuccess.classList.add('hidden');
                 return;
             }
             
-            const result = register(username, password);
+            const result = register(username, email, password);
             
             if (result.success) {
                 // Sikeres regisztráció után automatikus bejelentkezés
@@ -179,6 +263,7 @@ function initAuthUI() {
             } else {
                 authError.textContent = result.message;
                 authError.classList.remove('hidden');
+                authSuccess.classList.add('hidden');
             }
         });
 
@@ -186,6 +271,32 @@ function initAuthUI() {
         document.getElementById('registerPasswordConfirm').addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 registerBtn.click();
+            }
+        });
+    }
+
+    // Elfelejtett jelszó
+    if (forgotPasswordBtn) {
+        forgotPasswordBtn.addEventListener('click', () => {
+            const email = document.getElementById('forgotEmail').value;
+            
+            const result = recoverPassword(email);
+            
+            if (result.success) {
+                authError.classList.add('hidden');
+                authSuccess.innerHTML = `<strong>Felhasználónév:</strong> ${result.username}<br><strong>Jelszó:</strong> ${result.message.replace('A jelszavad: ', '')}`;
+                authSuccess.classList.remove('hidden');
+            } else {
+                authError.textContent = result.message;
+                authError.classList.remove('hidden');
+                authSuccess.classList.add('hidden');
+            }
+        });
+
+        // Enter gomb kezelése forgot password form-on
+        document.getElementById('forgotEmail').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                forgotPasswordBtn.click();
             }
         });
     }
@@ -198,4 +309,3 @@ function initAuthUI() {
 }
 
 export { isLoggedIn, getCurrentUser, logout, initAuthUI };
-

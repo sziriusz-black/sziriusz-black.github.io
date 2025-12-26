@@ -24,6 +24,7 @@
                     <input type="password" id="loginPassword" maxlength="30" placeholder="Add meg a jelszavad">
                 </div>
                 <button id="loginBtn" class="auth-btn">Bejelentkezés</button>
+                <p class="auth-forgot"><a href="#" id="showForgotPassword">Elfelejtettem a jelszavam</a></p>
                 <p class="auth-switch">Nincs még fiókod? <a href="#" id="showRegister">Regisztrálj!</a></p>
             </div>
 
@@ -33,6 +34,10 @@
                 <div class="auth-input-group">
                     <label for="registerUsername">Felhasználónév</label>
                     <input type="text" id="registerUsername" maxlength="20" placeholder="Válassz egy nevet">
+                </div>
+                <div class="auth-input-group">
+                    <label for="registerEmail">Email cím</label>
+                    <input type="email" id="registerEmail" maxlength="50" placeholder="Add meg az email címed">
                 </div>
                 <div class="auth-input-group">
                     <label for="registerPassword">Jelszó</label>
@@ -46,7 +51,20 @@
                 <p class="auth-switch">Van már fiókod? <a href="#" id="showLogin">Jelentkezz be!</a></p>
             </div>
 
+            <!-- Elfelejtett jelszó form -->
+            <div id="forgotPasswordForm" class="auth-form hidden">
+                <h2>Elfelejtett jelszó</h2>
+                <p class="auth-info">Add meg az email címed, és megmutatjuk a jelszavad.</p>
+                <div class="auth-input-group">
+                    <label for="forgotEmail">Email cím</label>
+                    <input type="email" id="forgotEmail" maxlength="50" placeholder="Add meg az email címed">
+                </div>
+                <button id="forgotPasswordBtn" class="auth-btn">Jelszó lekérése</button>
+                <p class="auth-switch"><a href="#" id="backToLogin">Vissza a bejelentkezéshez</a></p>
+            </div>
+
             <div id="authError" class="auth-error hidden"></div>
+            <div id="authSuccess" class="auth-success hidden"></div>
         </div>
     </div>
 
