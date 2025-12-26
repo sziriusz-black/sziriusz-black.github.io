@@ -15,14 +15,74 @@ import { saveGameState } from './save-load.js';
 import { updateUI } from './ui.js';
 
 const CHAT_STORAGE_KEY = 'retroSkyblockChat';
+const REPORTS_STORAGE_KEY = 'retroSkyblockChatReports';
 const MAX_MESSAGES = 50;
 const ADMIN_USERNAMES = ['Szíriusz', 'Szirius', 'szíriusz', 'szirius'];
+
+// Trágár szavak listája
+const PROFANITY_LIST = [
+    // Magyar
+    'kurva', 'fasz', 'faszom', 'geci', 'gecis', 'pina', 'pinas', 'csöcs', 'segg', 'segges',
+    'buzi', 'buzis', 'köcsög', 'ribanc', 'szar', 'szaros', 'baszd', 'basz', 'kibasz',
+    'megbasz', 'anyad', 'anyád', 'picsa', 'picsába', 'fasza', 'bazmeg', 'baszdmeg',
+    // Angol
+    'fuck', 'shit', 'bitch', 'ass', 'asshole', 'dick', 'cock', 'pussy', 'cunt',
+    'nigger', 'nigga', 'faggot', 'retard', 'whore', 'slut'
+];
 
 // Admin-e a felhasználó
 function isAdmin(username) {
     return ADMIN_USERNAMES.some(admin => 
         admin.toLowerCase() === username.toLowerCase()
     );
+}
+
+// Trágár szó ellenőrzése
+function containsProfanity(text) {
+    const lowerText = text.toLowerCase();
+    for (const word of PROFANITY_LIST) {
+        if (lowerText.includes(word)) {
+            return word;
+        }
+    }
+    return null;
+}
+
+// Jelentések betöltése
+function getReports() {
+    try {
+        const reports = localStorage.getItem(REPORTS_STORAGE_KEY);
+        return reports ? JSON.parse(reports) : [];
+    } catch (error) {
+        return [];
+    }
+}
+
+// Jelentés mentése
+function saveReport(username, message, detectedWord) {
+    const reports = getReports();
+    reports.push({
+        id: crypto.randomUUID(),
+        username: username,
+        message: message,
+        detectedWord: detectedWord,
+        timestamp: Date.now(),
+        seen: false
+    });
+    localStorage.setItem(REPORTS_STORAGE_KEY, JSON.stringify(reports));
+}
+
+// Olvasatlan jelentések száma
+function getUnseenReportsCount() {
+    return getReports().filter(r => !r.seen).
+length;
+}
+
+// Jelentések megjelölése olvasottként
+function markReportsAsSeen() {
+    const reports = getReports();
+    reports.forEach(r => r.seen = true);
+    localStorage.setItem(REPORTS_STORAGE_KEY, JSON.stringify(reports));
 }
 
 // Chat üzenetek betöltése
@@ -89,7 +149,9 @@ function processCommand(text, currentUser) {
                 '/workers [mennyiség] - Munkás hozzáadása\n' +
                 '/broadcast [üzenet] - Rendszer üzenet küldése\n' +
                 '/reset - Játék újrakezdése\n' +
-                '/god - Végtelen erőforrások'
+                '/god - Végtelen erőforrások\n' +
+                '/reports - Káromkodás jelentések\n' +
+                '/clearreports - Jelentések törlése'
             );
             break;
             
@@ -163,6 +225,29 @@ function processCommand(text, currentUser) {
             updateUI();
             saveGameState();
             addSystemMessage('⚡ GOD MODE aktiválva! Végtelen erőforrások!');
+            break;
+            
+        case 'reports':
+            const reports = getReports();
+            const unseenReports = reports.filter(r => !r.seen);
+            if (reports.length === 0) {
+                addSystemMessage('📋 Nincsenek jelentések.');
+            } else {
+                let reportText = `📋 Jelentések (${unseenReports.length} új):\n`;
+                reports.slice(-10).forEach(r => {
+                    const date = new Date(r.timestamp);
+                    const timeStr = `${date.getMonth()+1}.${date.getDate()} ${date.getHours()}:${date.getMinutes().toString().padStart(2,'0')}`;
+                    const newMark = r.seen ? '' : '🆕 ';
+                    reportText += `${newMark}[${timeStr}] ${r.username}: "${r.message}" (${r.detectedWord})\n`;
+                });
+                addSystemMessage(reportText);
+                markReportsAsSeen();
+            }
+            break;
+            
+        case 'clearreports':
+            localStorage.removeItem(REPORTS_STORAGE_KEY);
+            addSystemMessage('🗑️ Jelentések törölve!');
             break;
             
         default:
@@ -244,6 +329,19 @@ function sendMessage() {
     if (text.startsWith('/')) {
         processCommand(text, currentUser);
         return;
+    }
+    
+    // Trágár szó ellenőrzése (admin kivételével)
+    if (!isAdmin(currentUser.username)) {
+        const detectedWord = containsProfanity(text);
+        if (detectedWord) {
+            // Jelentés mentése az adminnak
+            saveReport(currentUser.username, text, detectedWord);
+            
+            // Figyelmeztetés a felhasználónak
+            addSystemMessage(`⚠️ ${currentUser.username}, a káromkodás nem megengedett! Az üzeneted nem lett elküldve és jelentve lett az adminnak.`);
+            return;
+        }
     }
     
     const messages = getChatMessages();
