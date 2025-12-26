@@ -13,6 +13,7 @@ import { getCurrentUser } from './auth.js';
 
 const CHAT_STORAGE_KEY = 'retroSkyblockChat';
 const REPORTS_STORAGE_KEY = 'retroSkyblockChatReports';
+const MUTES_STORAGE_KEY = 'retroSkyblockChatMutes';
 const MAX_MESSAGES = 50;
 const ADMIN_USERNAMES = ['Szíriusz', 'Szirius', 'szíriusz', 'szirius'];
 
@@ -82,6 +83,99 @@ function markReportsAsSeen() {
     localStorage.setItem(REPORTS_STORAGE_KEY, JSON.stringify(reports));
 }
 
+// === MUTE RENDSZER ===
+
+// Mute-ok betöltése
+function getMutes() {
+    try {
+        const mutes = localStorage.getItem(MUTES_STORAGE_KEY);
+        return mutes ? JSON.parse(mutes) : [];
+    } catch (error) {
+        return [];
+    }
+}
+
+// Mute mentése
+function saveMutes(mutes) {
+    localStorage.setItem(MUTES_STORAGE_KEY, JSON.stringify(mutes));
+}
+
+// Idő string parse-olása (pl. "1d", "2h", "30m")
+function parseTimeString(timeStr) {
+    const regex = /^(\d+)([dhm])$/i;
+    const match = timeStr.match(regex);
+    
+    if (!match) return null;
+    
+    const value = parseInt(match[1]);
+    const unit = match[2].toLowerCase();
+    
+    let milliseconds = 0;
+    switch (unit) {
+        case 'd': milliseconds = value * 24 * 60 * 60 * 1000; break;
+        case 'h': milliseconds = value * 60 * 60 * 1000; break;
+        case 'm': milliseconds = value * 60 * 1000; break;
+    }
+    
+    return milliseconds;
+}
+
+// Mute hozzáadása
+function addMute(username, durationMs) {
+    const mutes = getMutes();
+    const expiresAt = Date.now() + durationMs;
+    
+    // Ha már van mute, frissítjük
+    const existingIndex = mutes.findIndex(m => m.username.toLowerCase() === username.toLowerCase());
+    if (existingIndex >= 0) {
+        mutes[existingIndex].expiresAt = expiresAt;
+    } else {
+        mutes.push({
+            username: username,
+            expiresAt: expiresAt
+        });
+    }
+    
+    saveMutes(mutes);
+}
+
+// Mute ellenőrzése - visszaadja a hátralévő időt ms-ben, vagy null ha nincs mute
+function checkMute(username) {
+    const mutes = getMutes();
+    const mute = mutes.find(m => m.username.toLowerCase() === username.toLowerCase());
+    
+    if (!mute) return null;
+    
+    const remaining = mute.expiresAt - Date.now();
+    
+    if (remaining <= 0) {
+        // Mute lejárt, töröljük
+        const newMutes = mutes.filter(m => m.username.toLowerCase() !== username.toLowerCase());
+        saveMutes(newMutes);
+        return null;
+    }
+    
+    return remaining;
+}
+
+// Hátralévő idő formázása
+function formatRemainingTime(ms) {
+    const seconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+    
+    if (days > 0) {
+        return `${days} nap ${hours % 24} óra`;
+    } else if (hours > 0) {
+        return `${hours} óra ${minutes % 60} perc`;
+    } else if (minutes > 0) {
+        return `${minutes} perc`;
+    } else {
+        return `${seconds} másodperc`;
+    }
+}
+
 // Chat üzenetek betöltése
 function getChatMessages() {
     try {
@@ -141,7 +235,9 @@ function processCommand(text, currentUser) {
                 '/clear - Chat törlése\n' +
                 '/broadcast [üzenet] - Rendszer üzenet küldése\n' +
                 '/reset - Játék újrakezdése\n' +
-                '/reports - Káromkodás jelentések'
+                '/reports - Káromkodás jelentések\n' +
+                '/mute [név] [idő] - Játékos némítása (pl: /mute Teszt 30m)\n' +
+                '/unmute [név] - Némítás feloldása'
             );
             break;
             
@@ -181,6 +277,43 @@ function processCommand(text, currentUser) {
                 });
                 addSystemMessage(reportText);
                 markReportsAsSeen();
+            }
+            break;
+            
+        case 'mute':
+            if (args.length < 2) {
+                addSystemMessage('❌ Használat: /mute [játékosnév] [idő]\nIdő formátum: 30m (perc), 2h (óra), 1d (nap)');
+            } else {
+                const muteUsername = args[0];
+                const muteTimeStr = args[1];
+                const muteDuration = parseTimeString(muteTimeStr);
+                
+                if (!muteDuration) {
+                    addSystemMessage('❌ Érvénytelen idő formátum!\nPéldák: 30m (30 perc), 2h (2 óra), 1d (1 nap)');
+                } else if (isAdmin(muteUsername)) {
+                    addSystemMessage('❌ Admint nem lehet némítani!');
+                } else {
+                    addMute(muteUsername, muteDuration);
+                    addSystemMessage(`🔇 ${muteUsername} némítva ${formatRemainingTime(muteDuration)} időtartamra!`);
+                }
+            }
+            break;
+            
+        case 'unmute':
+            if (args.length < 1) {
+                addSystemMessage('❌ Használat: /unmute [játékosnév]');
+            } else {
+                const unmuteUsername = args[0];
+                const mutes = getMutes();
+                const muteIndex = mutes.findIndex(m => m.username.toLowerCase() === unmuteUsername.toLowerCase());
+                
+                if (muteIndex < 0) {
+                    addSystemMessage(`❌ ${unmuteUsername} nincs némítva!`);
+                } else {
+                    mutes.splice(muteIndex, 1);
+                    saveMutes(mutes);
+                    addSystemMessage(`🔊 ${unmuteUsername} némítása feloldva!`);
+                }
             }
             break;
             
@@ -262,6 +395,13 @@ function sendMessage() {
     // Parancs ellenőrzése
     if (text.startsWith('/')) {
         processCommand(text, currentUser);
+        return;
+    }
+    
+    // Mute ellenőrzése
+    const muteRemaining = checkMute(currentUser.username);
+    if (muteRemaining) {
+        addSystemMessage(`🔇 Le vagy némítva! Hátralévő idő: ${formatRemainingTime(muteRemaining)}`);
         return;
     }
     
