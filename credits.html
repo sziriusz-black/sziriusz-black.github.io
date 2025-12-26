@@ -133,24 +133,87 @@
             align-items: center;
             gap: 10px;
         }
-        .footer {
+        .big-footer {
+            background: #2a0845;
+            margin-top: 80px;
+            margin-left: -20px;
+            margin-right: -20px;
+            margin-bottom: -40px;
+            padding: 50px 40px 30px 40px;
+        }
+        .footer-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 40px;
+        }
+        .footer-section h3 {
+            color: #ffd700;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+        .footer-section ul {
+            list-style: none;
+        }
+        .footer-section ul li {
+            margin-bottom: 12px;
+        }
+        .footer-section ul li a {
+            color: #c9a0dc;
+            text-decoration: none;
+            font-size: 14px;
+            transition: color 0.2s;
+        }
+        .footer-section ul li a:hover {
+            color: #fff;
+        }
+        .footer-logo-section {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .footer-logo-img {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+            border-radius: 15px;
+        }
+        .social-icons {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        .social-icons a {
+            color: #c9a0dc;
+            font-size: 22px;
+            text-decoration: none;
+            transition: color 0.2s, transform 0.2s;
+        }
+        .social-icons a:hover {
+            color: #fff;
+            transform: scale(1.2);
+        }
+        .footer-bottom {
+            max-width: 1000px;
+            margin: 40px auto 0 auto;
+            padding-top: 20px;
+            border-top: 1px solid rgba(201, 160, 220, 0.2);
             text-align: center;
-            margin-top: 60px;
-            padding-top: 30px;
-            border-top: 1px solid rgba(74, 74, 74, 0.5);
-        }
-        .footer-logo {
-            width: 80px;
-            height: 80px;
-            margin-bottom: 15px;
-            opacity: 0.8;
-        }
-        .footer-text {
-            color: #666;
+            color: #8b6b9e;
             font-size: 12px;
         }
-        .footer-year {
-            color: #4a9eff;
+        @media (max-width: 800px) {
+            .footer-content {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        @media (max-width: 500px) {
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
         }
         @media (max-width: 600px) {
             h1 {
@@ -229,11 +292,49 @@
             </div>
         </div>
 
-        <div class="footer">
-            <img src="images/retro-skyblock-logo.png" alt="Logo" class="footer-logo">
-            <p class="footer-text">Retro Skyblock © <span class="footer-year">2025</span></p>
-            <p class="footer-text">Készült ❤️-vel Magyarországon</p>
-        </div>
     </div>
+
+    <footer class="big-footer">
+        <div class="footer-content">
+            <div class="footer-section footer-logo-section">
+                <img src="images/retro-skyblock-logo.png" alt="Retro Skyblock" class="footer-logo-img">
+                <h3>Kövess minket</h3>
+                <div class="social-icons">
+                    <a href="https://discord.gg/CRbpNDmd4R" target="_blank" title="Discord">💬</a>
+                    <a href="https://www.youtube.com/@Sziriusz_Black" target="_blank" title="YouTube">▶️</a>
+                </div>
+            </div>
+
+            <div class="footer-section">
+                <h3>Navigáció</h3>
+                <ul>
+                    <li><a href="index.html">🏠 Főoldal</a></li>
+                    <li><a href="index.html?secret=67">🎮 Játék</a></li>
+                    <li><a href="update.html">📋 Frissítések</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h3>Közösség</h3>
+                <ul>
+                    <li><a href="https://discord.gg/CRbpNDmd4R" target="_blank">💬 Discord szerver</a></li>
+                    <li><a href="player.html">👥 Játékosok</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h3>Információ</h3>
+                <ul>
+                    <li><a href="credits.html">✨ Credits</a></li>
+                    <li><a href="#">📧 Kapcsolat</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>Retro Skyblock © 2025 — Készült ❤️-vel Magyarországon</p>
+        </div>
+    </footer>
 </body>
 </html>
+
