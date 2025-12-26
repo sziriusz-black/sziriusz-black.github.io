@@ -58,6 +58,7 @@
             border: 3px solid #4a4a4a;
             box-shadow: 8px 8px 0px #000;
             overflow: hidden;
+            border-radius: 20px;
         }
         .member-header {
             background: linear-gradient(135deg, rgba(74, 158, 255, 0.3), rgba(255, 107, 107, 0.2));
@@ -116,14 +117,21 @@
             color: #4a9eff;
             padding: 5px 12px;
             font-size: 12px;
+            border-radius: 10px;
         }
-        .birthday {
+        .color-box {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        .favorite-colors {
             display: flex;
             align-items: center;
             gap: 10px;
-        }
-        .birthday-icon {
-            font-size: 24px;
         }
         .footer {
             text-align: center;
@@ -179,11 +187,11 @@
                         </div>
                     </div>
                     <div class="member-section">
-                        <div class="section-title">🎂 Született</div>
+                        <div class="section-title">🎨 Kedvenc szín</div>
                         <div class="section-content">
-                            <div class="birthday">
-                                <span class="birthday-icon">🎈</span>
-                                <span>2012. január 17.</span>
+                            <div class="favorite-colors">
+                                <span class="color-box" style="background: #22c55e;"></span>
+                                <span>Zöld</span>
                             </div>
                         </div>
                     </div>
@@ -207,11 +215,13 @@
                         </div>
                     </div>
                     <div class="member-section">
-                        <div class="section-title">🎂 Született</div>
+                        <div class="section-title">🎨 Kedvenc színek</div>
                         <div class="section-content">
-                            <div class="birthday">
-                                <span class="birthday-icon">🎈</span>
-                                <span>1994. január 15.</span>
+                            <div class="favorite-colors">
+                                <span class="color-box" style="background: #3b82f6;"></span>
+                                <span>Kék</span>
+                                <span class="color-box" style="background: #a855f7; margin-left: 10px;"></span>
+                                <span>Lila</span>
                             </div>
                         </div>
                     </div>
