@@ -8,17 +8,49 @@
     <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
     <style>
+        /* === THEME VÁLTOZÓK === */
+        :root {
+            --bg-primary: #1a1a2e;
+            --bg-secondary: #16213e;
+            --bg-tertiary: #0f3460;
+            --bg-card: rgba(0, 0, 0, 0.6);
+            --text-primary: #ffffff;
+            --text-secondary: #aaaaaa;
+            --text-muted: #888888;
+            --border-color: #4a4a4a;
+            --accent-gold: #ffd700;
+            --accent-blue: #4a9eff;
+            --header-bg: rgba(74, 158, 255, 0.2);
+            --header-hover: rgba(74, 158, 255, 0.4);
+            --detail-bg: rgba(74, 158, 255, 0.1);
+        }
+        [data-theme="light"] {
+            --bg-primary: #f0f4f8;
+            --bg-secondary: #e2e8f0;
+            --bg-tertiary: #cbd5e1;
+            --bg-card: rgba(255, 255, 255, 0.9);
+            --text-primary: #1a1a2e;
+            --text-secondary: #4a5568;
+            --text-muted: #718096;
+            --border-color: #cbd5e1;
+            --accent-gold: #d69e2e;
+            --accent-blue: #3182ce;
+            --header-bg: rgba(74, 158, 255, 0.15);
+            --header-hover: rgba(74, 158, 255, 0.3);
+            --detail-bg: rgba(74, 158, 255, 0.08);
+        }
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
         body {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-tertiary) 100%);
             min-height: 100vh;
             font-family: 'Courier New', monospace;
-            color: #fff;
+            color: var(--text-primary);
             padding: 40px 20px;
+            transition: background 0.3s ease, color 0.3s ease;
         }
         .container {
             max-width: 800px;
@@ -26,14 +58,14 @@
         }
         h1 {
             text-align: center;
-            color: #ffd700;
+            color: var(--accent-gold);
             font-size: 36px;
             margin-bottom: 40px;
             text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
         }
         .back-link {
             display: inline-block;
-            color: #4a9eff;
+            color: var(--accent-blue);
             text-decoration: none;
             margin-bottom: 30px;
             font-size: 14px;
@@ -43,13 +75,14 @@
             text-decoration: underline;
         }
         .version-card {
-            background: rgba(0, 0, 0, 0.6);
-            border: 3px solid #4a4a4a;
+            background: var(--bg-card);
+            border: 3px solid var(--border-color);
             margin-bottom: 20px;
-            box-shadow: 4px 4px 0px #000;
+            box-shadow: 4px 4px 0px rgba(0,0,0,0.3);
+            transition: background 0.3s ease, border-color 0.3s ease;
         }
         .version-header {
-            background: rgba(74, 158, 255, 0.2);
+            background: var(--header-bg);
             padding: 15px 20px;
             display: flex;
             justify-content: space-between;
@@ -60,11 +93,11 @@
             transition: background 0.2s;
         }
         .version-header:hover {
-            background: rgba(74, 158, 255, 0.4);
+            background: var(--header-hover);
         }
         .version-name {
             font-size: 22px;
-            color: #4a9eff;
+            color: var(--accent-blue);
             font-weight: bold;
         }
         .version-info {
@@ -74,11 +107,11 @@
         }
         .version-date {
             font-size: 14px;
-            color: #888;
+            color: var(--text-muted);
         }
         .version-arrow {
             font-size: 18px;
-            color: #4a9eff;
+            color: var(--accent-blue);
             transition: transform 0.3s;
         }
         .version-card.open .version-arrow {
@@ -89,12 +122,12 @@
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.3s ease-out, padding 0.3s ease-out;
-            border-top: 0 solid #4a4a4a;
+            border-top: 0 solid var(--border-color);
         }
         .version-card.open .version-changes {
             padding: 20px;
             max-height: 2000px;
-            border-top: 2px solid #4a4a4a;
+            border-top: 2px solid var(--border-color);
         }
         .version-changes ul {
             list-style: none;
@@ -105,6 +138,7 @@
             padding-left: 25px;
             position: relative;
             border-bottom: 1px solid rgba(74, 74, 74, 0.5);
+            color: var(--text-primary);
         }
         .version-changes li:last-child {
             border-bottom: none;
@@ -129,7 +163,7 @@
             transition: color 0.2s;
         }
         .change-item:hover {
-            color: #4a9eff;
+            color: var(--accent-blue);
         }
         .change-item::after {
             content: " ℹ️";
@@ -138,13 +172,13 @@
         }
         .change-detail {
             display: none;
-            background: rgba(74, 158, 255, 0.1);
-            border-left: 3px solid #4a9eff;
+            background: var(--detail-bg);
+            border-left: 3px solid var(--accent-blue);
             padding: 10px 15px;
             margin-top: 8px;
             margin-left: 25px;
             font-size: 13px;
-            color: #aaa;
+            color: var(--text-secondary);
             line-height: 1.6;
         }
         .change-detail.open {
@@ -521,6 +555,15 @@
     </div>
 
     <script>
+        // Téma inicializálása localStorage-ból
+        function initTheme() {
+            const savedTheme = localStorage.getItem('retroSkyblockTheme') || 'dark';
+            if (savedTheme === 'light') {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        }
+        initTheme();
+        
         function toggleVersion(header) {
             const card = header.parentElement;
             card.classList.toggle('open');
