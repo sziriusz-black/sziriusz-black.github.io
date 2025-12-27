@@ -168,6 +168,21 @@ export function loadGameState(createInitialMap, updateUI) {
             if (state.warehouseLevel !== undefined) {
                 gameState.warehouseLevel = state.warehouseLevel;
             }
+            
+            // Ellenőrizzük, hogy van-e már raktár a térképen
+            const hasWarehouse = gameState.map.some(tile => tile.type === 'warehouse');
+            if (!hasWarehouse) {
+                // Keresünk egy üres földet a raktárnak
+                const emptyTile = gameState.map.find(tile => tile.type === 'owned');
+                if (emptyTile) {
+                    emptyTile.type = 'warehouse';
+                    emptyTile.level = 1;
+                    gameState.warehouseCapacity = 20;
+                    gameState.warehouseLevel = 1;
+                    console.log(`Raktár hozzáadva: (${emptyTile.x}, ${emptyTile.y})`);
+                }
+            }
+            
             if (updateUI) updateUI();
         }
     } catch (e) {
