@@ -210,6 +210,12 @@
                     </svg>
                     <span data-i18n="settings.chat">Chat</span>
                 </div>
+                <div id="shopMenuItem" class="settings-menu-item" title="Bolt">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z" fill="currentColor"/>
+                    </svg>
+                    <span data-i18n="settings.shop">Bolt</span>
+                </div>
                 <div id="creditsMenuItem" class="settings-menu-item" title="Credits">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" fill="currentColor"/>
@@ -253,6 +259,21 @@
                 </div>
                 <div id="warehouseItems" class="warehouse-items"></div>
                 <div id="warehouseSellSection" class="warehouse-sell-section"></div>
+            </div>
+        </div>
+
+        <div id="shopModal" class="modal hidden">
+            <div class="modal-content shop-modal">
+                <button class="close-btn" id="closeShopModal">×</button>
+                <h2>🛒 Bolt</h2>
+                <div class="shop-container">
+                    <div class="shop-sidebar">
+                        <div class="shop-category active" data-category="money">💰 Pénz</div>
+                        <div class="shop-category" data-category="resources">🪵 Erőforrások</div>
+                        <div class="shop-category" data-category="special">⭐ Egyedi Offerek</div>
+                    </div>
+                    <div class="shop-products" id="shopProducts"></div>
+                </div>
             </div>
         </div>
 

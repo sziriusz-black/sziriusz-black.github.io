@@ -44,6 +44,7 @@ const translations = {
         'settings.language': 'Nyelv',
         'settings.chat': 'Chat',
         'settings.credits': 'Credits',
+        'settings.shop': 'Bolt',
         'settings.logout': 'Kijelentkezés',
         
         // Státusz panel
@@ -155,6 +156,7 @@ const translations = {
         'settings.language': 'Language',
         'settings.chat': 'Chat',
         'settings.credits': 'Credits',
+        'settings.shop': 'Shop',
         'settings.logout': 'Logout',
         
         // Status panel
@@ -266,6 +268,7 @@ const translations = {
         'settings.language': 'Sprache',
         'settings.chat': 'Chat',
         'settings.credits': 'Credits',
+        'settings.shop': 'Laden',
         'settings.logout': 'Abmelden',
         
         // Status panel

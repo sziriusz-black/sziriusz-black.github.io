@@ -27,7 +27,7 @@ import { setupZoom } from './zoom.js';
 import { saveGameState } from './save-load.js';
 import { loadMuteState } from './audio.js';
 import { closeBubble } from './bubble.js';
-import { updateSoundIcon, handleSoundToggle, toggleSettingsMenu, closeSettingsMenu, handleLanguageToggle, updateLanguageFlag, handleLogout, handleCredits, handleThemeToggle, initTheme } from './settings.js';
+import { updateSoundIcon, handleSoundToggle, toggleSettingsMenu, closeSettingsMenu, handleLanguageToggle, updateLanguageFlag, handleLogout, handleCredits, handleThemeToggle, initTheme, handleShop } from './settings.js';
 import { translateDOM } from './i18n.js';
 import { openChat, initChat } from './chat.js';
 
@@ -42,7 +42,8 @@ import {
     openCornModal, closeCornModal, sellCorn, 
     openDiscordModal, closeDiscordModal, 
     closeUpgradeModal, setupModalSliders,
-    closeWarehouseModal, setupWarehouseModalEvents
+    closeWarehouseModal, setupWarehouseModalEvents,
+    openShopModal, closeShopModal, setupShopModalEvents
 } from './modals.js';
 
 // Ablak átméretezés kezelése
@@ -128,6 +129,7 @@ export function setupModalEvents() {
     // Modal slider-ek
     setupModalSliders();
     setupWarehouseModalEvents();
+    setupShopModalEvents();
 
     // Modal kívülre kattintás
     document.getElementById('cornModal').addEventListener('click', (e) => {
@@ -172,6 +174,7 @@ export function setupSettingsEvents() {
     document.getElementById('themeMenuItem').addEventListener('click', handleThemeToggle);
     document.getElementById('chatMenuItem').addEventListener('click', handleChat);
     document.getElementById('creditsMenuItem').addEventListener('click', handleCredits);
+    document.getElementById('shopMenuItem').addEventListener('click', handleShop);
     document.getElementById('logoutMenuItem').addEventListener('click', handleLogout);
     
     // Kívülre kattintás - settings menü bezárása

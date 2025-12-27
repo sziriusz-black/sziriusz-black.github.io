@@ -20,6 +20,7 @@
 import { toggleMute, isMusicMuted } from './audio.js';
 import { cycleLanguage, getLanguage, FLAGS, LANGUAGE_NAMES, getNextLanguage, t } from './i18n.js';
 import { logout } from './auth.js';
+import { openShopModal } from './modals.js';
 
 // === THEME KEZELÉS ===
 const THEME_STORAGE_KEY = 'retroSkyblockTheme';
@@ -141,5 +142,10 @@ export function handleCredits() {
 
 export function handleThemeToggle() {
     toggleTheme();
+}
+
+export function handleShop() {
+    closeSettingsMenu();
+    openShopModal();
 }
 

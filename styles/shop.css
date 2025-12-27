@@ -1,0 +1,192 @@
+/**
+ * @file styles/shop.css
+ * @description Bolt modal stílusok
+ */
+
+/* Bolt modal */
+.shop-modal {
+    max-width: 700px;
+    min-width: 500px;
+    max-height: 80vh;
+}
+
+.shop-modal h2 {
+    color: var(--accent-gold);
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+/* Bolt konténer */
+.shop-container {
+    display: flex;
+    gap: 15px;
+    min-height: 400px;
+}
+
+/* Bal oldali kategória menü */
+.shop-sidebar {
+    width: 150px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.shop-category {
+    padding: 12px 15px;
+    background: var(--bg-tertiary);
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.shop-category:hover {
+    border-color: var(--accent-gold);
+    transform: translateX(3px);
+}
+
+.shop-category.active {
+    background: rgba(255, 215, 0, 0.2);
+    border-color: var(--accent-gold);
+    color: var(--accent-gold);
+    font-weight: bold;
+}
+
+/* Termékek lista */
+.shop-products {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    overflow-y: auto;
+    max-height: 400px;
+    padding-right: 5px;
+}
+
+.shop-product {
+    background: var(--bg-tertiary);
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.shop-product:hover {
+    border-color: var(--accent-blue);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.shop-product.featured {
+    border-color: var(--accent-gold);
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), var(--bg-tertiary));
+    position: relative;
+}
+
+.shop-product.featured::before {
+    content: '⭐';
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    font-size: 20px;
+}
+
+.product-name {
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--text-primary);
+}
+
+.product-description {
+    font-size: 12px;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+.product-bonus {
+    font-size: 11px;
+    color: #4caf50;
+    font-weight: bold;
+}
+
+.product-price {
+    font-size: 18px;
+    font-weight: bold;
+    color: var(--accent-gold);
+    margin-top: auto;
+}
+
+.buy-button {
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #4caf50, #388e3c);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.buy-button:hover {
+    background: linear-gradient(135deg, #66bb6a, #43a047);
+    transform: scale(1.02);
+}
+
+.buy-button:active {
+    transform: scale(0.98);
+}
+
+/* Scrollbar stílus */
+.shop-products::-webkit-scrollbar {
+    width: 6px;
+}
+
+.shop-products::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+    border-radius: 3px;
+}
+
+.shop-products::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 3px;
+}
+
+.shop-products::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-gold);
+}
+
+/* Mobil responsive */
+@media (max-width: 600px) {
+    .shop-modal {
+        min-width: auto;
+        max-width: 95vw;
+    }
+    
+    .shop-container {
+        flex-direction: column;
+    }
+    
+    .shop-sidebar {
+        width: 100%;
+        flex-direction: row;
+        overflow-x: auto;
+    }
+    
+    .shop-category {
+        white-space: nowrap;
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+    
+    .shop-products {
+        grid-template-columns: 1fr;
+        max-height: 300px;
+    }
+}
+

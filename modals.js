@@ -31,5 +31,8 @@ export { openUpgradeModal, closeUpgradeModal } from './modals/upgrade-modal.js';
 // Raktár modal
 export { openWarehouseModal, closeWarehouseModal, setupWarehouseModalEvents } from './modals/warehouse-modal.js';
 
+// Bolt modal
+export { openShopModal, closeShopModal, setupShopModalEvents } from './modals/shop-modal.js';
+
 // Slider események
 export { setupModalSliders } from './modals/modal-sliders.js';
