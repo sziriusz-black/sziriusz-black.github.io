@@ -13,6 +13,7 @@ import { getCurrentUser, getUsers } from './auth.js';
 import { gameState } from './gameState.js';
 
 const CHAT_STORAGE_KEY = 'retroSkyblockChat';
+const BROADCAST_STORAGE_KEY = 'retroSkyblockBroadcast';
 const REPORTS_STORAGE_KEY = 'retroSkyblockChatReports';
 const MUTES_STORAGE_KEY = 'retroSkyblockChatMutes';
 const PENDING_GIFTS_KEY = 'retroSkyblockPendingGifts';
@@ -29,7 +30,8 @@ const COMMANDS = [
     { name: 'player', description: 'Játékosok oldal megnyitása', adminOnly: false },
     { name: 'gift', description: 'Ajándék küldése: /gift [kinek] [mit] [mennyit]', adminOnly: false },
     { name: 'clear', description: 'Chat törlése', adminOnly: true },
-    { name: 'broadcast', description: 'Rendszer üzenet: /broadcast [üzenet]', adminOnly: true },
+    { name: 'broadcast', description: 'Kiemelt üzenet mindenkinek: /broadcast [üzenet]', adminOnly: true },
+    { name: 'clearbroadcast', description: 'Broadcast üzenetek törlése', adminOnly: true },
     { name: 'reset', description: 'Játék újrakezdése', adminOnly: true },
     { name: 'reports', description: 'Jelentések megtekintése', adminOnly: true },
     { name: 'mute', description: 'Játékos némítása: /mute [név] [idő]', adminOnly: true },
@@ -298,6 +300,35 @@ function addSystemMessage(text) {
     renderMessages();
 }
 
+// === BROADCAST RENDSZER ===
+// A broadcast üzenetek NEM törlődnek frissítéskor, mindenki látja
+
+function getBroadcasts() {
+    try {
+        const broadcasts = localStorage.getItem(BROADCAST_STORAGE_KEY);
+        return broadcasts ? JSON.parse(broadcasts) : [];
+    } catch (error) {
+        return [];
+    }
+}
+
+function saveBroadcasts(broadcasts) {
+    // Csak az utolsó 10 broadcast-ot tartjuk meg
+    const trimmed = broadcasts.slice(-10);
+    localStorage.setItem(BROADCAST_STORAGE_KEY, JSON.stringify(trimmed));
+}
+
+function addBroadcast(text, senderUsername) {
+    const broadcasts = getBroadcasts();
+    broadcasts.push({
+        id: crypto.randomUUID(),
+        text: text,
+        senderUsername: senderUsername,
+        timestamp: Date.now()
+    });
+    saveBroadcasts(broadcasts);
+}
+
 // Parancs feldolgozása
 function processCommand(text, currentUser) {
     if (!text.startsWith('/')) return false;
@@ -409,7 +440,8 @@ function processCommand(text, currentUser) {
                 '━━━━━━━━━━━━━━━━━━━━\n' +
                 '👑 Admin:\n' +
                 '/clear - Chat törlése\n' +
-                '/broadcast [üzenet] - Rendszer üzenet\n' +
+                '/broadcast [üzenet] - Kiemelt üzenet mindenkinek\n' +
+                '/clearbroadcast - Broadcast üzenetek törlése\n' +
                 '/reset - Játék újrakezdése\n' +
                 '/reports - Jelentések\n' +
                 '/mute [név] [idő] - Némítás\n' +
@@ -446,8 +478,17 @@ function processCommand(text, currentUser) {
                 addSystemMessage('❌ Használat: /broadcast [üzenet]');
             } else {
                 const broadcastText = args.join(' ');
-                addSystemMessage(`📢 ${broadcastText}`);
+                // Broadcast mentése - ez NEM törlődik frissítéskor
+                addBroadcast(broadcastText, currentUser.username);
+                addSystemMessage(`✅ Broadcast elküldve: "${broadcastText}"`);
+                renderMessages(); // Frissítjük a megjelenítést
             }
+            break;
+            
+        case 'clearbroadcast':
+            localStorage.removeItem(BROADCAST_STORAGE_KEY);
+            addSystemMessage('🗑️ Broadcast üzenetek törölve!');
+            renderMessages();
             break;
             
         case 'reset':
@@ -584,14 +625,34 @@ function formatTime(timestamp) {
 function renderMessages() {
     const messagesContainer = document.getElementById('chatMessages');
     const messages = getChatMessages();
+    const broadcasts = getBroadcasts();
     const currentUser = getCurrentUser();
     
-    if (messages.length === 0) {
+    // Broadcast üzenetek HTML-je (ezek mindig felül jelennek meg)
+    let broadcastsHtml = '';
+    if (broadcasts.length > 0) {
+        broadcastsHtml = broadcasts.map(broadcast => {
+            const date = new Date(broadcast.timestamp);
+            const timeStr = `${date.getMonth()+1}.${date.getDate()} ${date.getHours()}:${date.getMinutes().toString().padStart(2,'0')}`;
+            return `
+                <div class="chat-message broadcast">
+                    <div class="chat-message-header">
+                        <span class="chat-message-user">📢 Broadcast - ${escapeHtml(broadcast.senderUsername)}</span>
+                        <span class="chat-message-time">${timeStr}</span>
+                    </div>
+                    <div class="chat-message-text">${escapeHtml(broadcast.text)}</div>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    if (messages.length === 0 && broadcasts.length === 0) {
         messagesContainer.innerHTML = '<div class="chat-empty">Még nincsenek üzenetek.<br>Légy te az első!</div>';
         return;
     }
     
-    messagesContainer.innerHTML = messages.map(msg => {
+    // Normál üzenetek
+    const messagesHtml = messages.map(msg => {
         // Gift üzenetek csak a fogadónak jelennek meg
         if (msg.type === 'gift') {
             // Ha én vagyok a fogadó
@@ -631,6 +692,9 @@ function renderMessages() {
             </div>
         `;
     }).join('');
+    
+    // Broadcast üzenetek felül, normál üzenetek alatta
+    messagesContainer.innerHTML = broadcastsHtml + messagesHtml;
     
     // Görgetés az aljára
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
