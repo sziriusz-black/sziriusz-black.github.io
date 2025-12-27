@@ -19,9 +19,10 @@
  * Kérjük, a megfelelő modulba fejlessz!
  */
 import { CONFIG } from './config.js';
-import { gameState } from './gameState.js';
+import { gameState, hasStorageSpace } from './gameState.js';
 import { playSound } from './audio.js';
 import { findTile, isAdjacentToOwned, calculateTilePrice, hasAvailableWorker } from './tile-operations.js';
+import { showError } from './ui.js';
 
 // Terület vásárlása
 export function purchaseTile(x, y, updateUI, saveGameState) {
@@ -135,6 +136,11 @@ export function buildCornField(x, y, updateUI, saveGameState) {
 export function harvestCornField(x, y, updateUI, saveGameState) {
     const tile = findTile(x, y);
     if (tile && tile.type === 'cornfield') {
+        // Raktár kapacitás ellenőrzés
+        if (!hasStorageSpace(1)) {
+            showError('⚠️ A raktár megtelt! Adj el valamit először.');
+            return;
+        }
         tile.type = 'emptycornfield';
         gameState.corn++;
         updateUI();
@@ -234,6 +240,135 @@ export function skipTreeCut(x, y, updateUI, saveGameState) {
             playSound('minecraftChop');
         }
         gameState.cuttingTrees.delete(key);
+    }
+}
+
+// === BÁNYA MŰVELETEK ===
+
+// Bánya építése (3 munkás, 10 perc)
+export function buildMine(x, y, updateUI, saveGameState) {
+    const tile = findTile(x, y);
+    if (tile && tile.type === 'owned' && 
+        gameState.money >= CONFIG.MINE_BUILD_PRICE && 
+        gameState.workers >= CONFIG.MINE_BUILD_WORKERS &&
+        !gameState.buildingMines.has(`${x},${y}`)) {
+        
+        // Munkások foglalása
+        gameState.workers -= CONFIG.MINE_BUILD_WORKERS;
+        gameState.money -= CONFIG.MINE_BUILD_PRICE;
+        
+        // Tile típus változtatása épülő bányára
+        tile.type = 'buildingmine';
+        
+        // Építési folyamat indítása
+        gameState.buildingMines.set(`${x},${y}`, {
+            timeLeft: CONFIG.MINE_BUILD_TIME,
+            startTime: Date.now()
+        });
+        
+        updateUI();
+        saveGameState();
+        playSound('build');
+    }
+}
+
+// Bányászás indítása (2 munkás, 5 perc)
+export function startMining(x, y, updateUI, saveGameState) {
+    const tile = findTile(x, y);
+    const key = `${x},${y}`;
+    
+    if (tile && tile.type === 'mine' && 
+        gameState.workers >= CONFIG.MINE_MINING_WORKERS &&
+        !gameState.miningMines.has(key)) {
+        
+        // Munkások foglalása
+        gameState.workers -= CONFIG.MINE_MINING_WORKERS;
+        
+        // Bányászási folyamat indítása
+        gameState.miningMines.set(key, {
+            timeLeft: CONFIG.MINE_MINING_TIME,
+            startTime: Date.now()
+        });
+        
+        updateUI();
+        saveGameState();
+        playSound('cut');
+    }
+}
+
+// Bánya eladása
+export function sellMine(x, y, updateUI, saveGameState) {
+    const tile = findTile(x, y);
+    if (tile && tile.type === 'mine') {
+        tile.type = 'owned';
+        gameState.money += CONFIG.MINE_SELL_PRICE;
+        updateUI();
+        saveGameState();
+        playSound('sell');
+    }
+}
+
+// Bányászat eredményének kiszámítása esély alapján (fejlesztés növeli az esélyeket)
+export function calculateMiningResult(mineLevel = 1) {
+    const roll = Math.random() * 100;
+    
+    // Fejlesztés bónusz: +0.5% minden ritka nyersanyagra szintenként
+    const levelBonus = (mineLevel - 1) * 0.5;
+    
+    const diamondChance = CONFIG.MINE_DIAMOND_CHANCE + levelBonus;
+    const coalChance = CONFIG.MINE_COAL_CHANCE + levelBonus;
+    const ironChance = CONFIG.MINE_IRON_CHANCE + levelBonus;
+    // A kő esélye csökken, ahogy a többié nő
+    
+    if (roll < diamondChance) {
+        return { type: 'diamond', name: '💎 Gyémánt' };
+    } else if (roll < diamondChance + coalChance) {
+        return { type: 'coal', name: '⚫ Szén' };
+    } else if (roll < diamondChance + coalChance + ironChance) {
+        return { type: 'iron', name: '🔩 Vas' };
+    } else {
+        return { type: 'stone', name: '🪨 Kő' };
+    }
+}
+
+// Bánya fejlesztése - +0.5% esély minden ritka nyersanyagra
+export function upgradeMine(x, y, updateUI, saveGameState) {
+    const tile = findTile(x, y);
+    if (tile && tile.type === 'mine') {
+        const currentLevel = tile.level || 1;
+        const upgradePrice = CONFIG.UPGRADE_BASE_PRICE + (currentLevel - 1) * CONFIG.UPGRADE_INCREMENT;
+        
+        if (gameState.money >= upgradePrice) {
+            tile.level = currentLevel + 1;
+            gameState.money -= upgradePrice;
+            updateUI();
+            saveGameState();
+            playSound('build');
+        }
+    }
+}
+
+// === RAKTÁR MŰVELETEK ===
+
+// Raktár fejlesztése - +10 hely szintenként
+export function upgradeWarehouse(updateUI, saveGameState) {
+    const currentLevel = gameState.warehouseLevel || 1;
+    const upgradePrice = CONFIG.WAREHOUSE_UPGRADE_PRICE * currentLevel;
+    
+    if (gameState.money >= upgradePrice) {
+        gameState.warehouseLevel = currentLevel + 1;
+        gameState.warehouseCapacity += CONFIG.WAREHOUSE_UPGRADE_CAPACITY;
+        gameState.money -= upgradePrice;
+        
+        // Frissítsük a tile szintjét is
+        const warehouseTile = gameState.map.find(t => t.type === 'warehouse');
+        if (warehouseTile) {
+            warehouseTile.level = gameState.warehouseLevel;
+        }
+        
+        updateUI();
+        saveGameState();
+        playSound('build');
     }
 }
 

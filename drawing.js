@@ -21,3 +21,5 @@ export { drawHouse } from './sprites/house.js';
 export { drawCornField } from './sprites/cornfield.js';
 export { drawEmptyCornField } from './sprites/empty-cornfield.js';
 export { drawStoneCutter } from './sprites/stonecutter.js';
+export { drawMine, drawBuildingMine } from './sprites/mine.js';
+export { drawWarehouse } from './sprites/warehouse.js';

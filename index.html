@@ -102,6 +102,23 @@
                 <span class="icon">👷</span>
                 <span id="workers">3</span>/<span id="maxWorkers">3</span>
             </div>
+            <div class="status-divider"></div>
+            <div class="status-item" title="Kő">
+                <span class="icon">🪨</span>
+                <span id="stone">0</span>
+            </div>
+            <div class="status-item" title="Vas">
+                <span class="icon">🔩</span>
+                <span id="iron">0</span>
+            </div>
+            <div class="status-item" title="Szén">
+                <span class="icon">⚫</span>
+                <span id="coal">0</span>
+            </div>
+            <div class="status-item" title="Gyémánt">
+                <span class="icon">💎</span>
+                <span id="diamond">0</span>
+            </div>
         </div>
 
         <div id="bubble" class="hidden">
@@ -223,6 +240,19 @@
                 <button class="close-btn" id="closeUpgradeModal">×</button>
                 <h2 id="upgradeTitle">Upgrade</h2>
                 <div id="upgradeContent" class="upgrade-content"></div>
+            </div>
+        </div>
+
+        <div id="warehouseModal" class="modal hidden">
+            <div class="modal-content warehouse-modal">
+                <button class="close-btn" id="closeWarehouseModal">×</button>
+                <h2>📦 Raktár</h2>
+                <div id="warehouseCapacityText" class="warehouse-capacity-text">0/20 (20 szabad)</div>
+                <div id="warehouseCapacityBar" class="warehouse-capacity-bar">
+                    <div class="capacity-fill"></div>
+                </div>
+                <div id="warehouseItems" class="warehouse-items"></div>
+                <div id="warehouseSellSection" class="warehouse-sell-section"></div>
             </div>
         </div>
 

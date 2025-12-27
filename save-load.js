@@ -83,6 +83,11 @@ export function saveGameState() {
             money: gameState.money,
             planks: gameState.planks,
             corn: gameState.corn,
+            // Bánya erőforrások
+            stone: gameState.stone,
+            iron: gameState.iron,
+            coal: gameState.coal,
+            diamond: gameState.diamond,
             ownedTiles: gameState.ownedTiles,
             map: gameState.map,
             camera: gameState.camera,
@@ -90,9 +95,14 @@ export function saveGameState() {
             cuttingTrees: Object.fromEntries(gameState.cuttingTrees),
             buildingCornfields: Object.fromEntries(gameState.buildingCornfields),
             replantingCornfields: Object.fromEntries(gameState.replantingCornfields),
+            buildingMines: Object.fromEntries(gameState.buildingMines),
+            miningMines: Object.fromEntries(gameState.miningMines),
             // Munkás rendszer
             workers: gameState.workers,
             maxWorkers: gameState.maxWorkers,
+            // Raktár rendszer
+            warehouseCapacity: gameState.warehouseCapacity,
+            warehouseLevel: gameState.warehouseLevel,
             // Tutorial állapot megőrzése
             tutorialCompleted: tutorialCompleted
         };
@@ -111,6 +121,11 @@ export function loadGameState(createInitialMap, updateUI) {
             gameState.money = state.money || 10;
             gameState.planks = state.planks || 0;
             gameState.corn = state.corn || 0;
+            // Bánya erőforrások
+            gameState.stone = state.stone || 0;
+            gameState.iron = state.iron || 0;
+            gameState.coal = state.coal || 0;
+            gameState.diamond = state.diamond || 0;
             gameState.ownedTiles = state.ownedTiles || 0;
             gameState.map = state.map || [];
             if (state.camera) {
@@ -129,12 +144,25 @@ export function loadGameState(createInitialMap, updateUI) {
             if (state.replantingCornfields) {
                 gameState.replantingCornfields = new Map(Object.entries(state.replantingCornfields));
             }
+            if (state.buildingMines) {
+                gameState.buildingMines = new Map(Object.entries(state.buildingMines));
+            }
+            if (state.miningMines) {
+                gameState.miningMines = new Map(Object.entries(state.miningMines));
+            }
             // Munkás rendszer visszaállítása
             if (state.workers !== undefined) {
                 gameState.workers = state.workers;
             }
             if (state.maxWorkers !== undefined) {
                 gameState.maxWorkers = state.maxWorkers;
+            }
+            // Raktár rendszer visszaállítása
+            if (state.warehouseCapacity !== undefined) {
+                gameState.warehouseCapacity = state.warehouseCapacity;
+            }
+            if (state.warehouseLevel !== undefined) {
+                gameState.warehouseLevel = state.warehouseLevel;
             }
             if (updateUI) updateUI();
         }

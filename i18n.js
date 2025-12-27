@@ -88,6 +88,18 @@ const translations = {
         // Buborék - kővágó
         'bubble.stonecutter': 'Kővágó (Szint {0})',
         
+        // Buborék - bánya
+        'bubble.buildMine': 'Bánya építése ({0} pénz)',
+        'bubble.mine': 'Bánya (Szint {0})',
+        'bubble.mining': 'Bányászás folyamatban...',
+        'bubble.startMining': 'Bányászás indítása',
+        
+        // Buborék - raktár
+        'bubble.warehouse': 'Raktár (Szint {0})',
+        'bubble.storage': 'Tárhely',
+        'bubble.openWarehouse': 'Megnyitás',
+        'bubble.storageFull': 'A raktár megtelt!',
+        
         // Modalok - deszka eladás
         'modal.plankSell': 'Deszka Eladás',
         'modal.sellAmount': 'Eladandó deszkák:',
@@ -187,6 +199,18 @@ const translations = {
         // Bubble - stonecutter
         'bubble.stonecutter': 'Stone Cutter (Level {0})',
         
+        // Bubble - mine
+        'bubble.buildMine': 'Build Mine ({0} coins)',
+        'bubble.mine': 'Mine (Level {0})',
+        'bubble.mining': 'Mining in progress...',
+        'bubble.startMining': 'Start Mining',
+        
+        // Bubble - warehouse
+        'bubble.warehouse': 'Warehouse (Level {0})',
+        'bubble.storage': 'Storage',
+        'bubble.openWarehouse': 'Open',
+        'bubble.storageFull': 'Storage is full!',
+        
         // Modals - plank sell
         'modal.plankSell': 'Sell Planks',
         'modal.sellAmount': 'Planks to sell:',
@@ -285,6 +309,18 @@ const translations = {
         
         // Bubble - stonecutter
         'bubble.stonecutter': 'Steinmetz (Stufe {0})',
+        
+        // Bubble - Mine
+        'bubble.buildMine': 'Mine bauen ({0} Münzen)',
+        'bubble.mine': 'Mine (Stufe {0})',
+        'bubble.mining': 'Bergbau läuft...',
+        'bubble.startMining': 'Bergbau starten',
+        
+        // Bubble - Lager
+        'bubble.warehouse': 'Lager (Stufe {0})',
+        'bubble.storage': 'Speicher',
+        'bubble.openWarehouse': 'Öffnen',
+        'bubble.storageFull': 'Lager ist voll!',
         
         // Modals - plank sell
         'modal.plankSell': 'Bretter verkaufen',

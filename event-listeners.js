@@ -41,7 +41,8 @@ import {
     openPlankModal, closeModal, sellPlanks, 
     openCornModal, closeCornModal, sellCorn, 
     openDiscordModal, closeDiscordModal, 
-    closeUpgradeModal, setupModalSliders 
+    closeUpgradeModal, setupModalSliders,
+    closeWarehouseModal, setupWarehouseModalEvents
 } from './modals.js';
 
 // Ablak átméretezés kezelése
@@ -126,11 +127,19 @@ export function setupModalEvents() {
     
     // Modal slider-ek
     setupModalSliders();
+    setupWarehouseModalEvents();
 
     // Modal kívülre kattintás
     document.getElementById('cornModal').addEventListener('click', (e) => {
         if (e.target.id === 'cornModal') {
             closeCornModal();
+        }
+    });
+
+    // Raktár modal
+    document.getElementById('warehouseModal').addEventListener('click', (e) => {
+        if (e.target.id === 'warehouseModal') {
+            closeWarehouseModal();
         }
     });
 

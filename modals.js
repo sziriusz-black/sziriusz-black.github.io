@@ -28,5 +28,8 @@ export { openDiscordModal, closeDiscordModal } from './modals/discord-modal.js';
 // Upgrade modal
 export { openUpgradeModal, closeUpgradeModal } from './modals/upgrade-modal.js';
 
+// Raktár modal
+export { openWarehouseModal, closeWarehouseModal, setupWarehouseModalEvents } from './modals/warehouse-modal.js';
+
 // Slider események
 export { setupModalSliders } from './modals/modal-sliders.js';

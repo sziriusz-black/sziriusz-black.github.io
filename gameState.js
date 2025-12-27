@@ -22,6 +22,11 @@ export const gameState = {
     money: 10,
     planks: 0,
     corn: 0,
+    // Új bánya erőforrások
+    stone: 0,
+    iron: 0,
+    coal: 0,
+    diamond: 0,
     ownedTiles: 0,
     map: [],
     camera: {
@@ -33,8 +38,29 @@ export const gameState = {
     cuttingTrees: new Map(),
     buildingCornfields: new Map(),
     replantingCornfields: new Map(),
+    // Bánya műveletek
+    buildingMines: new Map(),    // Épülő bányák
+    miningMines: new Map(),      // Aktívan bányászó bányák
     // Munkás rendszer
     workers: 3,    // Szabad munkások (kezdő ház ad 3-at)
-    maxWorkers: 3  // Összes munkás
+    maxWorkers: 3, // Összes munkás
+    // Raktár rendszer
+    warehouseCapacity: 20,      // Raktár kapacitás (alapértelmezett)
+    warehouseLevel: 1           // Raktár szint
 };
+
+// Raktár kapacitás kiszámítása (összes tárgy)
+export function getUsedStorageSpace() {
+    return gameState.planks + gameState.corn + gameState.stone + gameState.iron + gameState.coal + gameState.diamond;
+}
+
+// Van-e hely a raktárban
+export function hasStorageSpace(amount = 1) {
+    return getUsedStorageSpace() + amount <= gameState.warehouseCapacity;
+}
+
+// Szabad hely a raktárban
+export function getFreeStorageSpace() {
+    return Math.max(0, gameState.warehouseCapacity - getUsedStorageSpace());
+}
 

@@ -21,13 +21,13 @@
  * Kérjük, a megfelelő modulba fejlessz!
  */
 import { CONFIG } from './config.js';
-import { gameState } from './gameState.js';
+import { gameState, getUsedStorageSpace, getFreeStorageSpace } from './gameState.js';
 import { findTile, isAdjacentToOwned, calculateTilePrice, hasAvailableWorker } from './tile-operations.js';
-import { purchaseTile, cutTree, sellHouse, buildHouse, buildTree, buildStoneCutter, buildCornField, harvestCornField, replantCornField, sellCornField, sellStoneCutter } from './building-actions.js';
+import { purchaseTile, cutTree, sellHouse, buildHouse, buildTree, buildStoneCutter, buildCornField, harvestCornField, replantCornField, sellCornField, sellStoneCutter, buildMine, startMining, sellMine, upgradeMine, upgradeWarehouse } from './building-actions.js';
 import { saveGameState } from './save-load.js';
 import { onTutorialEvent } from './tutorial.js';
 import { showError, updateUI } from './ui.js';
-import { openUpgradeModal } from './modals.js';
+import { openUpgradeModal, openWarehouseModal } from './modals.js';
 import { t } from './i18n.js';
 
 let canvas = null;
@@ -133,10 +133,13 @@ export function generateBubbleContent(tileX, tileY, tile) {
             <button class="bubble-button" ${gameState.money < CONFIG.STONECUTTER_BUILD_PRICE ? 'disabled' : ''} data-action="buildStoneCutter" data-x="${tileX}" data-y="${tileY}">
                 ${t('bubble.buildStoneCutter', CONFIG.STONECUTTER_BUILD_PRICE)}
             </button>
+            <button class="bubble-button" ${gameState.money < CONFIG.MINE_BUILD_PRICE || gameState.workers < CONFIG.MINE_BUILD_WORKERS ? 'disabled' : ''} data-action="buildMine" data-x="${tileX}" data-y="${tileY}">
+                ${t('bubble.buildMine', CONFIG.MINE_BUILD_PRICE)} (${CONFIG.MINE_BUILD_WORKERS} munkás)
+            </button>
         `;
         
-        if (gameState.money < CONFIG.HOUSE_BUILD_PRICE && gameState.money < CONFIG.TREE_BUILD_PRICE && gameState.money < CONFIG.CORNFIELD_BUILD_PRICE && gameState.money < CONFIG.STONECUTTER_BUILD_PRICE) {
-            const needed = Math.min(CONFIG.HOUSE_BUILD_PRICE, CONFIG.TREE_BUILD_PRICE, CONFIG.CORNFIELD_BUILD_PRICE, CONFIG.STONECUTTER_BUILD_PRICE) - gameState.money;
+        if (gameState.money < CONFIG.HOUSE_BUILD_PRICE && gameState.money < CONFIG.TREE_BUILD_PRICE && gameState.money < CONFIG.CORNFIELD_BUILD_PRICE && gameState.money < CONFIG.STONECUTTER_BUILD_PRICE && gameState.money < CONFIG.MINE_BUILD_PRICE) {
+            const needed = Math.min(CONFIG.HOUSE_BUILD_PRICE, CONFIG.TREE_BUILD_PRICE, CONFIG.CORNFIELD_BUILD_PRICE, CONFIG.STONECUTTER_BUILD_PRICE, CONFIG.MINE_BUILD_PRICE) - gameState.money;
             return { showError: t('bubble.needMoney', needed) };
         }
     } else if (tile.type === 'cornfield') {
@@ -197,6 +200,89 @@ export function generateBubbleContent(tileX, tileY, tile) {
                 ${t('bubble.sell', CONFIG.STONECUTTER_SELL_PRICE)}
             </button>
         `;
+    } else if (tile.type === 'mine') {
+        // Bánya - bányászás, upgrade és eladás
+        const mineLevel = tile.level || 1;
+        const isMining = gameState.miningMines.has(`${tileX},${tileY}`);
+        
+        // Fejlesztés bónusz megjelenítése
+        const levelBonus = (mineLevel - 1) * 0.5;
+        const diamondChance = (1 + levelBonus).toFixed(1);
+        const ironChance = (5 + levelBonus).toFixed(1);
+        const coalChance = (4 + levelBonus).toFixed(1);
+        
+        if (isMining) {
+            const data = gameState.miningMines.get(`${tileX},${tileY}`);
+            const now = Date.now();
+            const elapsed = (now - data.startTime) / 1000;
+            const timeLeft = Math.max(0, CONFIG.MINE_MINING_TIME - elapsed);
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = Math.floor(timeLeft % 60);
+            content.innerHTML = `
+                <div>⛏️ ${t('bubble.mining')}</div>
+                <div>${t('bubble.timeLeft', `${minutes}:${seconds.toString().padStart(2, '0')}`)}</div>
+            `;
+        } else {
+            const canMine = gameState.workers >= CONFIG.MINE_MINING_WORKERS;
+            const lastResult = tile.lastMiningResult ? `<div style="margin-bottom: 5px; color: #ffd700;">Utolsó: ${tile.lastMiningResult.name}</div>` : '';
+            content.innerHTML = `
+                <div style="margin-bottom: 10px;">⛏️ ${t('bubble.mine', mineLevel)}</div>
+                <div style="font-size: 10px; margin-bottom: 5px; opacity: 0.8;">
+                    💎${diamondChance}% | 🔩${ironChance}% | ⚫${coalChance}%
+                </div>
+                ${lastResult}
+                <button class="bubble-button" ${!canMine ? 'disabled' : ''} data-action="startMining" data-x="${tileX}" data-y="${tileY}">
+                    ${t('bubble.startMining')} ${!canMine ? t('bubble.noWorker') : `(${CONFIG.MINE_MINING_WORKERS} munkás)`}
+                </button>
+                <button class="bubble-button" data-action="openUpgrade" data-x="${tileX}" data-y="${tileY}" data-type="mine">
+                    ${t('bubble.upgrade')} (+0.5% esélyek)
+                </button>
+                <button class="bubble-button" data-action="sellMine" data-x="${tileX}" data-y="${tileY}">
+                    ${t('bubble.sell', CONFIG.MINE_SELL_PRICE)}
+                </button>
+            `;
+        }
+    } else if (tile.type === 'buildingmine') {
+        // Épülő bánya
+        const data = gameState.buildingMines.get(`${tileX},${tileY}`);
+        if (data) {
+            const now = Date.now();
+            const elapsed = (now - data.startTime) / 1000;
+            const timeLeft = Math.max(0, CONFIG.MINE_BUILD_TIME - elapsed);
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = Math.floor(timeLeft % 60);
+            content.innerHTML = `
+                <div>⛏️ Bánya építése...</div>
+                <div>Hátralévő idő: ${minutes}:${seconds.toString().padStart(2, '0')}</div>
+            `;
+        } else {
+            content.innerHTML = `<div>⛏️ Bánya építése folyamatban...</div>`;
+        }
+    } else if (tile.type === 'warehouse') {
+        // Raktár - megnyitás és upgrade
+        const warehouseLevel = gameState.warehouseLevel || 1;
+        const usedSpace = getUsedStorageSpace();
+        const totalSpace = gameState.warehouseCapacity;
+        const freeSpace = getFreeStorageSpace();
+        const upgradePrice = CONFIG.WAREHOUSE_UPGRADE_PRICE * warehouseLevel;
+        const canUpgrade = gameState.money >= upgradePrice;
+        
+        content.innerHTML = `
+            <div style="margin-bottom: 10px;">📦 ${t('bubble.warehouse', warehouseLevel)}</div>
+            <div style="margin-bottom: 5px; font-size: 12px;">
+                ${t('bubble.storage')}: ${usedSpace}/${totalSpace}
+                ${freeSpace === 0 ? '<span style="color: #ff4444;"> (TELE!)</span>' : ''}
+            </div>
+            <div style="width: 100%; height: 8px; background: #333; border-radius: 4px; margin-bottom: 10px;">
+                <div style="width: ${(usedSpace / totalSpace) * 100}%; height: 100%; background: ${freeSpace === 0 ? '#ff4444' : '#4caf50'}; border-radius: 4px;"></div>
+            </div>
+            <button class="bubble-button" data-action="openWarehouse" data-x="${tileX}" data-y="${tileY}">
+                ${t('bubble.openWarehouse')}
+            </button>
+            <button class="bubble-button" ${!canUpgrade ? 'disabled' : ''} data-action="upgradeWarehouse" data-x="${tileX}" data-y="${tileY}">
+                ${t('bubble.upgrade')} (+${CONFIG.WAREHOUSE_UPGRADE_CAPACITY} hely, ${upgradePrice} 💰)
+            </button>
+        `;
     }
     
     return { showError: null };
@@ -250,9 +336,11 @@ export function refreshActiveBubble() {
         const isCuttingTree = gameState.cuttingTrees.has(key);
         const isBuildingCornfield = gameState.buildingCornfields.has(key);
         const isReplantingCornfield = gameState.replantingCornfields.has(key);
+        const isBuildingMine = gameState.buildingMines.has(key);
+        const isMining = gameState.miningMines.has(key);
         
         // Csak akkor frissítjük, ha folyamatban van valami időzített művelet
-        if (isCuttingTree || isBuildingCornfield || isReplantingCornfield) {
+        if (isCuttingTree || isBuildingCornfield || isReplantingCornfield || isBuildingMine || isMining) {
             generateBubbleContent(tileX, tileY, tile);
         }
     } catch (error) {
@@ -311,6 +399,21 @@ export function handleAction(action, x, y, type) {
             break;
         case 'sellStoneCutter':
             sellStoneCutter(x, y, updateUI, saveGameState);
+            break;
+        case 'buildMine':
+            buildMine(x, y, updateUI, saveGameState);
+            break;
+        case 'startMining':
+            startMining(x, y, updateUI, saveGameState);
+            break;
+        case 'sellMine':
+            sellMine(x, y, updateUI, saveGameState);
+            break;
+        case 'openWarehouse':
+            openWarehouseModal();
+            return; // Ne zárjuk be a buborékot
+        case 'upgradeWarehouse':
+            upgradeWarehouse(updateUI, saveGameState);
             break;
         case 'openUpgrade':
             openUpgradeModal(x, y, type, closeBubble);

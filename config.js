@@ -36,13 +36,34 @@ export const CONFIG = {
     CORN_SELL_PRICE: 5,
     STONECUTTER_BUILD_PRICE: 50,
     STONECUTTER_SELL_PRICE: 25,
+    // Bánya rendszer
+    MINE_BUILD_PRICE: 100,           // Bánya építési ára
+    MINE_BUILD_TIME: 600,            // Építési idő: 10 perc (másodpercben)
+    MINE_BUILD_WORKERS: 3,           // Építéshez szükséges munkások
+    MINE_MINING_TIME: 300,           // Bányászási idő: 5 perc (másodpercben)
+    MINE_MINING_WORKERS: 2,          // Bányászáshoz szükséges munkások
+    MINE_SELL_PRICE: 75,             // Bánya eladási ára
+    // Bánya nyersanyag esélyek (összesen 100%)
+    MINE_STONE_CHANCE: 90,           // 90% kő
+    MINE_IRON_CHANCE: 5,             // 5% vas
+    MINE_COAL_CHANCE: 4,             // 4% szén
+    MINE_DIAMOND_CHANCE: 1,          // 1% gyémánt
+    // Bánya nyersanyag eladási árak
+    STONE_SELL_PRICE: 8,
+    IRON_SELL_PRICE: 25,
+    COAL_SELL_PRICE: 15,
+    DIAMOND_SELL_PRICE: 100,
     // Upgrade árak (alapár + szint * növekmény)
     UPGRADE_BASE_PRICE: 100,        // Alapár (első upgrade)
     UPGRADE_INCREMENT: 50,          // Növekmény szintenként
     // Munkás rendszer
     STARTER_HOUSE_WORKERS: 3,  // Kezdő ház munkásai
     NORMAL_HOUSE_WORKERS: 2,   // Normál ház munkásai
-    WORKER_COST_PER_ACTION: 1  // Műveletenkénti munkás költség
+    WORKER_COST_PER_ACTION: 1, // Műveletenkénti munkás költség
+    // Raktár rendszer
+    WAREHOUSE_BASE_CAPACITY: 20,    // Raktár alap kapacitás
+    WAREHOUSE_UPGRADE_CAPACITY: 10, // +10 hely upgrade-enként
+    WAREHOUSE_UPGRADE_PRICE: 150    // Raktár upgrade ára
 };
 
 // Térkép típusok
@@ -53,6 +74,9 @@ export const TileType = {
     OWNED: 'owned',
     CORNFIELD: 'cornfield',
     EMPTY_CORNFIELD: 'emptycornfield',
-    STONECUTTER: 'stonecutter'
+    STONECUTTER: 'stonecutter',
+    MINE: 'mine',
+    BUILDING_MINE: 'buildingmine',   // Épülő bánya
+    WAREHOUSE: 'warehouse'           // Raktár
 };
 

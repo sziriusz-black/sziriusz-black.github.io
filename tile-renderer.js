@@ -19,7 +19,7 @@
 import { CONFIG } from './config.js';
 import { gameState } from './gameState.js';
 import { getContext } from './canvas.js';
-import { drawTree, drawHouse, drawCornField, drawEmptyCornField, drawStoneCutter } from './drawing.js';
+import { drawTree, drawHouse, drawCornField, drawEmptyCornField, drawStoneCutter, drawMine, drawBuildingMine, drawWarehouse } from './drawing.js';
 
 // Grid renderelése (meg nem vásárolt területek)
 export function renderGrid(visibleArea, findTile) {
@@ -75,6 +75,15 @@ export function renderTiles() {
                 break;
             case 'stonecutter':
                 drawStoneCutter(ctx, x, y);
+                break;
+            case 'mine':
+                drawMine(ctx, x, y, tile.level || 1);
+                break;
+            case 'buildingmine':
+                drawBuildingMine(ctx, x, y);
+                break;
+            case 'warehouse':
+                drawWarehouse(ctx, x, y, tile.level || 1);
                 break;
             // 'owned' típus: csak zöld háttér, nincs sprite
         }

@@ -23,10 +23,22 @@ export function updateStatusPanel() {
     const workersEl = document.getElementById('workers');
     const maxWorkersEl = document.getElementById('maxWorkers');
     
+    // Bánya erőforrások
+    const stoneEl = document.getElementById('stone');
+    const ironEl = document.getElementById('iron');
+    const coalEl = document.getElementById('coal');
+    const diamondEl = document.getElementById('diamond');
+    
     if (moneyEl) moneyEl.textContent = gameState.money;
     if (planksEl) planksEl.textContent = gameState.planks;
     if (cornEl) cornEl.textContent = gameState.corn;
     if (workersEl) workersEl.textContent = gameState.workers;
     if (maxWorkersEl) maxWorkersEl.textContent = gameState.maxWorkers;
+    
+    // Bánya erőforrások frissítése
+    if (stoneEl) stoneEl.textContent = gameState.stone;
+    if (ironEl) ironEl.textContent = gameState.iron;
+    if (coalEl) coalEl.textContent = gameState.coal;
+    if (diamondEl) diamondEl.textContent = gameState.diamond;
 }
 

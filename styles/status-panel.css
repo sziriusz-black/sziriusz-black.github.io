@@ -41,6 +41,12 @@
     margin-bottom: 0;
 }
 
+.status-divider {
+    border-top: 2px solid var(--border-color);
+    margin: 8px 0;
+    opacity: 0.5;
+}
+
 .status-item .icon {
     font-size: 20px;
     cursor: pointer;
