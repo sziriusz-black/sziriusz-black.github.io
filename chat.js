@@ -637,7 +637,7 @@ function renderMessages() {
             return `
                 <div class="chat-message broadcast">
                     <div class="chat-message-header">
-                        <span class="chat-message-user">📢 Broadcast - ${escapeHtml(broadcast.senderUsername)}</span>
+                        <span class="chat-message-user">📢 Rendszer</span>
                         <span class="chat-message-time">${timeStr}</span>
                     </div>
                     <div class="chat-message-text">${escapeHtml(broadcast.text)}</div>
