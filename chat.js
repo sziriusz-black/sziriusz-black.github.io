@@ -730,6 +730,9 @@ function isChatOpen() {
 
 // Chat inicializálása
 function initChat() {
+    // Chat törlése oldal frissítéskor
+    localStorage.removeItem(CHAT_STORAGE_KEY);
+    
     const chatClose = document.getElementById('chatClose');
     const chatSend = document.getElementById('chatSend');
     const chatInput = document.getElementById('chatInput');

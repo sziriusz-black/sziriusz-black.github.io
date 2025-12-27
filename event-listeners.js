@@ -27,7 +27,7 @@ import { setupZoom } from './zoom.js';
 import { saveGameState } from './save-load.js';
 import { loadMuteState } from './audio.js';
 import { closeBubble } from './bubble.js';
-import { updateSoundIcon, handleSoundToggle, toggleSettingsMenu, closeSettingsMenu, handleLanguageToggle, updateLanguageFlag, handleLogout, handleCredits } from './settings.js';
+import { updateSoundIcon, handleSoundToggle, toggleSettingsMenu, closeSettingsMenu, handleLanguageToggle, updateLanguageFlag, handleLogout, handleCredits, handleThemeToggle, initTheme } from './settings.js';
 import { translateDOM } from './i18n.js';
 import { openChat, initChat } from './chat.js';
 
@@ -160,6 +160,7 @@ export function setupSettingsEvents() {
         openDiscordModal();
     });
     document.getElementById('languageMenuItem').addEventListener('click', handleLanguageToggle);
+    document.getElementById('themeMenuItem').addEventListener('click', handleThemeToggle);
     document.getElementById('chatMenuItem').addEventListener('click', handleChat);
     document.getElementById('creditsMenuItem').addEventListener('click', handleCredits);
     document.getElementById('logoutMenuItem').addEventListener('click', handleLogout);
@@ -179,6 +180,9 @@ export function setupSettingsEvents() {
     
     // Hang állapot betöltése és ikon frissítése
     loadMuteState();
+    
+    // Téma inicializálása
+    initTheme();
     
     // Chat inicializálása
     initChat();

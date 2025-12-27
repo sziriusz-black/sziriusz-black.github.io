@@ -25,24 +25,24 @@
 .settings-icon {
     width: 40px;
     height: 40px;
-    background: rgba(0, 0, 0, 0.8);
-    border: 3px solid #4a4a4a;
+    background: var(--bg-overlay-strong);
+    border: 3px solid var(--border-color);
     border-radius: 0;
     padding: 4px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 4px 4px 0px #000;
-    color: #aaa;
-    transition: all 0.1s;
+    box-shadow: 4px 4px 0px rgba(0,0,0,0.5);
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
 }
 
 .settings-icon:hover {
-    background: rgba(0, 0, 0, 0.9);
-    color: #fff;
+    background: var(--bg-overlay-strong);
+    color: var(--text-primary);
     transform: translate(-1px, -1px);
-    box-shadow: 5px 5px 0px #000;
+    box-shadow: 5px 5px 0px rgba(0,0,0,0.5);
 }
 
 .settings-icon:active {
@@ -63,10 +63,11 @@
     position: absolute;
     top: 50px;
     right: 0;
-    background: rgba(0, 0, 0, 0.9);
-    border: 3px solid #4a4a4a;
-    box-shadow: 4px 4px 0px #000;
+    background: var(--bg-overlay-strong);
+    border: 3px solid var(--border-color);
+    box-shadow: 4px 4px 0px rgba(0,0,0,0.5);
     min-width: 150px;
+    transition: background 0.3s ease;
 }
 
 .settings-menu.hidden {
@@ -79,10 +80,10 @@
     gap: 10px;
     padding: 12px 15px;
     cursor: pointer;
-    color: #fff;
+    color: var(--text-primary);
     font-size: 14px;
-    transition: background 0.1s;
-    border-bottom: 1px solid #4a4a4a;
+    transition: background 0.2s ease;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .settings-menu-item:last-child {
@@ -90,7 +91,7 @@
 }
 
 .settings-menu-item:hover {
-    background: rgba(74, 158, 255, 0.2);
+    background: rgba(74, 158, 255, 0.3);
 }
 
 .settings-menu-item svg {
@@ -171,8 +172,22 @@
 /* Menü elválasztó vonal */
 .settings-menu-divider {
     height: 1px;
-    background: #4a4a4a;
+    background: var(--border-color);
     margin: 5px 0;
+}
+
+/* Téma váltó */
+#themeMenuItem svg {
+    color: var(--accent-gold);
+}
+
+.theme-icon {
+    font-size: 20px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 /* Kijelentkezés gomb */

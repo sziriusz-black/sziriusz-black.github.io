@@ -11,6 +11,14 @@
 
 import { isLoggedIn, initAuthUI } from './auth.js';
 
+// Téma inicializálása (hogy az auth és countdown képernyőn is működjön)
+function initThemeEarly() {
+    const savedTheme = localStorage.getItem('retroSkyblockTheme') || 'dark';
+    if (savedTheme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+    }
+}
+
 // A céldátum amire visszaszámolunk (módosítható)
 const TARGET_DATE = new Date('2025-12-30T12:00:00');
 
@@ -43,6 +51,9 @@ function updateCountdown() {
 
 // Inicializálás
 function initSecretAccess() {
+    // Téma korai inicializálása (mielőtt bármi megjelenne)
+    initThemeEarly();
+    
     const authOverlay = document.getElementById('authOverlay');
     const gameContent = document.getElementById('gameContent');
     const countdownOverlay = document.getElementById('countdownOverlay');

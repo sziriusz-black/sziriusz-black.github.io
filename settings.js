@@ -21,6 +21,56 @@ import { toggleMute, isMusicMuted } from './audio.js';
 import { cycleLanguage, getLanguage, FLAGS, LANGUAGE_NAMES, getNextLanguage, t } from './i18n.js';
 import { logout } from './auth.js';
 
+// === THEME KEZELÉS ===
+const THEME_STORAGE_KEY = 'retroSkyblockTheme';
+
+export function getTheme() {
+    return localStorage.getItem(THEME_STORAGE_KEY) || 'dark';
+}
+
+export function setTheme(theme) {
+    localStorage.setItem(THEME_STORAGE_KEY, theme);
+    applyTheme(theme);
+}
+
+export function applyTheme(theme) {
+    if (theme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+    } else {
+        document.documentElement.removeAttribute('data-theme');
+    }
+    updateThemeUI(theme);
+}
+
+export function updateThemeUI(theme) {
+    const themeIcon = document.getElementById('themeIcon');
+    const themeText = document.getElementById('themeText');
+    const themeMenuItem = document.getElementById('themeMenuItem');
+    
+    if (themeIcon) {
+        themeIcon.textContent = theme === 'light' ? '☀️' : '🌙';
+    }
+    
+    if (themeText) {
+        themeText.textContent = theme === 'light' ? 'Téma: Világos' : 'Téma: Sötét';
+    }
+    
+    if (themeMenuItem) {
+        themeMenuItem.title = theme === 'light' ? 'Váltás sötét témára' : 'Váltás világos témára';
+    }
+}
+
+export function toggleTheme() {
+    const currentTheme = getTheme();
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+}
+
+export function initTheme() {
+    const savedTheme = getTheme();
+    applyTheme(savedTheme);
+}
+
 export function toggleSettingsMenu() {
     const menu = document.getElementById('settingsMenu');
     const icon = document.getElementById('settingsIcon');
@@ -87,5 +137,9 @@ export function handleLogout() {
 
 export function handleCredits() {
     window.open('https://sziriusz-black.github.io/credits', '_blank');
+}
+
+export function handleThemeToggle() {
+    toggleTheme();
 }
 

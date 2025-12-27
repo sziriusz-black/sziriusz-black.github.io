@@ -19,15 +19,16 @@
 /* Bubble és modal komponensek */
 #bubble {
     position: fixed;
-    background: rgba(0, 0, 0, 0.9);
-    border: 3px solid #4a4a4a;
+    background: var(--bg-overlay-strong);
+    border: 3px solid var(--border-color);
     border-radius: 0;
     padding: 15px;
     z-index: 2000;
     min-width: 200px;
-    box-shadow: 4px 4px 0px #000;
-    color: #fff;
+    box-shadow: 4px 4px 0px rgba(0,0,0,0.3);
+    color: var(--text-primary);
     font-size: 14px;
+    transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 #bubble.large {
@@ -74,14 +75,14 @@
     width: 100%;
     padding: 8px;
     margin: 5px 0;
-    background: #4a9eff;
+    background: var(--accent-blue);
     border: 2px solid #2a7acc;
     color: #fff;
     cursor: pointer;
     font-family: 'Courier New', monospace;
     font-size: 12px;
-    box-shadow: 2px 2px 0px #000;
-    transition: all 0.1s;
+    box-shadow: 2px 2px 0px rgba(0,0,0,0.3);
+    transition: all 0.2s ease;
 }
 
 .bubble-button:hover {
@@ -109,11 +110,12 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.8);
+    background: var(--bg-modal);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 3000;
+    transition: background 0.3s ease;
 }
 
 .modal.hidden {
@@ -121,12 +123,13 @@
 }
 
 .modal-content {
-    background: #2a2a3e;
-    border: 4px solid #4a4a4a;
+    background: var(--modal-bg);
+    border: 4px solid var(--border-color);
     padding: 20px;
     min-width: 300px;
-    box-shadow: 6px 6px 0px #000;
-    color: #fff;
+    box-shadow: 6px 6px 0px rgba(0,0,0,0.3);
+    color: var(--text-primary);
+    transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .modal-content h2 {
@@ -149,7 +152,7 @@
 #cornSlider {
     width: 100%;
     height: 8px;
-    background: #4a4a4a;
+    background: var(--border-color);
     outline: none;
     -webkit-appearance: none;
     appearance: none;
@@ -186,14 +189,14 @@
 .modal-buttons button {
     flex: 1;
     padding: 10px;
-    background: #4a9eff;
+    background: var(--accent-blue);
     border: 2px solid #2a7acc;
     color: #fff;
     cursor: pointer;
     font-family: 'Courier New', monospace;
     font-size: 14px;
-    box-shadow: 2px 2px 0px #000;
-    transition: all 0.1s;
+    box-shadow: 2px 2px 0px rgba(0,0,0,0.3);
+    transition: all 0.2s ease;
 }
 
 .modal-buttons button:hover {
@@ -207,13 +210,15 @@
     box-shadow: 1px 1px 0px #000;
 }
 
-#cancelSell {
-    background: #666;
-    border-color: #444;
+#cancelSell,
+#cancelCornSell {
+    background: var(--button-bg);
+    border-color: var(--border-color);
 }
 
-#cancelSell:hover {
-    background: #777;
+#cancelSell:hover,
+#cancelCornSell:hover {
+    background: var(--button-hover);
 }
 
 /* Discord modal */
@@ -224,12 +229,12 @@
 
 #discordModal .modal-content {
     position: relative;
-    background: #2a2a3e;
-    border: 4px solid #4a4a4a;
+    background: var(--modal-bg);
+    border: 4px solid var(--border-color);
     padding: 30px;
     min-width: 400px;
-    box-shadow: 6px 6px 0px #000;
-    color: #fff;
+    box-shadow: 6px 6px 0px rgba(0,0,0,0.3);
+    color: var(--text-primary);
 }
 
 #discordModal .close-btn {
@@ -239,17 +244,17 @@
 }
 
 .discord-box {
-    background: rgba(0, 0, 0, 0.5);
-    border: 3px solid #4a4a4a;
+    background: var(--bg-overlay);
+    border: 3px solid var(--border-color);
     padding: 20px;
     margin-top: 20px;
-    box-shadow: 2px 2px 0px #000;
+    box-shadow: 2px 2px 0px rgba(0,0,0,0.3);
 }
 
 .discord-url {
     font-family: 'Courier New', monospace;
     font-size: 16px;
-    color: #4a9eff;
+    color: var(--accent-blue);
     text-align: center;
     word-break: break-all;
     user-select: all;
@@ -277,14 +282,14 @@
 }
 
 .upgrade-modal h2 {
-    color: #ffcc00;
+    color: var(--accent-gold);
     margin-bottom: 15px;
     text-align: center;
 }
 
 .upgrade-content {
-    background: rgba(0, 0, 0, 0.4);
-    border: 2px solid #4a4a4a;
+    background: var(--bg-overlay);
+    border: 2px solid var(--border-color);
     padding: 15px;
     margin-bottom: 10px;
 }
@@ -295,8 +300,8 @@
     align-items: center;
     padding: 10px;
     margin-bottom: 10px;
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid #4a4a4a;
+    background: var(--button-bg);
+    border: 1px solid var(--border-color);
 }
 
 .upgrade-item:last-child {
@@ -309,17 +314,17 @@
 
 .upgrade-name {
     font-weight: bold;
-    color: #fff;
+    color: var(--text-primary);
     margin-bottom: 5px;
 }
 
 .upgrade-desc {
     font-size: 12px;
-    color: #aaa;
+    color: var(--text-secondary);
 }
 
 .upgrade-price {
-    color: #ffcc00;
+    color: var(--accent-gold);
     font-size: 12px;
     margin-top: 3px;
 }
@@ -351,7 +356,7 @@
     text-align: center;
     padding: 10px;
     background: rgba(74, 158, 255, 0.2);
-    border: 1px solid #4a9eff;
+    border: 1px solid var(--accent-blue);
     margin-bottom: 15px;
     font-size: 14px;
 }

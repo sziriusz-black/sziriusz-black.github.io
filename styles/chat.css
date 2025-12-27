@@ -9,13 +9,14 @@
     right: 20px;
     width: 350px;
     height: 450px;
-    background: rgba(0, 0, 0, 0.9);
-    border: 3px solid #4a4a4a;
-    box-shadow: 6px 6px 0px #000;
+    background: var(--bg-overlay-strong);
+    border: 3px solid var(--border-color);
+    box-shadow: 6px 6px 0px rgba(0,0,0,0.3);
     z-index: 10000;
     display: flex;
     flex-direction: column;
     font-family: 'Courier New', monospace;
+    transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .chat-window.hidden {
@@ -28,8 +29,8 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 2px solid #4a4a4a;
-    color: #4a9eff;
+    border-bottom: 2px solid var(--border-color);
+    color: var(--accent-blue);
     font-weight: bold;
     font-size: 16px;
 }
@@ -58,10 +59,11 @@
 }
 
 .chat-message {
-    background: rgba(74, 74, 74, 0.5);
+    background: var(--button-bg);
     padding: 10px 12px;
     border-radius: 0;
-    border-left: 3px solid #4a9eff;
+    border-left: 3px solid var(--accent-blue);
+    transition: background 0.3s ease;
 }
 
 .chat-message-header {
@@ -72,16 +74,16 @@
 }
 
 .chat-message-user {
-    color: #4a9eff;
+    color: var(--accent-blue);
     font-weight: bold;
 }
 
 .chat-message-time {
-    color: #666;
+    color: var(--text-muted);
 }
 
 .chat-message-text {
-    color: #ddd;
+    color: var(--text-primary);
     font-size: 13px;
     line-height: 1.4;
     word-wrap: break-word;
@@ -139,31 +141,32 @@
     display: flex;
     padding: 10px;
     gap: 8px;
-    border-top: 2px solid #4a4a4a;
-    background: rgba(0, 0, 0, 0.5);
+    border-top: 2px solid var(--border-color);
+    background: var(--bg-overlay);
 }
 
 .chat-input {
     flex: 1;
-    background: rgba(0, 0, 0, 0.6);
-    border: 2px solid #4a4a4a;
+    background: var(--input-bg);
+    border: 2px solid var(--border-color);
     padding: 10px 12px;
-    color: #fff;
+    color: var(--text-primary);
     font-family: 'Courier New', monospace;
     font-size: 14px;
     outline: none;
+    transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .chat-input:focus {
-    border-color: #4a9eff;
+    border-color: var(--accent-blue);
 }
 
 .chat-input::placeholder {
-    color: #666;
+    color: var(--text-muted);
 }
 
 .chat-send {
-    background: #4a9eff;
+    background: var(--accent-blue);
     border: none;
     color: #fff;
     padding: 10px 15px;
@@ -178,7 +181,7 @@
 
 .chat-empty {
     text-align: center;
-    color: #666;
+    color: var(--text-muted);
     padding: 40px 20px;
     font-size: 14px;
 }

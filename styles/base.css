@@ -18,6 +18,65 @@
  * - Mobillal kapcsolatos → mobile.css
  */
 
+/* === THEME VÁLTOZÓK === */
+:root {
+    /* Dark téma (alapértelmezett) */
+    --bg-primary: #1a1a2e;
+    --bg-secondary: #16213e;
+    --bg-tertiary: #0f3460;
+    --bg-overlay: rgba(0, 0, 0, 0.6);
+    --bg-overlay-strong: rgba(0, 0, 0, 0.8);
+    --bg-modal: rgba(0, 0, 0, 0.85);
+    
+    --text-primary: #ffffff;
+    --text-secondary: #aaaaaa;
+    --text-muted: #666666;
+    
+    --border-color: #4a4a4a;
+    --border-hover: #4a9eff;
+    
+    --accent-gold: #ffd700;
+    --accent-blue: #4a9eff;
+    --accent-green: #4eff4e;
+    --accent-red: #ff4444;
+    
+    --panel-bg: rgba(0, 0, 0, 0.7);
+    --bubble-bg: #1a1a2e;
+    --modal-bg: #1e1e2e;
+    --button-bg: #3a3a5a;
+    --button-hover: #4a4a7a;
+    --input-bg: #2a2a4a;
+}
+
+/* Light téma */
+[data-theme="light"] {
+    --bg-primary: #f0f4f8;
+    --bg-secondary: #e2e8f0;
+    --bg-tertiary: #cbd5e1;
+    --bg-overlay: rgba(255, 255, 255, 0.8);
+    --bg-overlay-strong: rgba(255, 255, 255, 0.95);
+    --bg-modal: rgba(255, 255, 255, 0.95);
+    
+    --text-primary: #1a1a2e;
+    --text-secondary: #4a5568;
+    --text-muted: #a0aec0;
+    
+    --border-color: #cbd5e1;
+    --border-hover: #3182ce;
+    
+    --accent-gold: #d69e2e;
+    --accent-blue: #3182ce;
+    --accent-green: #38a169;
+    --accent-red: #e53e3e;
+    
+    --panel-bg: rgba(255, 255, 255, 0.9);
+    --bubble-bg: #ffffff;
+    --modal-bg: #ffffff;
+    --button-bg: #e2e8f0;
+    --button-hover: #cbd5e1;
+    --input-bg: #f7fafc;
+}
+
 /* Alap stílusok és reset */
 * {
     margin: 0;
@@ -32,7 +91,8 @@
 body {
     overflow: hidden;
     font-family: 'Courier New', monospace;
-    background: #1a1a2e;
+    background: var(--bg-primary);
+    color: var(--text-primary);
     image-rendering: pixelated;
     image-rendering: -moz-crisp-edges;
     image-rendering: crisp-edges;
@@ -42,6 +102,7 @@ body {
     -webkit-user-select: none;
     user-select: none;
     -webkit-tap-highlight-color: transparent;
+    transition: background 0.3s ease, color 0.3s ease;
 }
 
 #gameCanvas {
@@ -59,23 +120,23 @@ body {
     position: fixed;
     bottom: 10px;
     left: 10px;
-    background: rgba(0, 0, 0, 0.6);
-    border: 2px solid #4a4a4a;
+    background: var(--bg-overlay);
+    border: 2px solid var(--border-color);
     border-radius: 0;
     padding: 5px 10px;
     z-index: 1000;
     font-size: 12px;
-    color: #aaa;
+    color: var(--text-secondary);
     font-family: 'Courier New', monospace;
     cursor: pointer;
     user-select: none;
-    transition: all 0.1s;
+    transition: all 0.2s ease;
 }
 
 #version:hover {
-    background: rgba(0, 0, 0, 0.8);
-    color: #fff;
-    border-color: #4a9eff;
+    background: var(--bg-overlay-strong);
+    color: var(--text-primary);
+    border-color: var(--border-hover);
 }
 
 .error-message {
@@ -115,11 +176,12 @@ body {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-tertiary) 100%);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 9999;
+    transition: background 0.3s ease;
 }
 
 .countdown-overlay.hidden {
@@ -128,7 +190,7 @@ body {
 
 .countdown-content {
     text-align: center;
-    color: #fff;
+    color: var(--text-primary);
     font-family: 'Courier New', monospace;
 }
 
