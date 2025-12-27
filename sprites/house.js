@@ -81,3 +81,61 @@ export function drawHouse(ctx, x, y) {
     ctx.fill();
 }
 
+// Épülő ház - építési állványzattal és burkolattal
+export function drawBuildingHouse(ctx, x, y) {
+    const tileSize = CONFIG.TILE_SIZE;
+    const centerX = x + tileSize / 2;
+    
+    // Alap struktúra (halványabb, félig kész ház)
+    ctx.fillStyle = 'rgba(102, 102, 102, 0.5)';
+    ctx.fillRect(Math.floor(x + 4), Math.floor(y + tileSize / 3), tileSize - 8, tileSize * 2 / 3 - 4);
+    
+    // Félig kész tető körvonal
+    ctx.strokeStyle = 'rgba(255, 0, 0, 0.5)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(Math.floor(centerX), Math.floor(y + 2));
+    ctx.lineTo(Math.floor(x + 2), Math.floor(y + tileSize / 3));
+    ctx.lineTo(Math.floor(x + tileSize - 2), Math.floor(y + tileSize / 3));
+    ctx.closePath();
+    ctx.stroke();
+    
+    // Építési állványzat - fa gerendák
+    ctx.fillStyle = '#8b6f47';
+    
+    // Bal oldali függőleges gerenda
+    ctx.fillRect(Math.floor(x), Math.floor(y + 2), 3, tileSize - 4);
+    // Jobb oldali függőleges gerenda
+    ctx.fillRect(Math.floor(x + tileSize - 3), Math.floor(y + 2), 3, tileSize - 4);
+    
+    // Vízszintes gerendák
+    ctx.fillRect(Math.floor(x), Math.floor(y + 2), tileSize, 2);
+    ctx.fillRect(Math.floor(x), Math.floor(y + tileSize / 2), tileSize, 2);
+    ctx.fillRect(Math.floor(x), Math.floor(y + tileSize - 4), tileSize, 2);
+    
+    // Kereszt gerendák (X minta)
+    ctx.strokeStyle = '#6b5137';
+    ctx.lineWidth = 2;
+    // Bal felső - jobb alsó
+    ctx.beginPath();
+    ctx.moveTo(Math.floor(x + 3), Math.floor(y + 4));
+    ctx.lineTo(Math.floor(x + tileSize - 3), Math.floor(y + tileSize / 2 - 2));
+    ctx.stroke();
+    // Jobb felső - bal alsó
+    ctx.beginPath();
+    ctx.moveTo(Math.floor(x + tileSize - 3), Math.floor(y + 4));
+    ctx.lineTo(Math.floor(x + 3), Math.floor(y + tileSize / 2 - 2));
+    ctx.stroke();
+    
+    // Narancssárga építési háló/fólia (sarkokban)
+    ctx.fillStyle = 'rgba(255, 165, 0, 0.4)';
+    ctx.fillRect(Math.floor(x + 4), Math.floor(y + tileSize / 3 + 4), 6, 8);
+    ctx.fillRect(Math.floor(x + tileSize - 10), Math.floor(y + tileSize / 3 + 4), 6, 8);
+    
+    // Építés alatt ikon
+    ctx.fillStyle = '#ffa500';
+    ctx.font = 'bold 10px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('🔨', centerX, y + tileSize - 8);
+}
+

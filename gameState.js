@@ -41,6 +41,8 @@ export const gameState = {
     // Bánya műveletek
     buildingMines: new Map(),    // Épülő bányák
     miningMines: new Map(),      // Aktívan bányászó bányák
+    // Ház építés
+    buildingHouses: new Map(),   // Épülő házak
     // Munkás rendszer
     workers: 3,    // Szabad munkások (kezdő ház ad 3-at)
     maxWorkers: 3, // Összes munkás

@@ -291,5 +291,52 @@ export function updateTimers(updateUI, saveGameState, closeBubble) {
         }
     });
     miningToRemove.forEach(key => gameState.miningMines.delete(key));
+    
+    // === HÁZ ÉPÍTÉS IDŐZÍTŐ ===
+    const houseBuildToRemove = [];
+    gameState.buildingHouses.forEach((data, key) => {
+        const elapsed = (now - data.startTime) / 1000;
+        const timeLeft = Math.max(0, CONFIG.HOUSE_BUILD_TIME - elapsed);
+        
+        if (timeLeft <= 0) {
+            // Ház kész - munkások visszaadása
+            gameState.workers += CONFIG.HOUSE_BUILD_WORKERS;
+            const [x, y] = key.split(',').map(Number);
+            const tile = findTile(x, y);
+            if (tile && tile.type === 'buildinghouse') {
+                tile.type = 'house';
+                // Munkások növelése (normál ház)
+                gameState.maxWorkers += CONFIG.NORMAL_HOUSE_WORKERS;
+                gameState.workers += CONFIG.NORMAL_HOUSE_WORKERS;
+                updateUI();
+                saveGameState();
+                playSound('complete');
+            }
+            houseBuildToRemove.push(key);
+            
+            if (gameState.activeBubble) {
+                const [bubbleX, bubbleY] = key.split(',').map(Number);
+                if (gameState.activeBubble.x === bubbleX && gameState.activeBubble.y === bubbleY) {
+                    closeBubble();
+                }
+            }
+        } else {
+            data.timeLeft = Math.ceil(timeLeft);
+            
+            if (gameState.activeBubble) {
+                const [x, y] = key.split(',').map(Number);
+                if (gameState.activeBubble.x === x && gameState.activeBubble.y === y) {
+                    const content = document.getElementById('bubbleContent');
+                    const minutes = Math.floor(data.timeLeft / 60);
+                    const seconds = data.timeLeft % 60;
+                    content.innerHTML = `
+                        <div>🔨 Ház építése folyamatban...</div>
+                        <div>Hátralévő idő: ${minutes}:${seconds.toString().padStart(2, '0')}</div>
+                    `;
+                }
+            }
+        }
+    });
+    houseBuildToRemove.forEach(key => gameState.buildingHouses.delete(key));
 }
 

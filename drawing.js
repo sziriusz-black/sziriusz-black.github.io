@@ -17,7 +17,7 @@
  */
 
 export { drawTree } from './sprites/tree.js';
-export { drawHouse } from './sprites/house.js';
+export { drawHouse, drawBuildingHouse } from './sprites/house.js';
 export { drawCornField } from './sprites/cornfield.js';
 export { drawEmptyCornField } from './sprites/empty-cornfield.js';
 export { drawStoneCutter } from './sprites/stonecutter.js';

@@ -72,15 +72,29 @@ export function sellHouse(x, y, updateUI, saveGameState) {
     }
 }
 
-// Ház építése
+// Ház építése (3 munkás, 2 perc)
 export function buildHouse(x, y, updateUI, saveGameState) {
     const tile = findTile(x, y);
-    if (tile && tile.type === 'owned' && gameState.money >= CONFIG.HOUSE_BUILD_PRICE) {
-        tile.type = 'house';
+    const key = `${x},${y}`;
+    
+    if (tile && tile.type === 'owned' && 
+        gameState.money >= CONFIG.HOUSE_BUILD_PRICE && 
+        gameState.workers >= CONFIG.HOUSE_BUILD_WORKERS &&
+        !gameState.buildingHouses.has(key)) {
+        
+        // Munkások foglalása
+        gameState.workers -= CONFIG.HOUSE_BUILD_WORKERS;
         gameState.money -= CONFIG.HOUSE_BUILD_PRICE;
-        // Munkások növelése (normál ház)
-        gameState.maxWorkers += CONFIG.NORMAL_HOUSE_WORKERS;
-        gameState.workers += CONFIG.NORMAL_HOUSE_WORKERS;
+        
+        // Tile típus változtatása épülő házra
+        tile.type = 'buildinghouse';
+        
+        // Építési folyamat indítása
+        gameState.buildingHouses.set(key, {
+            timeLeft: CONFIG.HOUSE_BUILD_TIME,
+            startTime: Date.now()
+        });
+        
         updateUI();
         saveGameState();
         playSound('build');

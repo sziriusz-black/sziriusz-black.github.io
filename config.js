@@ -25,6 +25,8 @@ export const CONFIG = {
     TREE_CUT_TIME: 30,
     PURCHASE_PRICE: 100,
     HOUSE_BUILD_PRICE: 50,
+    HOUSE_BUILD_TIME: 120,           // Ház építési idő: 2 perc (másodpercben)
+    HOUSE_BUILD_WORKERS: 3,          // Ház építéséhez szükséges munkások
     TREE_BUILD_PRICE: 10,
     HOUSE_SELL_PRICE: 25,
     PLANK_SELL_PRICE: 12,
@@ -71,6 +73,7 @@ export const TileType = {
     EMPTY: 'empty',
     TREE: 'tree',
     HOUSE: 'house',
+    BUILDING_HOUSE: 'buildinghouse', // Épülő ház
     OWNED: 'owned',
     CORNFIELD: 'cornfield',
     EMPTY_CORNFIELD: 'emptycornfield',

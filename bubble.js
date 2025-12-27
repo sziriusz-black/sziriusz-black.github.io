@@ -85,6 +85,22 @@ export function generateBubbleContent(tileX, tileY, tile) {
                 </button>
             `;
         }
+    } else if (tile.type === 'buildinghouse') {
+        // Épülő ház
+        const data = gameState.buildingHouses.get(`${tileX},${tileY}`);
+        if (data) {
+            const now = Date.now();
+            const elapsed = (now - data.startTime) / 1000;
+            const timeLeft = Math.max(0, CONFIG.HOUSE_BUILD_TIME - elapsed);
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = Math.floor(timeLeft % 60);
+            content.innerHTML = `
+                <div>🔨 Ház építése folyamatban...</div>
+                <div>Hátralévő idő: ${minutes}:${seconds.toString().padStart(2, '0')}</div>
+            `;
+        } else {
+            content.innerHTML = `<div>🔨 Ház építése folyamatban...</div>`;
+        }
     } else if (tile.type === 'house') {
         // Ház - upgrade és eladás
         const houseLevel = tile.level || 1;
@@ -121,8 +137,8 @@ export function generateBubbleContent(tileX, tileY, tile) {
         const workerWarning = noWorker ? ' ' + t('bubble.noWorker') : '';
         content.innerHTML = `
             <div style="margin-bottom: 10px;">${t('bubble.build')}</div>
-            <button class="bubble-button" ${gameState.money < CONFIG.HOUSE_BUILD_PRICE ? 'disabled' : ''} data-action="buildHouse" data-x="${tileX}" data-y="${tileY}">
-                ${t('bubble.buildHouse', CONFIG.HOUSE_BUILD_PRICE)}
+            <button class="bubble-button" ${gameState.money < CONFIG.HOUSE_BUILD_PRICE || gameState.workers < CONFIG.HOUSE_BUILD_WORKERS ? 'disabled' : ''} data-action="buildHouse" data-x="${tileX}" data-y="${tileY}">
+                ${t('bubble.buildHouse', CONFIG.HOUSE_BUILD_PRICE)} (${CONFIG.HOUSE_BUILD_WORKERS} munkás)
             </button>
             <button class="bubble-button" ${gameState.money < CONFIG.TREE_BUILD_PRICE || noWorker ? 'disabled' : ''} data-action="buildTree" data-x="${tileX}" data-y="${tileY}">
                 ${t('bubble.plantTree', CONFIG.TREE_BUILD_PRICE)}${workerWarning}
@@ -338,9 +354,10 @@ export function refreshActiveBubble() {
         const isReplantingCornfield = gameState.replantingCornfields.has(key);
         const isBuildingMine = gameState.buildingMines.has(key);
         const isMining = gameState.miningMines.has(key);
+        const isBuildingHouse = gameState.buildingHouses.has(key);
         
         // Csak akkor frissítjük, ha folyamatban van valami időzített művelet
-        if (isCuttingTree || isBuildingCornfield || isReplantingCornfield || isBuildingMine || isMining) {
+        if (isCuttingTree || isBuildingCornfield || isReplantingCornfield || isBuildingMine || isMining || isBuildingHouse) {
             generateBubbleContent(tileX, tileY, tile);
         }
     } catch (error) {

@@ -97,6 +97,7 @@ export function saveGameState() {
             replantingCornfields: Object.fromEntries(gameState.replantingCornfields),
             buildingMines: Object.fromEntries(gameState.buildingMines),
             miningMines: Object.fromEntries(gameState.miningMines),
+            buildingHouses: Object.fromEntries(gameState.buildingHouses),
             // Munkás rendszer
             workers: gameState.workers,
             maxWorkers: gameState.maxWorkers,
@@ -149,6 +150,9 @@ export function loadGameState(createInitialMap, updateUI) {
             }
             if (state.miningMines) {
                 gameState.miningMines = new Map(Object.entries(state.miningMines));
+            }
+            if (state.buildingHouses) {
+                gameState.buildingHouses = new Map(Object.entries(state.buildingHouses));
             }
             // Munkás rendszer visszaállítása
             if (state.workers !== undefined) {
