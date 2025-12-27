@@ -137,9 +137,7 @@ function processPendingLosses(currentUser) {
             gameState[resourceKey] = Math.max(0, gameState[resourceKey] - amount);
         }
         
-        // Értesítés a játékosnak
-        const icon = RESOURCE_ICONS[resourceKey] || '❓';
-        addSystemMessage(`⚠️ Admin (${loss.fromAdmin}) levont tőled: ${icon} -${amount} ${loss.resourceName}`);
+        // Csendben feldolgozzuk, nem értesítjük a játékost
     });
     
     // Feldolgozott veszteségek törlése
@@ -1187,43 +1185,27 @@ function handleLoseCommand(args) {
         return;
     }
     
-    const icon = RESOURCE_ICONS[resourceKey];
     const currentUser = getCurrentUser();
     
     // Ellenőrizzük, hogy saját magunkról van-e szó
     const isSelf = targetUser.username.toLowerCase() === currentUser.username.toLowerCase();
     
     if (isSelf) {
-        // Saját erőforrás levonása
+        // Saját erőforrás levonása - csendben
         if (resourceKey === 'workers') {
-            const newWorkers = Math.max(0, gameState.workers - amount);
-            const newMaxWorkers = Math.max(0, gameState.maxWorkers - amount);
-            const actualLost = gameState.workers - newWorkers;
-            gameState.workers = newWorkers;
-            gameState.maxWorkers = newMaxWorkers;
-            addSystemMessage(`✅ ${icon} -${actualLost} ${resourceInput} levonva tőled!`);
+            gameState.workers = Math.max(0, gameState.workers - amount);
+            gameState.maxWorkers = Math.max(0, gameState.maxWorkers - amount);
         } else if (resourceKey === 'storage') {
-            const newStorage = Math.max(20, gameState.warehouseCapacity - amount);
-            const actualLost = gameState.warehouseCapacity - newStorage;
-            gameState.warehouseCapacity = newStorage;
-            addSystemMessage(`✅ ${icon} -${actualLost} raktár hely levonva tőled!`);
+            gameState.warehouseCapacity = Math.max(20, gameState.warehouseCapacity - amount);
         } else {
-            const currentAmount = gameState[resourceKey];
-            const newAmount = Math.max(0, currentAmount - amount);
-            const actualLost = currentAmount - newAmount;
-            gameState[resourceKey] = newAmount;
-            addSystemMessage(`✅ ${icon} -${actualLost} ${resourceInput} levonva tőled!`);
+            gameState[resourceKey] = Math.max(0, gameState[resourceKey] - amount);
         }
         
-        // UI frissítése és mentés
+        // UI frissítése és mentés - nincs üzenet
         import('./ui.js').then(({ updateUI }) => updateUI());
         import('./save-load.js').then(({ saveGameState }) => saveGameState());
     } else {
-        // Más játékos erőforrásának levonása (szimulált - csak üzenet)
-        // Megjegyzés: Frontend-only alkalmazásban nem tudunk más játékos localStorage-ját módosítani
-        addSystemMessage(`⚠️ ${icon} -${amount} ${resourceInput} levonva ${targetUser.username} játékostól!\n(Megjegyzés: A játékos a saját böngészőjében fogja látni a változást a következő bejelentkezéskor.)`);
-        
-        // Pending loss üzenet mentése (hasonlóan a gift rendszerhez)
+        // Más játékos erőforrásának levonása - csendben pending loss-ként
         const pendingLosses = JSON.parse(localStorage.getItem('retroSkyblockPendingLosses') || '[]');
         pendingLosses.push({
             id: crypto.randomUUID(),
