@@ -99,6 +99,10 @@
             font-size: 22px;
             color: var(--accent-blue);
             font-weight: bold;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
         .version-info {
             display: flex;
@@ -184,6 +188,30 @@
         .change-detail.open {
             display: block;
         }
+        .permalink-link {
+            visibility: hidden;
+            background: none;
+            border: none;
+            padding: 0;
+            margin: 0;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            color: var(--accent-blue);
+            transition: opacity 0.2s;
+            text-decoration: none;
+        }
+        .version-header:hover .permalink-link {
+            visibility: visible;
+        }
+        .permalink-link:hover {
+            opacity: 0.7;
+        }
+        .permalink-icon {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
         @media (max-width: 600px) {
             h1 {
                 font-size: 24px;
@@ -199,9 +227,17 @@
         <a href="index.html" class="back-link">← Vissza a játékhoz</a>
         <h1>🎮 Frissítési napló</h1>
 
-        <div class="version-card">
+        <div class="version-card" data-version="2.0">
             <div class="version-header" onclick="toggleVersion(this)">
-                <span class="version-name">V2.0 - Nagy Frissítés</span>
+                <span class="version-name">
+                    V2.0 - Nagy Frissítés
+                    <a class="permalink-link" href="?version=2.0" title="permalink">
+                        <svg class="permalink-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+                        </svg>
+                    </a>
+                </span>
                 <div class="version-info">
                     <span class="version-date">2025. december 26.</span>
                     <span class="version-arrow">▼</span>
@@ -369,9 +405,17 @@
             </div>
         </div>
 
-        <div class="version-card">
+        <div class="version-card" data-version="1.3.1">
             <div class="version-header" onclick="toggleVersion(this)">
-                <span class="version-name">V1.3.1 - Hibajavítások</span>
+                <span class="version-name">
+                    V1.3.1 - Hibajavítások
+                    <a class="permalink-link" href="?version=1.3.1" title="permalink">
+                        <svg class="permalink-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+                        </svg>
+                    </a>
+                </span>
                 <div class="version-info">
                     <span class="version-date">2025. december 24. 18:00</span>
                     <span class="version-arrow">▼</span>
@@ -401,9 +445,17 @@
             </div>
         </div>
 
-        <div class="version-card">
+        <div class="version-card" data-version="1.3">
             <div class="version-header" onclick="toggleVersion(this)">
-                <span class="version-name">V1.3 - Kővágó & Fejlesztések</span>
+                <span class="version-name">
+                    V1.3 - Kővágó & Fejlesztések
+                    <a class="permalink-link" href="?version=1.3" title="permalink">
+                        <svg class="permalink-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+                        </svg>
+                    </a>
+                </span>
                 <div class="version-info">
                     <span class="version-date">2025. december 22. 12:00</span>
                     <span class="version-arrow">▼</span>
@@ -439,9 +491,17 @@
             </div>
         </div>
 
-        <div class="version-card">
+        <div class="version-card" data-version="1.2">
             <div class="version-header" onclick="toggleVersion(this)">
-                <span class="version-name">V1.2 - Kukorica</span>
+                <span class="version-name">
+                    V1.2 - Kukorica
+                    <a class="permalink-link" href="?version=1.2" title="permalink">
+                        <svg class="permalink-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+                        </svg>
+                    </a>
+                </span>
                 <div class="version-info">
                     <span class="version-date">2025. december 20. 10:00</span>
                     <span class="version-arrow">▼</span>
@@ -471,9 +531,17 @@
             </div>
         </div>
 
-        <div class="version-card">
+        <div class="version-card" data-version="1.1">
             <div class="version-header" onclick="toggleVersion(this)">
-                <span class="version-name">V1.1 - Fa ültetés</span>
+                <span class="version-name">
+                    V1.1 - Fa ültetés
+                    <a class="permalink-link" href="?version=1.1" title="permalink">
+                        <svg class="permalink-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+                        </svg>
+                    </a>
+                </span>
                 <div class="version-info">
                     <span class="version-date">2025. december 18. 14:00</span>
                     <span class="version-arrow">▼</span>
@@ -509,9 +577,17 @@
             </div>
         </div>
 
-        <div class="version-card">
+        <div class="version-card" data-version="1.0">
             <div class="version-header" onclick="toggleVersion(this)">
-                <span class="version-name">V1.0 - Első kiadás</span>
+                <span class="version-name">
+                    V1.0 - Első kiadás
+                    <a class="permalink-link" href="?version=1.0" title="permalink">
+                        <svg class="permalink-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+                        </svg>
+                    </a>
+                </span>
                 <div class="version-info">
                     <span class="version-date">2025. december 15. 09:00</span>
                     <span class="version-arrow">▼</span>
@@ -564,6 +640,23 @@
         }
         initTheme();
         
+        // Verzió megnyitása URL paraméter alapján
+        function initVersionFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const versionParam = urlParams.get('version');
+            
+            if (versionParam) {
+                const versionCard = document.querySelector(`.version-card[data-version="${versionParam}"]`);
+                if (versionCard) {
+                    versionCard.classList.add('open');
+                    // Scrollozás a blokkhoz
+                    setTimeout(() => {
+                        versionCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }, 100);
+                }
+            }
+        }
+        
         function toggleVersion(header) {
             const card = header.parentElement;
             card.classList.toggle('open');
@@ -574,6 +667,9 @@
             const detail = item.nextElementSibling;
             detail.classList.toggle('open');
         }
+        
+        // Oldal betöltésekor ellenőrizd az URL paramétert
+        initVersionFromUrl();
     </script>
 </body>
 </html>

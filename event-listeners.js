@@ -185,11 +185,6 @@ export function setupSettingsEvents() {
         }
     });
     
-    // Verzió kattintás - update oldal megnyitása
-    document.getElementById('version').addEventListener('click', () => {
-        window.open('update.html', '_blank');
-    });
-    
     // Hang állapot betöltése és ikon frissítése
     loadMuteState();
     

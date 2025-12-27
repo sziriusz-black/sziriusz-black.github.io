@@ -131,6 +131,8 @@ body {
     cursor: pointer;
     user-select: none;
     transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
 }
 
 #version:hover {
