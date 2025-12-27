@@ -143,6 +143,91 @@
     gap: 8px;
     border-top: 2px solid var(--border-color);
     background: var(--bg-overlay);
+    position: relative;
+}
+
+/* === AUTOCOMPLETE STÍLUSOK === */
+.chat-autocomplete {
+    position: absolute;
+    bottom: 100%;
+    left: 10px;
+    right: 10px;
+    background: var(--bg-overlay-strong, rgba(0, 0, 0, 0.95));
+    border: 2px solid var(--accent-blue);
+    border-bottom: none;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 10001;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.chat-autocomplete.hidden {
+    display: none;
+}
+
+.chat-autocomplete-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    border-bottom: 1px solid var(--border-color, #4a4a4a);
+}
+
+.chat-autocomplete-item:last-child {
+    border-bottom: none;
+}
+
+.chat-autocomplete-item:hover,
+.chat-autocomplete-item.selected {
+    background: rgba(74, 158, 255, 0.3);
+}
+
+.chat-autocomplete-item.selected {
+    background: rgba(74, 158, 255, 0.4);
+    border-left: 3px solid var(--accent-blue);
+    padding-left: 9px;
+}
+
+.autocomplete-command {
+    color: var(--accent-blue, #4a9eff);
+    font-weight: bold;
+    font-size: 14px;
+    min-width: 90px;
+}
+
+.autocomplete-desc {
+    color: var(--text-secondary, #aaa);
+    font-size: 12px;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.autocomplete-admin {
+    font-size: 14px;
+    margin-left: auto;
+}
+
+/* Autocomplete scrollbar */
+.chat-autocomplete::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-autocomplete::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.chat-autocomplete::-webkit-scrollbar-thumb {
+    background: var(--accent-blue, #4a9eff);
+    border-radius: 3px;
+}
+
+/* Autocomplete hint a chat input-nál */
+.chat-input::placeholder {
+    color: var(--text-muted);
 }
 
 .chat-input {

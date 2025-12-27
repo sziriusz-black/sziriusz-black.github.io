@@ -21,6 +21,21 @@ const ADMIN_USERNAMES = ['Szíriusz', 'Szirius', 'szíriusz', 'szirius'];
 const MESSAGE_COOLDOWN_MS = 5000; // 5 másodperc cooldown
 
 let lastMessageTime = 0;
+let autocompleteSelectedIndex = -1;
+
+// === PARANCS DEFINÍCIÓK (autocomplete-hez) ===
+const COMMANDS = [
+    { name: 'help', description: 'Parancsok listája', adminOnly: false },
+    { name: 'player', description: 'Játékosok oldal megnyitása', adminOnly: false },
+    { name: 'gift', description: 'Ajándék küldése: /gift [kinek] [mit] [mennyit]', adminOnly: false },
+    { name: 'clear', description: 'Chat törlése', adminOnly: true },
+    { name: 'broadcast', description: 'Rendszer üzenet: /broadcast [üzenet]', adminOnly: true },
+    { name: 'reset', description: 'Játék újrakezdése', adminOnly: true },
+    { name: 'reports', description: 'Jelentések megtekintése', adminOnly: true },
+    { name: 'mute', description: 'Játékos némítása: /mute [név] [idő]', adminOnly: true },
+    { name: 'unmute', description: 'Némítás feloldása: /unmute [név]', adminOnly: true },
+    { name: 'info', description: 'Játékos adatai: /info [név]', adminOnly: true }
+];
 
 // === PENDING GIFTS RENDSZER ===
 
@@ -728,6 +743,167 @@ function isChatOpen() {
     return chatWindow && !chatWindow.classList.contains('hidden');
 }
 
+// === AUTOCOMPLETE FUNKCIÓK ===
+
+// Elérhető parancsok szűrése a felhasználó jogosultsága alapján
+function getAvailableCommands() {
+    const currentUser = getCurrentUser();
+    const userIsAdmin = currentUser && isAdmin(currentUser.username);
+    
+    return COMMANDS.filter(cmd => !cmd.adminOnly || userIsAdmin);
+}
+
+// Parancsok szűrése a beírt szöveg alapján
+function filterCommands(query) {
+    const availableCommands = getAvailableCommands();
+    const searchTerm = query.toLowerCase().slice(1); // "/" eltávolítása
+    
+    if (searchTerm === '') {
+        return availableCommands;
+    }
+    
+    return availableCommands.filter(cmd => 
+        cmd.name.toLowerCase().startsWith(searchTerm)
+    );
+}
+
+// Autocomplete menü megjelenítése
+function showAutocomplete(filteredCommands) {
+    let autocompleteMenu = document.getElementById('chatAutocomplete');
+    
+    if (!autocompleteMenu) {
+        autocompleteMenu = document.createElement('div');
+        autocompleteMenu.id = 'chatAutocomplete';
+        autocompleteMenu.className = 'chat-autocomplete';
+        const chatInputContainer = document.querySelector('.chat-input-container');
+        if (chatInputContainer) {
+            chatInputContainer.appendChild(autocompleteMenu);
+        }
+    }
+    
+    if (filteredCommands.length === 0) {
+        hideAutocomplete();
+        return;
+    }
+    
+    autocompleteMenu.innerHTML = filteredCommands.map((cmd, index) => `
+        <div class="chat-autocomplete-item ${index === autocompleteSelectedIndex ? 'selected' : ''}" 
+             data-command="${cmd.name}"
+             data-index="${index}">
+            <span class="autocomplete-command">/${cmd.name}</span>
+            <span class="autocomplete-desc">${cmd.description}</span>
+            ${cmd.adminOnly ? '<span class="autocomplete-admin">👑</span>' : ''}
+        </div>
+    `).join('');
+    
+    autocompleteMenu.classList.remove('hidden');
+    
+    // Kattintás esemény az autocomplete elemekre
+    autocompleteMenu.querySelectorAll('.chat-autocomplete-item').forEach(item => {
+        item.addEventListener('click', () => {
+            selectAutocompleteCommand(item.dataset.command);
+        });
+        item.addEventListener('mouseenter', () => {
+            autocompleteSelectedIndex = parseInt(item.dataset.index);
+            updateAutocompleteSelection();
+        });
+    });
+}
+
+// Autocomplete menü elrejtése
+function hideAutocomplete() {
+    const autocompleteMenu = document.getElementById('chatAutocomplete');
+    if (autocompleteMenu) {
+        autocompleteMenu.classList.add('hidden');
+    }
+    autocompleteSelectedIndex = -1;
+}
+
+// Autocomplete kijelölés frissítése
+function updateAutocompleteSelection() {
+    const items = document.querySelectorAll('.chat-autocomplete-item');
+    items.forEach((item, index) => {
+        if (index === autocompleteSelectedIndex) {
+            item.classList.add('selected');
+            // Görgetés a látható területre
+            item.scrollIntoView({ block: 'nearest' });
+        } else {
+            item.classList.remove('selected');
+        }
+    });
+}
+
+// Parancs kiválasztása az autocomplete-ből
+function selectAutocompleteCommand(commandName) {
+    const chatInput = document.getElementById('chatInput');
+    if (chatInput) {
+        chatInput.value = `/${commandName} `;
+        chatInput.focus();
+        hideAutocomplete();
+    }
+}
+
+// Autocomplete kezelése input eseménykor
+function handleAutocompleteInput(inputValue) {
+    if (inputValue.startsWith('/')) {
+        const filteredCommands = filterCommands(inputValue);
+        autocompleteSelectedIndex = filteredCommands.length > 0 ? 0 : -1;
+        showAutocomplete(filteredCommands);
+    } else {
+        hideAutocomplete();
+    }
+}
+
+// Autocomplete navigáció billentyűzettel
+function handleAutocompleteKeydown(event, inputValue) {
+    const autocompleteMenu = document.getElementById('chatAutocomplete');
+    const isAutocompleteVisible = autocompleteMenu && !autocompleteMenu.classList.contains('hidden');
+    
+    if (!isAutocompleteVisible) {
+        return false; // Nem kezeltük az eseményt
+    }
+    
+    const items = document.querySelectorAll('.chat-autocomplete-item');
+    const itemCount = items.length;
+    
+    switch (event.key) {
+        case 'ArrowDown':
+            event.preventDefault();
+            autocompleteSelectedIndex = (autocompleteSelectedIndex + 1) % itemCount;
+            updateAutocompleteSelection();
+            return true;
+            
+        case 'ArrowUp':
+            event.preventDefault();
+            autocompleteSelectedIndex = (autocompleteSelectedIndex - 1 + itemCount) % itemCount;
+            updateAutocompleteSelection();
+            return true;
+            
+        case 'Tab':
+            event.preventDefault();
+            if (autocompleteSelectedIndex >= 0 && autocompleteSelectedIndex < itemCount) {
+                const selectedItem = items[autocompleteSelectedIndex];
+                selectAutocompleteCommand(selectedItem.dataset.command);
+            }
+            return true;
+            
+        case 'Escape':
+            hideAutocomplete();
+            return true;
+            
+        case 'Enter':
+            if (autocompleteSelectedIndex >= 0 && autocompleteSelectedIndex < itemCount) {
+                event.preventDefault();
+                const selectedItem = items[autocompleteSelectedIndex];
+                selectAutocompleteCommand(selectedItem.dataset.command);
+                return true;
+            }
+            return false;
+    }
+    
+    return false;
+}
+
 // Chat inicializálása
 function initChat() {
     // Chat törlése oldal frissítéskor
@@ -746,16 +922,33 @@ function initChat() {
     }
     
     if (chatInput) {
+        // Input esemény az autocomplete-hez
+        chatInput.addEventListener('input', (e) => {
+            handleAutocompleteInput(e.target.value);
+        });
+        
+        // Billentyűzet események
         chatInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
+            // Először próbáljuk az autocomplete-tel kezelni
+            const handled = handleAutocompleteKeydown(e, chatInput.value);
+            
+            // Ha nem kezelte az autocomplete és Enter volt, akkor üzenet küldés
+            if (!handled && e.key === 'Enter') {
+                hideAutocomplete();
                 sendMessage();
             }
+        });
+        
+        // Focus elvesztésekor elrejtjük az autocomplete-t (kis késleltetéssel a kattintás miatt)
+        chatInput.addEventListener('blur', () => {
+            setTimeout(hideAutocomplete, 150);
         });
     }
     
     // Escape gomb kezelése
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && isChatOpen()) {
+            hideAutocomplete();
             closeChat();
         }
     });
