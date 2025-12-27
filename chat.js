@@ -32,6 +32,8 @@ const COMMANDS = [
     { name: 'clear', description: 'Chat törlése', adminOnly: true },
     { name: 'broadcast', description: 'Kiemelt üzenet mindenkinek: /broadcast [üzenet]', adminOnly: true },
     { name: 'clearbroadcast', description: 'Broadcast üzenetek törlése', adminOnly: true },
+    { name: 'give', description: 'Erőforrás hozzáadása: /give [mit] [mennyit]', adminOnly: true },
+    { name: 'lose', description: 'Erőforrás levonása: /lose [mit] [mennyit]', adminOnly: true },
     { name: 'reset', description: 'Játék újrakezdése', adminOnly: true },
     { name: 'reports', description: 'Jelentések megtekintése', adminOnly: true },
     { name: 'mute', description: 'Játékos némítása: /mute [név] [idő]', adminOnly: true },
@@ -442,6 +444,8 @@ function processCommand(text, currentUser) {
                 '/clear - Chat törlése\n' +
                 '/broadcast [üzenet] - Kiemelt üzenet mindenkinek\n' +
                 '/clearbroadcast - Broadcast üzenetek törlése\n' +
+                '/give [mit] [mennyit] - Erőforrás hozzáadása\n' +
+                '/lose [mit] [mennyit] - Erőforrás levonása\n' +
                 '/reset - Játék újrakezdése\n' +
                 '/reports - Jelentések\n' +
                 '/mute [név] [idő] - Némítás\n' +
@@ -489,6 +493,14 @@ function processCommand(text, currentUser) {
             localStorage.removeItem(BROADCAST_STORAGE_KEY);
             addSystemMessage('🗑️ Broadcast üzenetek törölve!');
             renderMessages();
+            break;
+            
+        case 'give':
+            handleGiveCommand(args);
+            break;
+            
+        case 'lose':
+            handleLoseCommand(args);
             break;
             
         case 'reset':
@@ -1030,6 +1042,122 @@ function initChat() {
             closeChat();
         }
     });
+}
+
+// === ADMIN PARANCSOK: /give és /lose ===
+
+// Erőforrás típusok
+const RESOURCE_TYPES = {
+    'penz': 'money', 'pénz': 'money', 'money': 'money', 'arany': 'money', 'gold': 'money',
+    'deszka': 'planks', 'planks': 'planks', 'fa': 'planks', 'wood': 'planks',
+    'kukorica': 'corn', 'corn': 'corn',
+    'ko': 'stone', 'kő': 'stone', 'stone': 'stone',
+    'vas': 'iron', 'iron': 'iron',
+    'szen': 'coal', 'szén': 'coal', 'coal': 'coal',
+    'gyemant': 'diamond', 'gyémánt': 'diamond', 'diamond': 'diamond',
+    'munkas': 'workers', 'munkás': 'workers', 'workers': 'workers', 'worker': 'workers',
+    'raktar': 'storage', 'raktár': 'storage', 'storage': 'storage'
+};
+
+const RESOURCE_ICONS = {
+    'money': '💰',
+    'planks': '🪵',
+    'corn': '🌽',
+    'stone': '🪨',
+    'iron': '🔩',
+    'coal': '⚫',
+    'diamond': '💎',
+    'workers': '👷',
+    'storage': '📦'
+};
+
+// /give [mit] [mennyit] - Admin parancs erőforrás hozzáadásához
+function handleGiveCommand(args) {
+    if (args.length < 2) {
+        addSystemMessage('❌ Használat: /give [mit] [mennyit]\nPéldák: /give pénz 100, /give deszka 50');
+        return;
+    }
+    
+    const resourceInput = args[0].toLowerCase();
+    const amount = parseInt(args[1]);
+    
+    if (isNaN(amount) || amount <= 0) {
+        addSystemMessage('❌ A mennyiségnek pozitív számnak kell lennie!');
+        return;
+    }
+    
+    const resourceKey = RESOURCE_TYPES[resourceInput];
+    if (!resourceKey) {
+        addSystemMessage(`❌ Ismeretlen erőforrás: "${args[0]}"\nElérhető: pénz, deszka, kukorica, kő, vas, szén, gyémánt, munkás, raktár`);
+        return;
+    }
+    
+    const icon = RESOURCE_ICONS[resourceKey];
+    
+    // Erőforrás hozzáadása
+    if (resourceKey === 'workers') {
+        gameState.workers += amount;
+        gameState.maxWorkers += amount;
+    } else if (resourceKey === 'storage') {
+        gameState.warehouseCapacity += amount;
+    } else {
+        gameState[resourceKey] += amount;
+    }
+    
+    // UI frissítése és mentés
+    import('./ui.js').then(({ updateUI }) => updateUI());
+    import('./save-load.js').then(({ saveGameState }) => saveGameState());
+    
+    addSystemMessage(`✅ ${icon} +${amount} ${resourceInput} hozzáadva!`);
+}
+
+// /lose [mit] [mennyit] - Admin parancs erőforrás elvételéhez
+function handleLoseCommand(args) {
+    if (args.length < 2) {
+        addSystemMessage('❌ Használat: /lose [mit] [mennyit]\nPéldák: /lose pénz 100, /lose deszka 50');
+        return;
+    }
+    
+    const resourceInput = args[0].toLowerCase();
+    const amount = parseInt(args[1]);
+    
+    if (isNaN(amount) || amount <= 0) {
+        addSystemMessage('❌ A mennyiségnek pozitív számnak kell lennie!');
+        return;
+    }
+    
+    const resourceKey = RESOURCE_TYPES[resourceInput];
+    if (!resourceKey) {
+        addSystemMessage(`❌ Ismeretlen erőforrás: "${args[0]}"\nElérhető: pénz, deszka, kukorica, kő, vas, szén, gyémánt, munkás, raktár`);
+        return;
+    }
+    
+    const icon = RESOURCE_ICONS[resourceKey];
+    
+    // Erőforrás levonása (minimum 0)
+    if (resourceKey === 'workers') {
+        const newWorkers = Math.max(0, gameState.workers - amount);
+        const newMaxWorkers = Math.max(0, gameState.maxWorkers - amount);
+        const actualLost = gameState.workers - newWorkers;
+        gameState.workers = newWorkers;
+        gameState.maxWorkers = newMaxWorkers;
+        addSystemMessage(`✅ ${icon} -${actualLost} ${resourceInput} levonva!`);
+    } else if (resourceKey === 'storage') {
+        const newStorage = Math.max(20, gameState.warehouseCapacity - amount);
+        const actualLost = gameState.warehouseCapacity - newStorage;
+        gameState.warehouseCapacity = newStorage;
+        addSystemMessage(`✅ ${icon} -${actualLost} raktár hely levonva!`);
+    } else {
+        const currentAmount = gameState[resourceKey];
+        const newAmount = Math.max(0, currentAmount - amount);
+        const actualLost = currentAmount - newAmount;
+        gameState[resourceKey] = newAmount;
+        addSystemMessage(`✅ ${icon} -${actualLost} ${resourceInput} levonva!`);
+    }
+    
+    // UI frissítése és mentés
+    import('./ui.js').then(({ updateUI }) => updateUI());
+    import('./save-load.js').then(({ saveGameState }) => saveGameState());
 }
 
 export { openChat, closeChat, initChat };
