@@ -326,13 +326,18 @@ export function sellMine(x, y, updateUI, saveGameState) {
 export function calculateMiningResult(mineLevel = 1) {
     const roll = Math.random() * 100;
     
-    // Fejlesztés bónusz: +0.5% minden ritka nyersanyagra szintenként
-    const levelBonus = (mineLevel - 1) * 0.5;
+    // Fejlesztés bónusz: +1% vas és szén szintenként (gyémánt és kő fix!)
+    const levelBonus = (mineLevel - 1) * 1;
     
-    const diamondChance = CONFIG.MINE_DIAMOND_CHANCE + levelBonus;
-    const coalChance = CONFIG.MINE_COAL_CHANCE + levelBonus;
-    const ironChance = CONFIG.MINE_IRON_CHANCE + levelBonus;
-    // A kő esélye csökken, ahogy a többié nő
+    // Fix esélyek (nem változnak)
+    const diamondChance = CONFIG.MINE_DIAMOND_CHANCE; // 1% fix
+    
+    // Növekvő esélyek fejlesztéssel
+    const coalChance = CONFIG.MINE_COAL_CHANCE + levelBonus;    // 4% + bónusz
+    const ironChance = CONFIG.MINE_IRON_CHANCE + levelBonus;    // 5% + bónusz
+    
+    // Kő esélye = ami marad (100% - többi), de minimum 0%
+    const stoneChance = Math.max(0, 100 - diamondChance - coalChance - ironChance);
     
     if (roll < diamondChance) {
         return { type: 'diamond', name: '💎 Gyémánt' };

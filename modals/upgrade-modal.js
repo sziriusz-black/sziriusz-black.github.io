@@ -92,22 +92,35 @@ export function openUpgradeModal(x, y, type, closeBubbleFn) {
         const upgradePrice = CONFIG.UPGRADE_BASE_PRICE + (level - 1) * CONFIG.UPGRADE_INCREMENT;
         const canAfford = gameState.money >= upgradePrice;
         
-        // Fejlesztés bónusz megjelenítése
-        const levelBonus = (level - 1) * 0.5;
-        const nextLevelBonus = level * 0.5;
-        const currentDiamondChance = (1 + levelBonus).toFixed(1);
-        const nextDiamondChance = (1 + nextLevelBonus).toFixed(1);
+        // Fejlesztés bónusz megjelenítése (csak vas és szén növekszik!)
+        const levelBonus = (level - 1) * 1;
+        const nextLevelBonus = level * 1;
+        
+        // Fix esélyek
+        const diamondChance = 1; // Fix 1%
+        
+        // Változó esélyek
+        const currentIronChance = 5 + levelBonus;
+        const currentCoalChance = 4 + levelBonus;
+        const currentStoneChance = Math.max(0, 100 - diamondChance - currentIronChance - currentCoalChance);
+        
+        const nextIronChance = 5 + nextLevelBonus;
+        const nextCoalChance = 4 + nextLevelBonus;
+        const nextStoneChance = Math.max(0, 100 - diamondChance - nextIronChance - nextCoalChance);
         
         title.textContent = '⛏️ Bánya fejlesztés';
         content.innerHTML = `
             <div class="current-level">
-                ${t('modal.currentLevel')} <strong>${level}</strong> | 💎 Gyémánt esély: <strong>${currentDiamondChance}%</strong>
+                ${t('modal.currentLevel')} <strong>${level}</strong>
+            </div>
+            <div class="mine-chances" style="font-size: 12px; margin-bottom: 10px; text-align: center;">
+                💎 ${diamondChance}% (fix) | 🔩 ${currentIronChance}% | ⚫ ${currentCoalChance}% | 🪨 ${currentStoneChance}%
             </div>
             <div class="your-money">💰 Pénzed: <strong>${gameState.money}</strong></div>
             <div class="upgrade-item">
                 <div class="upgrade-info">
                     <div class="upgrade-name">${t('modal.level', level + 1)}</div>
-                    <div class="upgrade-desc">+0.5% minden ritka nyersanyagra (💎${nextDiamondChance}%)</div>
+                    <div class="upgrade-desc">🔩 ${nextIronChance}% | ⚫ ${nextCoalChance}% | 🪨 ${nextStoneChance}%</div>
                     <div class="upgrade-price">Ár: ${upgradePrice} 💰</div>
                 </div>
                 <button class="upgrade-btn" ${!canAfford ? 'disabled' : ''} id="doUpgrade">

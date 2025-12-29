@@ -183,6 +183,33 @@ export function loadGameState(createInitialMap, updateUI) {
                 }
             }
             
+            // === BÁNYA RESET (V2.0 változás - esélyek újraszámolása) ===
+            // Ha már volt bánya reset, ne csináljuk újra
+            const MINE_RESET_KEY = 'retroSkyblockMineResetV2';
+            if (!localStorage.getItem(MINE_RESET_KEY)) {
+                let refundTotal = 0;
+                
+                // Végigmegyünk minden bányán
+                gameState.map.forEach(tile => {
+                    if (tile.type === 'mine' && tile.level && tile.level > 1) {
+                        // Számoljuk ki a visszajáró pénzt
+                        for (let lvl = 1; lvl < tile.level; lvl++) {
+                            refundTotal += CONFIG.UPGRADE_BASE_PRICE + (lvl - 1) * CONFIG.UPGRADE_INCREMENT;
+                        }
+                        // Szint visszaállítása 1-re
+                        tile.level = 1;
+                    }
+                });
+                
+                if (refundTotal > 0) {
+                    gameState.money += refundTotal;
+                    console.log(`Bánya reset: ${refundTotal} pénz visszaadva!`);
+                }
+                
+                // Jelöljük, hogy a reset megtörtént
+                localStorage.setItem(MINE_RESET_KEY, 'true');
+            }
+            
             if (updateUI) updateUI();
         }
     } catch (e) {
