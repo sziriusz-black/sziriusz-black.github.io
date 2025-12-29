@@ -5,8 +5,10 @@
 
 /* Raktár modal */
 .warehouse-modal {
-    max-width: 500px;
-    min-width: 350px;
+    width: 450px;
+    min-width: 450px;
+    max-width: 450px;
+    min-height: 400px;
 }
 
 .warehouse-modal h2 {
@@ -46,6 +48,7 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 10px;
     margin-bottom: 15px;
+    min-height: 200px;
 }
 
 .warehouse-item {
