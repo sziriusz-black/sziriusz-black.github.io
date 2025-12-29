@@ -1,9 +1,46 @@
 /* Aukciós Ház stílusok */
 
 .auction-modal {
-    max-width: 600px;
-    max-height: 80vh;
+    max-width: 800px;
+    width: 90%;
+    max-height: 85vh;
     overflow-y: auto;
+}
+
+/* Hibaüzenet az aukciós házon belül */
+.auction-message {
+    padding: 12px 15px;
+    border-radius: 6px;
+    margin-top: 15px;
+    font-size: 14px;
+    text-align: center;
+    display: none;
+}
+
+.auction-message.show {
+    display: block;
+}
+
+.auction-message.error {
+    background: rgba(244, 67, 54, 0.2);
+    border: 1px solid #f44336;
+    color: #ff6b6b;
+}
+
+.auction-message.success {
+    background: rgba(76, 175, 80, 0.2);
+    border: 1px solid #4CAF50;
+    color: #81c784;
+}
+
+[data-theme="light"] .auction-message.error {
+    background: rgba(244, 67, 54, 0.1);
+    color: #d32f2f;
+}
+
+[data-theme="light"] .auction-message.success {
+    background: rgba(76, 175, 80, 0.1);
+    color: #388e3c;
 }
 
 .auction-create {

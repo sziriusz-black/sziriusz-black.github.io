@@ -1239,6 +1239,20 @@ function saveAuctions(auctions) {
     localStorage.setItem(AUCTION_STORAGE_KEY, JSON.stringify(auctions));
 }
 
+// Üzenet megjelenítése az aukciós házon belül
+function showAuctionMessage(message, type = 'error') {
+    const messageEl = document.getElementById('auctionMessage');
+    if (!messageEl) return;
+    
+    messageEl.textContent = message;
+    messageEl.className = `auction-message show ${type}`;
+    
+    // 5 másodperc után eltűnik
+    setTimeout(() => {
+        messageEl.classList.remove('show');
+    }, 5000);
+}
+
 // Aukciós ház megnyitása
 function openAuctionHouse() {
     const modal = document.getElementById('auctionModal');
@@ -1342,7 +1356,7 @@ function renderAuctions() {
 function createAuction(resourceType, amount, price) {
     const currentUser = getCurrentUser();
     if (!currentUser) {
-        addSystemMessage('❌ Be kell jelentkezned az aukciózáshoz!');
+        showAuctionMessage('❌ Be kell jelentkezned az aukciózáshoz!', 'error');
         return false;
     }
     
@@ -1359,12 +1373,12 @@ function createAuction(resourceType, amount, price) {
     
     const stateKey = resourceMap[resourceType];
     if (!stateKey) {
-        addSystemMessage('❌ Ismeretlen erőforrás típus!');
+        showAuctionMessage('❌ Ismeretlen erőforrás típus!', 'error');
         return false;
     }
     
     if (gameState[stateKey] < amount) {
-        addSystemMessage(`❌ Nincs elég ${resourceType}! (Van: ${gameState[stateKey]})`);
+        showAuctionMessage(`❌ Nincs elég ${resourceType}! (Van: ${gameState[stateKey]})`, 'error');
         return false;
     }
     
@@ -1401,7 +1415,7 @@ function buyAuction(auctionId) {
     const auctionIndex = auctions.findIndex(a => a.id === auctionId);
     
     if (auctionIndex === -1) {
-        addSystemMessage('❌ Ez az aukció már nem elérhető!');
+        showAuctionMessage('❌ Ez az aukció már nem elérhető!', 'error');
         renderAuctions();
         return;
     }
@@ -1410,13 +1424,13 @@ function buyAuction(auctionId) {
     
     // Saját aukció ellenőrzése
     if (auction.sellerUsername.toLowerCase() === currentUser.username.toLowerCase()) {
-        addSystemMessage('❌ Nem vásárolhatod meg a saját aukciódat!');
+        showAuctionMessage('❌ Nem vásárolhatod meg a saját aukciódat!', 'error');
         return;
     }
     
     // Pénz ellenőrzése
     if (gameState.money < auction.price) {
-        addSystemMessage(`❌ Nincs elég aranyad! (Kell: ${auction.price}, Van: ${gameState.money})`);
+        showAuctionMessage(`❌ Nincs elég aranyad! (Kell: ${auction.price}, Van: ${gameState.money})`, 'error');
         return;
     }
     
@@ -1458,7 +1472,7 @@ function buyAuction(auctionId) {
     import('./ui.js').then(({ updateUI }) => updateUI());
     import('./save-load.js').then(({ saveGameState }) => saveGameState());
     
-    addSystemMessage(`✅ Sikeresen megvásároltad: ${auction.amount}x ${auction.resourceType} ${auction.price} aranyért!`);
+    showAuctionMessage(`✅ Sikeresen megvásároltad: ${auction.amount}x ${auction.resourceType} ${auction.price} aranyért!`, 'success');
     renderAuctions();
 }
 
@@ -1471,7 +1485,7 @@ function cancelAuction(auctionId) {
     const auctionIndex = auctions.findIndex(a => a.id === auctionId);
     
     if (auctionIndex === -1) {
-        addSystemMessage('❌ Ez az aukció már nem elérhető!');
+        showAuctionMessage('❌ Ez az aukció már nem elérhető!', 'error');
         renderAuctions();
         return;
     }
@@ -1480,7 +1494,7 @@ function cancelAuction(auctionId) {
     
     // Tulajdonos ellenőrzése
     if (auction.sellerUsername.toLowerCase() !== currentUser.username.toLowerCase()) {
-        addSystemMessage('❌ Csak a saját aukciódat vonhatod vissza!');
+        showAuctionMessage('❌ Csak a saját aukciódat vonhatod vissza!', 'error');
         return;
     }
     
@@ -1507,7 +1521,7 @@ function cancelAuction(auctionId) {
     import('./ui.js').then(({ updateUI }) => updateUI());
     import('./save-load.js').then(({ saveGameState }) => saveGameState());
     
-    addSystemMessage(`✅ Aukció visszavonva! ${auction.amount}x ${auction.resourceType} visszaadva.`);
+    showAuctionMessage(`✅ Aukció visszavonva! ${auction.amount}x ${auction.resourceType} visszaadva.`, 'success');
     renderAuctions();
 }
 
@@ -1524,17 +1538,17 @@ function handleCreateAuction() {
     const price = parseInt(priceInput.value);
     
     if (isNaN(amount) || amount <= 0) {
-        addSystemMessage('❌ Érvénytelen mennyiség!');
+        showAuctionMessage('❌ Érvénytelen mennyiség!', 'error');
         return;
     }
     
     if (isNaN(price) || price <= 0) {
-        addSystemMessage('❌ Érvénytelen ár!');
+        showAuctionMessage('❌ Érvénytelen ár!', 'error');
         return;
     }
     
     if (createAuction(resourceType, amount, price)) {
-        addSystemMessage(`✅ Aukció létrehozva: ${amount}x ${resourceType} - ${price} aranyért!`);
+        showAuctionMessage(`✅ Aukció létrehozva: ${amount}x ${resourceType} - ${price} aranyért!`, 'success');
         amountInput.value = '';
         priceInput.value = '';
     }
