@@ -277,6 +277,40 @@
             </div>
         </div>
 
+        <!-- Aukciós Ház Modal -->
+        <div id="auctionModal" class="modal hidden">
+            <div class="modal-content auction-modal">
+                <button class="close-btn" id="closeAuctionModal">×</button>
+                <h2>🏪 Aukciós Ház</h2>
+                
+                <!-- Új aukció létrehozása -->
+                <div class="auction-create">
+                    <h3>Új aukció</h3>
+                    <div class="auction-form">
+                        <select id="auctionResourceType">
+                            <option value="deszka">🪵 Deszka</option>
+                            <option value="kukorica">🌽 Kukorica</option>
+                            <option value="kő">🪨 Kő</option>
+                            <option value="vas">🔩 Vas</option>
+                            <option value="szén">⚫ Szén</option>
+                            <option value="gyémánt">💎 Gyémánt</option>
+                        </select>
+                        <input type="number" id="auctionAmount" placeholder="Mennyiség" min="1" maxlength="10">
+                        <input type="number" id="auctionPrice" placeholder="Ár (arany)" min="1" maxlength="10">
+                        <button id="createAuctionBtn">Eladásra</button>
+                    </div>
+                </div>
+                
+                <!-- Aktív aukciók listája -->
+                <div class="auction-list-container">
+                    <h3>Aktív aukciók</h3>
+                    <div id="auctionList" class="auction-list">
+                        <!-- Aukciók dinamikusan töltődnek -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div id="tutorialModal" class="modal hidden">
             <div class="modal-content tutorial-modal">
                 <h2 id="tutorialTitle">Üdvözöllek!</h2>

@@ -34,6 +34,7 @@ const COMMANDS = [
     { name: 'help', description: 'Parancsok listája', adminOnly: false },
     { name: 'player', description: 'Játékosok oldal megnyitása', adminOnly: false },
     { name: 'gift', description: 'Ajándék küldése: /gift [kinek] [mit] [mennyit]', adminOnly: false },
+    { name: 'ah', description: 'Aukciós ház megnyitása', adminOnly: false },
     { name: 'clear', description: 'Chat törlése', adminOnly: true },
     { name: 'broadcast', description: 'Kiemelt üzenet mindenkinek: /broadcast [üzenet]', adminOnly: true },
     { name: 'clearbroadcast', description: 'Broadcast üzenetek törlése', adminOnly: true },
@@ -385,6 +386,11 @@ function processCommand(text, currentUser) {
     if (command === 'player' || command === 'players') {
         window.open('player.html', '_blank');
         addSystemMessage('📋 Játékosok oldal megnyitva!');
+        return true;
+    }
+    
+    if (command === 'ah') {
+        openAuctionHouse();
         return true;
     }
     
@@ -1220,4 +1226,348 @@ function handleLoseCommand(args) {
     }
 }
 
-export { openChat, closeChat, initChat };
+// === AUKCIÓS HÁZ ===
+
+const AUCTION_STORAGE_KEY = 'retroSkyblockAuctions';
+
+function getAuctions() {
+    return JSON.parse(localStorage.getItem(AUCTION_STORAGE_KEY) || '[]');
+}
+
+function saveAuctions(auctions) {
+    localStorage.setItem(AUCTION_STORAGE_KEY, JSON.stringify(auctions));
+}
+
+// Aukciós ház megnyitása
+function openAuctionHouse() {
+    const modal = document.getElementById('auctionModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        renderAuctions();
+        closeChat();
+    }
+}
+
+// Aukciós ház bezárása
+function closeAuctionHouse() {
+    const modal = document.getElementById('auctionModal');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+}
+
+// Aukciók megjelenítése
+function renderAuctions() {
+    const container = document.getElementById('auctionList');
+    if (!container) return;
+    
+    const auctions = getAuctions();
+    const currentUser = getCurrentUser();
+    const now = Date.now();
+    
+    // Lejárt aukciók szűrése és visszaadás a tulajdonosnak
+    const activeAuctions = auctions.filter(auction => {
+        if (auction.expiresAt < now) {
+            // Lejárt - visszaadjuk az eladónak (pending gift)
+            const pendingGifts = JSON.parse(localStorage.getItem(PENDING_GIFTS_KEY) || '[]');
+            pendingGifts.push({
+                id: crypto.randomUUID(),
+                senderUsername: 'Aukciós Ház',
+                recipientUsername: auction.sellerUsername.toLowerCase(),
+                resourceType: auction.resourceType,
+                amount: auction.amount,
+                timestamp: Date.now()
+            });
+            localStorage.setItem(PENDING_GIFTS_KEY, JSON.stringify(pendingGifts));
+            return false;
+        }
+        return true;
+    });
+    
+    // Mentjük a szűrt listát
+    if (activeAuctions.length !== auctions.length) {
+        saveAuctions(activeAuctions);
+    }
+    
+    if (activeAuctions.length === 0) {
+        container.innerHTML = '<div class="auction-empty">🏪 Jelenleg nincsenek aktív aukciók.</div>';
+        return;
+    }
+    
+    container.innerHTML = activeAuctions.map(auction => {
+        const timeLeft = Math.max(0, auction.expiresAt - now);
+        const minutes = Math.floor(timeLeft / 60000);
+        const seconds = Math.floor((timeLeft % 60000) / 1000);
+        const isOwn = currentUser && auction.sellerUsername.toLowerCase() === currentUser.username.toLowerCase();
+        
+        const resourceIcons = {
+            'arany': '💰',
+            'deszka': '🪵',
+            'kukorica': '🌽',
+            'kő': '🪨',
+            'vas': '🔩',
+            'szén': '⚫',
+            'gyémánt': '💎'
+        };
+        const icon = resourceIcons[auction.resourceType] || '📦';
+        
+        return `
+            <div class="auction-item ${isOwn ? 'own-auction' : ''}">
+                <div class="auction-resource">
+                    <span class="auction-icon">${icon}</span>
+                    <span class="auction-amount">${auction.amount}x ${auction.resourceType}</span>
+                </div>
+                <div class="auction-seller">Eladó: ${auction.sellerUsername}</div>
+                <div class="auction-price">💰 ${auction.price} arany</div>
+                <div class="auction-time">⏱️ ${minutes}:${seconds.toString().padStart(2, '0')}</div>
+                ${isOwn 
+                    ? `<button class="auction-cancel-btn" data-id="${auction.id}">Visszavonás</button>`
+                    : `<button class="auction-buy-btn" data-id="${auction.id}">Megvásárlás</button>`
+                }
+            </div>
+        `;
+    }).join('');
+    
+    // Gombok eseménykezelői
+    container.querySelectorAll('.auction-buy-btn').forEach(btn => {
+        btn.addEventListener('click', () => buyAuction(btn.dataset.id));
+    });
+    container.querySelectorAll('.auction-cancel-btn').forEach(btn => {
+        btn.addEventListener('click', () => cancelAuction(btn.dataset.id));
+    });
+}
+
+// Új aukció létrehozása
+function createAuction(resourceType, amount, price) {
+    const currentUser = getCurrentUser();
+    if (!currentUser) {
+        addSystemMessage('❌ Be kell jelentkezned az aukciózáshoz!');
+        return false;
+    }
+    
+    // Erőforrás ellenőrzése és levonása
+    const resourceMap = {
+        'arany': 'money',
+        'deszka': 'planks',
+        'kukorica': 'corn',
+        'kő': 'stone',
+        'vas': 'iron',
+        'szén': 'coal',
+        'gyémánt': 'diamond'
+    };
+    
+    const stateKey = resourceMap[resourceType];
+    if (!stateKey) {
+        addSystemMessage('❌ Ismeretlen erőforrás típus!');
+        return false;
+    }
+    
+    if (gameState[stateKey] < amount) {
+        addSystemMessage(`❌ Nincs elég ${resourceType}! (Van: ${gameState[stateKey]})`);
+        return false;
+    }
+    
+    // Levonás
+    gameState[stateKey] -= amount;
+    
+    // Aukció létrehozása (30 perc lejárat)
+    const auctions = getAuctions();
+    auctions.push({
+        id: crypto.randomUUID(),
+        sellerUsername: currentUser.username,
+        resourceType: resourceType,
+        amount: amount,
+        price: price,
+        createdAt: Date.now(),
+        expiresAt: Date.now() + 30 * 60 * 1000 // 30 perc
+    });
+    saveAuctions(auctions);
+    
+    // UI frissítése
+    import('./ui.js').then(({ updateUI }) => updateUI());
+    import('./save-load.js').then(({ saveGameState }) => saveGameState());
+    
+    renderAuctions();
+    return true;
+}
+
+// Aukció megvásárlása
+function buyAuction(auctionId) {
+    const currentUser = getCurrentUser();
+    if (!currentUser) return;
+    
+    const auctions = getAuctions();
+    const auctionIndex = auctions.findIndex(a => a.id === auctionId);
+    
+    if (auctionIndex === -1) {
+        addSystemMessage('❌ Ez az aukció már nem elérhető!');
+        renderAuctions();
+        return;
+    }
+    
+    const auction = auctions[auctionIndex];
+    
+    // Saját aukció ellenőrzése
+    if (auction.sellerUsername.toLowerCase() === currentUser.username.toLowerCase()) {
+        addSystemMessage('❌ Nem vásárolhatod meg a saját aukciódat!');
+        return;
+    }
+    
+    // Pénz ellenőrzése
+    if (gameState.money < auction.price) {
+        addSystemMessage(`❌ Nincs elég aranyad! (Kell: ${auction.price}, Van: ${gameState.money})`);
+        return;
+    }
+    
+    // Pénz levonása
+    gameState.money -= auction.price;
+    
+    // Erőforrás hozzáadása
+    const resourceMap = {
+        'arany': 'money',
+        'deszka': 'planks',
+        'kukorica': 'corn',
+        'kő': 'stone',
+        'vas': 'iron',
+        'szén': 'coal',
+        'gyémánt': 'diamond'
+    };
+    const stateKey = resourceMap[auction.resourceType];
+    if (stateKey) {
+        gameState[stateKey] += auction.amount;
+    }
+    
+    // Eladónak pénz küldése (pending gift)
+    const pendingGifts = JSON.parse(localStorage.getItem(PENDING_GIFTS_KEY) || '[]');
+    pendingGifts.push({
+        id: crypto.randomUUID(),
+        senderUsername: currentUser.username,
+        recipientUsername: auction.sellerUsername.toLowerCase(),
+        resourceType: 'arany',
+        amount: auction.price,
+        timestamp: Date.now()
+    });
+    localStorage.setItem(PENDING_GIFTS_KEY, JSON.stringify(pendingGifts));
+    
+    // Aukció eltávolítása
+    auctions.splice(auctionIndex, 1);
+    saveAuctions(auctions);
+    
+    // UI frissítése
+    import('./ui.js').then(({ updateUI }) => updateUI());
+    import('./save-load.js').then(({ saveGameState }) => saveGameState());
+    
+    addSystemMessage(`✅ Sikeresen megvásároltad: ${auction.amount}x ${auction.resourceType} ${auction.price} aranyért!`);
+    renderAuctions();
+}
+
+// Aukció visszavonása
+function cancelAuction(auctionId) {
+    const currentUser = getCurrentUser();
+    if (!currentUser) return;
+    
+    const auctions = getAuctions();
+    const auctionIndex = auctions.findIndex(a => a.id === auctionId);
+    
+    if (auctionIndex === -1) {
+        addSystemMessage('❌ Ez az aukció már nem elérhető!');
+        renderAuctions();
+        return;
+    }
+    
+    const auction = auctions[auctionIndex];
+    
+    // Tulajdonos ellenőrzése
+    if (auction.sellerUsername.toLowerCase() !== currentUser.username.toLowerCase()) {
+        addSystemMessage('❌ Csak a saját aukciódat vonhatod vissza!');
+        return;
+    }
+    
+    // Erőforrás visszaadása
+    const resourceMap = {
+        'arany': 'money',
+        'deszka': 'planks',
+        'kukorica': 'corn',
+        'kő': 'stone',
+        'vas': 'iron',
+        'szén': 'coal',
+        'gyémánt': 'diamond'
+    };
+    const stateKey = resourceMap[auction.resourceType];
+    if (stateKey) {
+        gameState[stateKey] += auction.amount;
+    }
+    
+    // Aukció eltávolítása
+    auctions.splice(auctionIndex, 1);
+    saveAuctions(auctions);
+    
+    // UI frissítése
+    import('./ui.js').then(({ updateUI }) => updateUI());
+    import('./save-load.js').then(({ saveGameState }) => saveGameState());
+    
+    addSystemMessage(`✅ Aukció visszavonva! ${auction.amount}x ${auction.resourceType} visszaadva.`);
+    renderAuctions();
+}
+
+// Aukció létrehozása form kezelése
+function handleCreateAuction() {
+    const resourceSelect = document.getElementById('auctionResourceType');
+    const amountInput = document.getElementById('auctionAmount');
+    const priceInput = document.getElementById('auctionPrice');
+    
+    if (!resourceSelect || !amountInput || !priceInput) return;
+    
+    const resourceType = resourceSelect.value;
+    const amount = parseInt(amountInput.value);
+    const price = parseInt(priceInput.value);
+    
+    if (isNaN(amount) || amount <= 0) {
+        addSystemMessage('❌ Érvénytelen mennyiség!');
+        return;
+    }
+    
+    if (isNaN(price) || price <= 0) {
+        addSystemMessage('❌ Érvénytelen ár!');
+        return;
+    }
+    
+    if (createAuction(resourceType, amount, price)) {
+        addSystemMessage(`✅ Aukció létrehozva: ${amount}x ${resourceType} - ${price} aranyért!`);
+        amountInput.value = '';
+        priceInput.value = '';
+    }
+}
+
+// Aukciós ház események beállítása
+function setupAuctionEvents() {
+    const closeBtn = document.getElementById('closeAuctionModal');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closeAuctionHouse);
+    }
+    
+    const createBtn = document.getElementById('createAuctionBtn');
+    if (createBtn) {
+        createBtn.addEventListener('click', handleCreateAuction);
+    }
+    
+    // Modal kívülre kattintás
+    const modal = document.getElementById('auctionModal');
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeAuctionHouse();
+            }
+        });
+    }
+    
+    // Frissítés időzítő az aukciókhoz
+    setInterval(() => {
+        const modal = document.getElementById('auctionModal');
+        if (modal && !modal.classList.contains('hidden')) {
+            renderAuctions();
+        }
+    }, 1000);
+}
+
+export { openChat, closeChat, initChat, openAuctionHouse, closeAuctionHouse, setupAuctionEvents };

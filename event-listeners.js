@@ -29,7 +29,7 @@ import { loadMuteState } from './audio.js';
 import { closeBubble } from './bubble.js';
 import { updateSoundIcon, handleSoundToggle, toggleSettingsMenu, closeSettingsMenu, handleLanguageToggle, updateLanguageFlag, handleLogout, handleCredits, handleThemeToggle, initTheme, handleShop } from './settings.js';
 import { translateDOM } from './i18n.js';
-import { openChat, initChat } from './chat.js';
+import { openChat, initChat, setupAuctionEvents } from './chat.js';
 
 // Chat megnyitása
 function handleChat() {
@@ -212,5 +212,6 @@ export function setupAllEventListeners() {
     setupBubbleEvents();
     setupModalEvents();
     setupSettingsEvents();
+    setupAuctionEvents();
 }
 
