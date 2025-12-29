@@ -119,13 +119,10 @@ export function loadGameState(createInitialMap, updateUI) {
         // === GLOBÁLIS ÚJRAINDÍTÁS ELLENŐRZÉSE ===
         const pendingRestart = localStorage.getItem('retroSkyblockPendingRestart');
         if (pendingRestart === 'true') {
-            // Töröljük a flaget és a mentést
+            // Töröljük a flaget (mentés megmarad!)
             localStorage.removeItem('retroSkyblockPendingRestart');
-            localStorage.removeItem('skyblockGame');
-            alert('🔄 Admin által elrendelt globális újraindítás!\nA játékod újrakezdődik.');
-            createInitialMap();
-            if (updateUI) updateUI();
-            return;
+            // Csak értesítjük a játékost, az oldal már újratöltődött
+            console.log('🔄 Admin által elrendelt oldal újratöltés megtörtént.');
         }
         
         const saved = localStorage.getItem('skyblockGame');

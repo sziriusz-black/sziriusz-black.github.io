@@ -649,12 +649,11 @@ function processCommand(text, currentUser) {
             break;
             
         case 'restart':
-            if (confirm('Biztosan újra akarod indítani MINDENKI játékát? Ez mindenkinek törli a mentését!')) {
+            if (confirm('Biztosan újra akarod indítani MINDENKI oldalát?')) {
                 // Pending restart flag beállítása - minden játékos megkapja
                 localStorage.setItem('retroSkyblockPendingRestart', 'true');
-                addSystemMessage('🔄 Globális újraindítás elküldve! Minden játékos játéka újraindul amikor legközelebb megnyitják.');
-                // Saját játék újraindítása
-                localStorage.removeItem('skyblockGame');
+                addSystemMessage('🔄 Globális újraindítás elküldve! Minden játékos oldala újratöltődik amikor legközelebb megnyitják.');
+                // Saját oldal újraindítása (mentés megmarad!)
                 window.location.reload();
             }
             break;
