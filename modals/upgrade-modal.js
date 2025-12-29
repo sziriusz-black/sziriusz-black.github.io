@@ -20,7 +20,7 @@
 import { CONFIG } from '../config.js';
 import { gameState } from '../gameState.js';
 import { findTile } from '../tile-operations.js';
-import { upgradeHouse, upgradeStoneCutter } from '../building-actions.js';
+import { upgradeHouse, upgradeStoneCutter, upgradeMine } from '../building-actions.js';
 import { saveGameState } from '../save-load.js';
 import { updateUI } from '../ui.js';
 import { t } from '../i18n.js';
@@ -88,6 +88,33 @@ export function openUpgradeModal(x, y, type, closeBubbleFn) {
                 </button>
             </div>
         `;
+    } else if (type === 'mine') {
+        const upgradePrice = CONFIG.UPGRADE_BASE_PRICE + (level - 1) * CONFIG.UPGRADE_INCREMENT;
+        const canAfford = gameState.money >= upgradePrice;
+        
+        // Fejlesztés bónusz megjelenítése
+        const levelBonus = (level - 1) * 0.5;
+        const nextLevelBonus = level * 0.5;
+        const currentDiamondChance = (1 + levelBonus).toFixed(1);
+        const nextDiamondChance = (1 + nextLevelBonus).toFixed(1);
+        
+        title.textContent = '⛏️ Bánya fejlesztés';
+        content.innerHTML = `
+            <div class="current-level">
+                ${t('modal.currentLevel')} <strong>${level}</strong> | 💎 Gyémánt esély: <strong>${currentDiamondChance}%</strong>
+            </div>
+            <div class="your-money">💰 Pénzed: <strong>${gameState.money}</strong></div>
+            <div class="upgrade-item">
+                <div class="upgrade-info">
+                    <div class="upgrade-name">${t('modal.level', level + 1)}</div>
+                    <div class="upgrade-desc">+0.5% minden ritka nyersanyagra (💎${nextDiamondChance}%)</div>
+                    <div class="upgrade-price">Ár: ${upgradePrice} 💰</div>
+                </div>
+                <button class="upgrade-btn" ${!canAfford ? 'disabled' : ''} id="doUpgrade">
+                    ${t('bubble.upgrade')}
+                </button>
+            </div>
+        `;
     }
     
     modal.classList.remove('hidden');
@@ -100,6 +127,8 @@ export function openUpgradeModal(x, y, type, closeBubbleFn) {
                 upgradeHouse(currentUpgradeTileX, currentUpgradeTileY, updateUI, saveGameState);
             } else if (currentUpgradeType === 'stonecutter') {
                 upgradeStoneCutter(currentUpgradeTileX, currentUpgradeTileY, updateUI, saveGameState);
+            } else if (currentUpgradeType === 'mine') {
+                upgradeMine(currentUpgradeTileX, currentUpgradeTileY, updateUI, saveGameState);
             }
             // Ne záródjon be, frissítsük a tartalmat hogy folytatni lehessen
             refreshUpgradeModal();
