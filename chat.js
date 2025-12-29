@@ -1587,6 +1587,16 @@ function setupAuctionEvents() {
         });
     }
     
+    // Escape billentyűvel bezárás
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            const modal = document.getElementById('auctionModal');
+            if (modal && !modal.classList.contains('hidden')) {
+                closeAuctionHouse();
+            }
+        }
+    });
+    
     // Frissítés időzítő az aukciókhoz
     setInterval(() => {
         const modal = document.getElementById('auctionModal');
