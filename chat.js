@@ -1311,8 +1311,19 @@ function renderAuctions() {
     
     container.innerHTML = activeAuctions.map(auction => {
         const timeLeft = Math.max(0, auction.expiresAt - now);
-        const minutes = Math.floor(timeLeft / 60000);
-        const seconds = Math.floor((timeLeft % 60000) / 1000);
+        const days = Math.floor(timeLeft / (24 * 60 * 60 * 1000));
+        const hours = Math.floor((timeLeft % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
+        const minutes = Math.floor((timeLeft % (60 * 60 * 1000)) / 60000);
+        
+        let timeDisplay;
+        if (days > 0) {
+            timeDisplay = `${days}n ${hours}ó`;
+        } else if (hours > 0) {
+            timeDisplay = `${hours}ó ${minutes}p`;
+        } else {
+            timeDisplay = `${minutes}p`;
+        }
+        
         const isOwn = currentUser && auction.sellerUsername.toLowerCase() === currentUser.username.toLowerCase();
         
         const resourceIcons = {
@@ -1334,7 +1345,7 @@ function renderAuctions() {
                 </div>
                 <div class="auction-seller">Eladó: ${auction.sellerUsername}</div>
                 <div class="auction-price">💰 ${auction.price} arany</div>
-                <div class="auction-time">⏱️ ${minutes}:${seconds.toString().padStart(2, '0')}</div>
+                <div class="auction-time">⏱️ ${timeDisplay}</div>
                 ${isOwn 
                     ? `<button class="auction-cancel-btn" data-id="${auction.id}">Visszavonás</button>`
                     : `<button class="auction-buy-btn" data-id="${auction.id}">Megvásárlás</button>`
@@ -1394,7 +1405,7 @@ function createAuction(resourceType, amount, price) {
         amount: amount,
         price: price,
         createdAt: Date.now(),
-        expiresAt: Date.now() + 30 * 60 * 1000 // 30 perc
+        expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000 // 1 hét
     });
     saveAuctions(auctions);
     
