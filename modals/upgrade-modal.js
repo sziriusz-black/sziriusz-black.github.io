@@ -99,9 +99,15 @@ export function openUpgradeModal(x, y, type, closeBubbleFn) {
             } else if (currentUpgradeType === 'stonecutter') {
                 upgradeStoneCutter(currentUpgradeTileX, currentUpgradeTileY, updateUI, saveGameState);
             }
-            closeUpgradeModal();
+            // Ne záródjon be, frissítsük a tartalmat hogy folytatni lehessen
+            refreshUpgradeModal();
         });
     }
+}
+
+// Frissíti a modal tartalmát anélkül, hogy bezárná
+function refreshUpgradeModal() {
+    openUpgradeModal(currentUpgradeTileX, currentUpgradeTileY, currentUpgradeType, null);
 }
 
 export function closeUpgradeModal() {

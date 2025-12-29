@@ -431,7 +431,8 @@ export function handleAction(action, x, y, type) {
             return; // Ne zárjuk be a buborékot
         case 'upgradeWarehouse':
             upgradeWarehouse(updateUI, saveGameState);
-            break;
+            refreshActiveBubble(); // Frissítjük a buborékot, nem zárjuk be
+            return;
         case 'openUpgrade':
             openUpgradeModal(x, y, type, closeBubble);
             return; // Ne zárjuk be a buborékot
