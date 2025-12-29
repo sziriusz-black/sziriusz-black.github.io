@@ -1,3 +1,4 @@
 docker/mnt
 node_modules
+.deploy_state
 
