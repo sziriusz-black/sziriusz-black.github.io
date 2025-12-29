@@ -239,12 +239,66 @@
                     </a>
                 </span>
                 <div class="version-info">
-                    <span class="version-date">2025. december 26.</span>
+                    <span class="version-date">2025. december 29.</span>
                     <span class="version-arrow">▼</span>
                 </div>
             </div>
             <div class="version-changes">
                 <ul>
+                    <li class="new">
+                        <span class="change-item" onclick="toggleDetail(this)">Aukciós Ház (/ah parancs)</span>
+                        <div class="change-detail">
+                            Új aukciós rendszer! Eladhatod és megvásárolhatod más játékosok tárgyait. Az aukciók 30 percig aktívak. Elérhető a /ah paranccsal.
+                        </div>
+                    </li>
+                    <li class="new">
+                        <span class="change-item" onclick="toggleDetail(this)">Bánya épület</span>
+                        <div class="change-detail">
+                            Új épülettípus: bánya! 100 aranyért építhető, 3 munkás és 10 perc építési idő. Bányászás 2 munkással, 5 perc/ciklus. Nyersanyagok: kő (90%), vas (5%), szén (4%), gyémánt (1%). Fejlesztéssel +0.5% ritka esély!
+                        </div>
+                    </li>
+                    <li class="new">
+                        <span class="change-item" onclick="toggleDetail(this)">Raktár épület</span>
+                        <div class="change-detail">
+                            Alapból jár minden játékosnak! 20 férőhelyes tároló, fejleszthető. Ha megtelt, nem tudsz több erőforrást begyűjteni. Kattints rá a megnyitáshoz, ahol eladhatod a tárgyakat.
+                        </div>
+                    </li>
+                    <li class="new">
+                        <span class="change-item" onclick="toggleDetail(this)">Bolt (Shop)</span>
+                        <div class="change-detail">
+                            A beállításokban elérhető a Bolt, ahol (szimuláltan) igazi pénzért vásárolhatsz aranyat, erőforrásokat vagy egyedi offereket. Kategóriák: Pénz, Erőforrások, Egyedi Offerek.
+                        </div>
+                    </li>
+                    <li class="new">
+                        <span class="change-item" onclick="toggleDetail(this)">/gift parancs - Ajándék küldése</span>
+                        <div class="change-detail">
+                            Küldhetsz erőforrásokat más játékosoknak! Használat: /gift [kinek] [mit] [mennyit]. Példa: /gift Teszt arany 100. A címzett a következő chat megnyitáskor kapja meg.
+                        </div>
+                    </li>
+                    <li class="new">
+                        <span class="change-item" onclick="toggleDetail(this)">Parancs előzmények (↑/↓ nyilak)</span>
+                        <div class="change-detail">
+                            A chaten a fel/le nyilakkal visszahívhatod a korábban beírt parancsokat. Max 20 parancs tárolódik.
+                        </div>
+                    </li>
+                    <li class="new">
+                        <span class="change-item" onclick="toggleDetail(this)">Parancs autocomplete (Tab)</span>
+                        <div class="change-detail">
+                            Ha / karakterrel kezdesz gépelni, megjelenik egy lenyíló menü a parancsokkal. Nyilakkal navigálhatsz, Tab-bal vagy Enter-rel kiválaszthatod.
+                        </div>
+                    </li>
+                    <li class="new">
+                        <span class="change-item" onclick="toggleDetail(this)">Broadcast üzenetek (/broadcast)</span>
+                        <div class="change-detail">
+                            Admin parancs kiemelt üzenet küldésére. A broadcast üzenetek megmaradnak oldal frissítés után is, és a chat tetején jelennek meg "Rendszer" feladóval.
+                        </div>
+                    </li>
+                    <li class="new">
+                        <span class="change-item" onclick="toggleDetail(this)">Light/Dark téma váltás</span>
+                        <div class="change-detail">
+                            A beállításokban a Téma gombbal válthatod a világos és sötét mód között. A beállítás mentődik és minden oldalon érvényes.
+                        </div>
+                    </li>
                     <li class="new">
                         <span class="change-item" onclick="toggleDetail(this)">Chat rendszer</span>
                         <div class="change-detail">
@@ -381,6 +435,36 @@
                         <span class="change-item" onclick="toggleDetail(this)">Frissítési napló oldal</span>
                         <div class="change-detail">
                             A verzió számra kattintva (bal alsó sarok) megnyílik ez az oldal, ahol részletesen láthatod az összes frissítést és változást verziónként.
+                        </div>
+                    </li>
+                    <li class="new">
+                        <span class="change-item" onclick="toggleDetail(this)">/give és /lose admin parancsok</span>
+                        <div class="change-detail">
+                            Admin parancsok erőforrások adásához és elvételéhez. /give [mit] [mennyit] - hozzáadás. /lose [kitől] [mit] [mennyit] - elvétel csendben.
+                        </div>
+                    </li>
+                    <li class="new">
+                        <span class="change-item" onclick="toggleDetail(this)">Spam védelem (5 mp cooldown)</span>
+                        <div class="change-detail">
+                            A chaten 5 másodpercenként lehet csak üzenetet küldeni, hogy ne lehessen spammelni. Ez a korlátozás mindenkire vonatkozik, beleértve az adminokat is.
+                        </div>
+                    </li>
+                    <li class="new">
+                        <span class="change-item" onclick="toggleDetail(this)">Anti-cheat rendszer</span>
+                        <div class="change-detail">
+                            Ha valakinek hirtelen több mint 1000 arannyal nő a pénze (gyanús módon), a rendszer jelenti Szíriusznak és visszavonja a pénzt. A tulajdonosra (Szíriusz) nem vonatkozik.
+                        </div>
+                    </li>
+                    <li class="improve">
+                        <span class="change-item" onclick="toggleDetail(this)">5 kezdő terület (korábban 4)</span>
+                        <div class="change-detail">
+                            Az új játékosok most 5 területtel kezdenek: 1 ház, 1 raktár és 3 üres terület. Ez könnyebb kezdést biztosít.
+                        </div>
+                    </li>
+                    <li class="improve">
+                        <span class="change-item" onclick="toggleDetail(this)">Ház építési idő (2 perc, 3 munkás)</span>
+                        <div class="change-detail">
+                            A ház építése most 3 munkást igényel és 2 percig tart. Építés közben az épület "építési burkolatban" jelenik meg.
                         </div>
                     </li>
                     <li class="improve">
