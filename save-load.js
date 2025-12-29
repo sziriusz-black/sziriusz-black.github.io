@@ -116,6 +116,18 @@ export function saveGameState() {
 // Játékállapot betöltése
 export function loadGameState(createInitialMap, updateUI) {
     try {
+        // === GLOBÁLIS ÚJRAINDÍTÁS ELLENŐRZÉSE ===
+        const pendingRestart = localStorage.getItem('retroSkyblockPendingRestart');
+        if (pendingRestart === 'true') {
+            // Töröljük a flaget és a mentést
+            localStorage.removeItem('retroSkyblockPendingRestart');
+            localStorage.removeItem('skyblockGame');
+            alert('🔄 Admin által elrendelt globális újraindítás!\nA játékod újrakezdődik.');
+            createInitialMap();
+            if (updateUI) updateUI();
+            return;
+        }
+        
         const saved = localStorage.getItem('skyblockGame');
         if (saved) {
             const state = JSON.parse(saved);

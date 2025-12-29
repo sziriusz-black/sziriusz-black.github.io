@@ -18,7 +18,7 @@ const REPORTS_STORAGE_KEY = 'retroSkyblockChatReports';
 const MUTES_STORAGE_KEY = 'retroSkyblockChatMutes';
 const PENDING_GIFTS_KEY = 'retroSkyblockPendingGifts';
 const MAX_MESSAGES = 50;
-const ADMIN_USERNAMES = ['Szíriusz', 'Szirius', 'szíriusz', 'szirius'];
+const ADMIN_USERNAMES = ['Szíriusz', 'Szirius', 'szíriusz', 'szirius', 'Róka', 'róka', 'Roka', 'roka'];
 const MESSAGE_COOLDOWN_MS = 5000; // 5 másodperc cooldown
 
 let lastMessageTime = 0;
@@ -46,7 +46,8 @@ const COMMANDS = [
     { name: 'reports', description: 'Jelentések megtekintése', adminOnly: true },
     { name: 'mute', description: 'Játékos némítása: /mute [név] [idő]', adminOnly: true },
     { name: 'unmute', description: 'Némítás feloldása: /unmute [név]', adminOnly: true },
-    { name: 'info', description: 'Játékos adatai: /info [név]', adminOnly: true }
+    { name: 'info', description: 'Játékos adatai: /info [név]', adminOnly: true },
+    { name: 'restart', description: 'Mindenki játékának újraindítása', adminOnly: true }
 ];
 
 // === PENDING GIFTS RENDSZER ===
@@ -538,7 +539,8 @@ function processCommand(text, currentUser) {
                 '/reports - Jelentések\n' +
                 '/mute [név] [idő] - Némítás\n' +
                 '/unmute [név] - Némítás feloldása\n' +
-                '/info [név] - Játékos adatai'
+                '/info [név] - Játékos adatai\n' +
+                '/restart - Mindenki játékának újraindítása'
             );
         } else {
             // Normál help - csak publikus parancsok
@@ -598,6 +600,17 @@ function processCommand(text, currentUser) {
         case 'reset':
             if (confirm('Biztosan újra akarod kezdeni a játékot?')) {
                 localStorage.removeItem('retroSkyblockSave');
+                window.location.reload();
+            }
+            break;
+            
+        case 'restart':
+            if (confirm('Biztosan újra akarod indítani MINDENKI játékát? Ez mindenkinek törli a mentését!')) {
+                // Pending restart flag beállítása - minden játékos megkapja
+                localStorage.setItem('retroSkyblockPendingRestart', 'true');
+                addSystemMessage('🔄 Globális újraindítás elküldve! Minden játékos játéka újraindul amikor legközelebb megnyitják.');
+                // Saját játék újraindítása
+                localStorage.removeItem('skyblockGame');
                 window.location.reload();
             }
             break;
