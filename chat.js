@@ -41,6 +41,7 @@ const COMMANDS = [
     { name: 'clearbroadcast', description: 'Broadcast üzenetek törlése', adminOnly: true },
     { name: 'give', description: 'Erőforrás hozzáadása: /give [mit] [mennyit]', adminOnly: true },
     { name: 'lose', description: 'Erőforrás levonása: /lose [kitől] [mit] [mennyit]', adminOnly: true },
+    { name: 'set', description: 'Erőforrás beállítása: /set [mit] [mennyit] [kinek]', adminOnly: true },
     { name: 'reset', description: 'Játék újrakezdése', adminOnly: true },
     { name: 'reports', description: 'Jelentések megtekintése', adminOnly: true },
     { name: 'mute', description: 'Játékos némítása: /mute [név] [idő]', adminOnly: true },
@@ -144,6 +145,43 @@ function processPendingLosses(currentUser) {
     
     // Feldolgozott veszteségek törlése
     localStorage.setItem(PENDING_LOSSES_KEY, JSON.stringify(otherLosses));
+    
+    // UI frissítése és játék mentése
+    import('./ui.js').then(({ updateUI }) => updateUI());
+    import('./save-load.js').then(({ saveGameState }) => saveGameState());
+}
+
+// Függő beállítások (sets) feldolgozása
+const PENDING_SETS_KEY = 'retroSkyblockPendingSets';
+
+function processPendingSets(currentUser) {
+    if (!currentUser) return;
+    
+    const sets = JSON.parse(localStorage.getItem(PENDING_SETS_KEY) || '[]');
+    const mySets = sets.filter(s => s.targetUsername.toLowerCase() === currentUser.username.toLowerCase());
+    const otherSets = sets.filter(s => s.targetUsername.toLowerCase() !== currentUser.username.toLowerCase());
+    
+    if (mySets.length === 0) return;
+    
+    // Beállítások feldolgozása (az utolsó beállítás érvényesül minden erőforrásra)
+    mySets.forEach(set => {
+        const resourceKey = set.resourceKey;
+        const amount = set.amount;
+        
+        if (resourceKey === 'workers') {
+            gameState.workers = amount;
+            gameState.maxWorkers = amount;
+        } else if (resourceKey === 'storage') {
+            gameState.warehouseCapacity = Math.max(20, amount);
+        } else if (gameState[resourceKey] !== undefined) {
+            gameState[resourceKey] = amount;
+        }
+        
+        // Csendben feldolgozzuk, nem értesítjük a játékost
+    });
+    
+    // Feldolgozott beállítások törlése
+    localStorage.setItem(PENDING_SETS_KEY, JSON.stringify(otherSets));
     
     // UI frissítése és játék mentése
     import('./ui.js').then(({ updateUI }) => updateUI());
@@ -495,6 +533,7 @@ function processCommand(text, currentUser) {
                 '/clearbroadcast - Broadcast üzenetek törlése\n' +
                 '/give [mit] [mennyit] - Erőforrás hozzáadása\n' +
                 '/lose [kitől] [mit] [mennyit] - Erőforrás levonása\n' +
+                '/set [mit] [mennyit] [kinek] - Erőforrás beállítása\n' +
                 '/reset - Játék újrakezdése\n' +
                 '/reports - Jelentések\n' +
                 '/mute [név] [idő] - Némítás\n' +
@@ -550,6 +589,10 @@ function processCommand(text, currentUser) {
             
         case 'lose':
             handleLoseCommand(args);
+            break;
+            
+        case 'set':
+            handleSetCommand(args);
             break;
             
         case 'reset':
@@ -852,6 +895,7 @@ function openChat() {
     if (currentUser) {
         processPendingGifts(currentUser);
         processPendingLosses(currentUser);
+        processPendingSets(currentUser);
     }
     
     renderMessages();
@@ -1229,6 +1273,76 @@ function handleLoseCommand(args) {
             timestamp: Date.now()
         });
         localStorage.setItem('retroSkyblockPendingLosses', JSON.stringify(pendingLosses));
+    }
+}
+
+// /set [mit] [mennyit] [kinek] - beállítja az erőforrást egy konkrét értékre
+function handleSetCommand(args) {
+    if (args.length < 3) {
+        addSystemMessage('❌ Használat: /set [mit] [mennyit] [kinek]\nPéldák: /set pénz 1000 Szíriusz, /set deszka 50 JátékosNév');
+        return;
+    }
+    
+    const resourceInput = args[0].toLowerCase();
+    const amount = parseInt(args[1]);
+    const targetUsername = args[2];
+    
+    // Ellenőrizzük, hogy a célpont létezik-e
+    const users = getUsers();
+    const targetUser = users.find(u => u.username.toLowerCase() === targetUsername.toLowerCase());
+    
+    if (!targetUser) {
+        addSystemMessage(`❌ Nincs "${targetUsername}" nevű regisztrált játékos!`);
+        return;
+    }
+    
+    if (isNaN(amount) || amount < 0) {
+        addSystemMessage('❌ A mennyiségnek nem-negatív számnak kell lennie!');
+        return;
+    }
+    
+    const resourceKey = RESOURCE_TYPES[resourceInput];
+    if (!resourceKey) {
+        addSystemMessage(`❌ Ismeretlen erőforrás: "${args[0]}"\nElérhető: pénz, deszka, kukorica, kő, vas, szén, gyémánt, munkás, raktár`);
+        return;
+    }
+    
+    const currentUser = getCurrentUser();
+    
+    // Ellenőrizzük, hogy saját magunkról van-e szó
+    const isSelf = targetUser.username.toLowerCase() === currentUser.username.toLowerCase();
+    
+    if (isSelf) {
+        // Saját erőforrás beállítása
+        if (resourceKey === 'workers') {
+            gameState.workers = amount;
+            gameState.maxWorkers = amount;
+        } else if (resourceKey === 'storage') {
+            gameState.warehouseCapacity = Math.max(20, amount);
+        } else {
+            gameState[resourceKey] = amount;
+        }
+        
+        addSystemMessage(`✅ ${targetUser.username} ${args[0]} beállítva: ${amount}`);
+        
+        // UI frissítése és mentés
+        import('./ui.js').then(({ updateUI }) => updateUI());
+        import('./save-load.js').then(({ saveGameState }) => saveGameState());
+    } else {
+        // Más játékos erőforrásának beállítása - pending set-ként
+        const pendingSets = JSON.parse(localStorage.getItem('retroSkyblockPendingSets') || '[]');
+        pendingSets.push({
+            id: crypto.randomUUID(),
+            targetUsername: targetUser.username,
+            resourceKey: resourceKey,
+            resourceName: resourceInput,
+            amount: amount,
+            fromAdmin: currentUser.username,
+            timestamp: Date.now()
+        });
+        localStorage.setItem('retroSkyblockPendingSets', JSON.stringify(pendingSets));
+        
+        addSystemMessage(`✅ ${targetUser.username} ${args[0]} beállítva: ${amount} (érvénybe lép amikor megnyitja a chatot)`);
     }
 }
 
