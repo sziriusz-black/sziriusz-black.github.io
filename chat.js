@@ -35,6 +35,7 @@ const COMMANDS = [
     { name: 'player', description: 'Játékosok oldal megnyitása', adminOnly: false },
     { name: 'gift', description: 'Ajándék küldése: /gift [kinek] [mit] [mennyit]', adminOnly: false },
     { name: 'ah', description: 'Aukciós ház megnyitása', adminOnly: false },
+    { name: 'auctionhouse', description: 'Aukciós ház megnyitása', adminOnly: false },
     { name: 'clear', description: 'Chat törlése', adminOnly: true },
     { name: 'broadcast', description: 'Kiemelt üzenet mindenkinek: /broadcast [üzenet]', adminOnly: true },
     { name: 'clearbroadcast', description: 'Broadcast üzenetek törlése', adminOnly: true },
@@ -389,7 +390,7 @@ function processCommand(text, currentUser) {
         return true;
     }
     
-    if (command === 'ah') {
+    if (command === 'ah' || command === 'auctionhouse') {
         openAuctionHouse();
         return true;
     }
