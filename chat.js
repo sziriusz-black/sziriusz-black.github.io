@@ -732,8 +732,13 @@ function renderMessages() {
             return '';
         }
         
-        const isOwn = currentUser && msg.userId === currentUser.id;
+        // Rendszer üzenetek CSAK Szíriusznak látszanak (broadcast kivételével - az külön van kezelve)
         const isSystem = msg.type === 'system';
+        if (isSystem && (!currentUser || !isAdmin(currentUser.username))) {
+            return ''; // Nem admin nem látja a rendszer üzeneteket
+        }
+        
+        const isOwn = currentUser && msg.userId === currentUser.id;
         const isAdminUser = msg.type === 'user' && isAdmin(msg.username);
         
         let messageClass = 'chat-message';
