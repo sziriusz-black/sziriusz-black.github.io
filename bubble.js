@@ -365,6 +365,23 @@ export function refreshActiveBubble() {
     }
 }
 
+// Teljes buborék frissítése - használható fejlesztések után
+export function forceRefreshBubble() {
+    if (!gameState.activeBubble) return;
+    
+    try {
+        const tileX = gameState.activeBubble.x;
+        const tileY = gameState.activeBubble.y;
+        const tile = findTile(tileX, tileY);
+        
+        if (tile) {
+            generateBubbleContent(tileX, tileY, tile);
+        }
+    } catch (error) {
+        console.error('forceRefreshBubble hiba:', error);
+    }
+}
+
 export function updateBubblePosition(tileX, tileY) {
     const bubble = document.getElementById('bubble');
     if (!gameState.activeBubble || !canvas) return;
@@ -431,7 +448,7 @@ export function handleAction(action, x, y, type) {
             return; // Ne zárjuk be a buborékot
         case 'upgradeWarehouse':
             upgradeWarehouse(updateUI, saveGameState);
-            refreshActiveBubble(); // Frissítjük a buborékot, nem zárjuk be
+            forceRefreshBubble(); // Teljes frissítés a buboréknak
             return;
         case 'openUpgrade':
             openUpgradeModal(x, y, type, closeBubble);

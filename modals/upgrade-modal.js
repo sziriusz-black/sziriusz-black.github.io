@@ -55,11 +55,12 @@ export function openUpgradeModal(x, y, type, closeBubbleFn) {
             <div class="current-level">
                 ${t('modal.currentLevel')} <strong>${level}</strong> | ${t('modal.workers')} <strong>+${workers}</strong>
             </div>
+            <div class="your-money">💰 Pénzed: <strong>${gameState.money}</strong></div>
             <div class="upgrade-item">
                 <div class="upgrade-info">
                     <div class="upgrade-name">${t('modal.level', level + 1)}</div>
                     <div class="upgrade-desc">${t('modal.extraWorker')}</div>
-                    <div class="upgrade-price">${upgradePrice} 💰</div>
+                    <div class="upgrade-price">Ár: ${upgradePrice} 💰</div>
                 </div>
                 <button class="upgrade-btn" ${!canAfford ? 'disabled' : ''} id="doUpgrade">
                     ${t('bubble.upgrade')}
@@ -75,11 +76,12 @@ export function openUpgradeModal(x, y, type, closeBubbleFn) {
             <div class="current-level">
                 ${t('modal.currentLevel')} <strong>${level}</strong>
             </div>
+            <div class="your-money">💰 Pénzed: <strong>${gameState.money}</strong></div>
             <div class="upgrade-item">
                 <div class="upgrade-info">
                     <div class="upgrade-name">${t('modal.level', level + 1)}</div>
                     <div class="upgrade-desc">${t('modal.fasterCutting')}</div>
-                    <div class="upgrade-price">${upgradePrice} 💰</div>
+                    <div class="upgrade-price">Ár: ${upgradePrice} 💰</div>
                 </div>
                 <button class="upgrade-btn" ${!canAfford ? 'disabled' : ''} id="doUpgrade">
                     ${t('bubble.upgrade')}

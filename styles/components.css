@@ -363,7 +363,17 @@
     padding: 10px;
     background: rgba(74, 158, 255, 0.2);
     border: 1px solid var(--accent-blue);
+    margin-bottom: 10px;
+}
+
+.your-money {
+    text-align: center;
+    padding: 8px;
+    background: rgba(255, 215, 0, 0.15);
+    border: 1px solid var(--accent-gold);
     margin-bottom: 15px;
+    color: var(--accent-gold);
+    font-size: 14px;
     font-size: 14px;
 }
 
