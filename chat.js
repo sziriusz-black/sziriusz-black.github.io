@@ -18,10 +18,39 @@ const REPORTS_STORAGE_KEY = 'retroSkyblockChatReports';
 const MUTES_STORAGE_KEY = 'retroSkyblockChatMutes';
 const PENDING_GIFTS_KEY = 'retroSkyblockPendingGifts';
 const MAX_MESSAGES = 50;
-const ADMIN_USERNAMES = ['Szíriusz', 'Szirius', 'szíriusz', 'szirius', 'Róka', 'róka', 'Roka', 'roka'];
+const ADMIN_STORAGE_KEY = 'retroSkyblockAdmins';
+// Állandó tulajdonosok - ezeket nem lehet eltávolítani
+const OWNER_USERNAMES = ['Szíriusz', 'Róka'];
 const MESSAGE_COOLDOWN_MS = 5000; // 5 másodperc cooldown
 
 let lastMessageTime = 0;
+
+// Admin lista lekérése (tulajdonosok + dinamikusan hozzáadott adminok)
+function getAdminList() {
+    const dynamicAdmins = JSON.parse(localStorage.getItem(ADMIN_STORAGE_KEY) || '[]');
+    return [...OWNER_USERNAMES, ...dynamicAdmins];
+}
+
+// Admin hozzáadása
+function addAdmin(username) {
+    const admins = JSON.parse(localStorage.getItem(ADMIN_STORAGE_KEY) || '[]');
+    if (!admins.some(a => a.toLowerCase() === username.toLowerCase())) {
+        admins.push(username);
+        localStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(admins));
+    }
+}
+
+// Admin eltávolítása
+function removeAdmin(username) {
+    // Tulajdonosokat nem lehet eltávolítani
+    if (OWNER_USERNAMES.some(o => o.toLowerCase() === username.toLowerCase())) {
+        return false;
+    }
+    const admins = JSON.parse(localStorage.getItem(ADMIN_STORAGE_KEY) || '[]');
+    const newAdmins = admins.filter(a => a.toLowerCase() !== username.toLowerCase());
+    localStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(newAdmins));
+    return true;
+}
 let autocompleteSelectedIndex = -1;
 
 // === PARANCS ELŐZMÉNYEK ===
@@ -47,7 +76,9 @@ const COMMANDS = [
     { name: 'mute', description: 'Játékos némítása: /mute [név] [idő]', adminOnly: true },
     { name: 'unmute', description: 'Némítás feloldása: /unmute [név]', adminOnly: true },
     { name: 'info', description: 'Játékos adatai: /info [név]', adminOnly: true },
-    { name: 'restart', description: 'Mindenki játékának újraindítása', adminOnly: true }
+    { name: 'restart', description: 'Mindenki játékának újraindítása', adminOnly: true },
+    { name: 'admin', description: 'Admin kezelés: /admin [név] vagy /admin info', adminOnly: true },
+    { name: 'unadmin', description: 'Admin jog elvétele: /unadmin [név]', adminOnly: true }
 ];
 
 // === PENDING GIFTS RENDSZER ===
@@ -202,8 +233,16 @@ const PROFANITY_LIST = [
 
 // Admin-e a felhasználó
 function isAdmin(username) {
-    return ADMIN_USERNAMES.some(admin => 
+    const allAdmins = getAdminList();
+    return allAdmins.some(admin => 
         admin.toLowerCase() === username.toLowerCase()
+    );
+}
+
+// Tulajdonos-e a felhasználó (Szíriusz vagy Róka)
+function isOwner(username) {
+    return OWNER_USERNAMES.some(owner => 
+        owner.toLowerCase() === username.toLowerCase()
     );
 }
 
@@ -540,7 +579,12 @@ function processCommand(text, currentUser) {
                 '/mute [név] [idő] - Némítás\n' +
                 '/unmute [név] - Némítás feloldása\n' +
                 '/info [név] - Játékos adatai\n' +
-                '/restart - Mindenki játékának újraindítása'
+                '/restart - Mindenki játékának újraindítása\n' +
+                '━━━━━━━━━━━━━━━━━━━━\n' +
+                '🔒 Tulajdonos:\n' +
+                '/admin [név] - Admin kinevezése\n' +
+                '/admin info - Admin lista\n' +
+                '/unadmin [név] - Admin jog elvétele'
             );
         } else {
             // Normál help - csak publikus parancsok
@@ -720,6 +764,69 @@ function processCommand(text, currentUser) {
                 }
                 
                 addSystemMessage(infoText);
+            }
+            break;
+            
+        case 'admin':
+            // Csak tulajdonosok használhatják
+            if (!isOwner(currentUser.username)) {
+                addSystemMessage('❌ Csak tulajdonosok (Szíriusz, Róka) használhatják ezt a parancsot!');
+                break;
+            }
+            
+            if (args.length === 0) {
+                addSystemMessage('❌ Használat: /admin [név] vagy /admin info');
+            } else if (args[0].toLowerCase() === 'info') {
+                // Admin lista megjelenítése
+                const allAdmins = getAdminList();
+                const owners = OWNER_USERNAMES.join(', ');
+                const dynamicAdmins = JSON.parse(localStorage.getItem(ADMIN_STORAGE_KEY) || '[]');
+                
+                let adminText = '👑 Admin lista:\n';
+                adminText += '━━━━━━━━━━━━━━━━━━━━\n';
+                adminText += `🔒 Tulajdonosok: ${owners}\n`;
+                if (dynamicAdmins.length > 0) {
+                    adminText += `👥 Kinevezett adminok: ${dynamicAdmins.join(', ')}\n`;
+                } else {
+                    adminText += '👥 Kinevezett adminok: -\n';
+                }
+                addSystemMessage(adminText);
+            } else {
+                const newAdminName = args[0];
+                const allUsers = getUsers();
+                const newAdminUser = allUsers.find(u => u.username.toLowerCase() === newAdminName.toLowerCase());
+                
+                if (!newAdminUser) {
+                    addSystemMessage(`❌ Nincs "${newAdminName}" nevű regisztrált játékos!`);
+                } else if (isAdmin(newAdminUser.username)) {
+                    addSystemMessage(`❌ ${newAdminUser.username} már admin!`);
+                } else {
+                    addAdmin(newAdminUser.username);
+                    addSystemMessage(`✅ ${newAdminUser.username} mostantól admin!`);
+                }
+            }
+            break;
+            
+        case 'unadmin':
+            // Csak tulajdonosok használhatják
+            if (!isOwner(currentUser.username)) {
+                addSystemMessage('❌ Csak tulajdonosok (Szíriusz, Róka) használhatják ezt a parancsot!');
+                break;
+            }
+            
+            if (args.length === 0) {
+                addSystemMessage('❌ Használat: /unadmin [név]');
+            } else {
+                const removeAdminName = args[0];
+                
+                if (isOwner(removeAdminName)) {
+                    addSystemMessage(`❌ Tulajdonosoktól (Szíriusz, Róka) nem lehet elvenni az admin jogot!`);
+                } else if (!isAdmin(removeAdminName)) {
+                    addSystemMessage(`❌ ${removeAdminName} nem admin!`);
+                } else {
+                    removeAdmin(removeAdminName);
+                    addSystemMessage(`✅ ${removeAdminName} admin joga elvéve!`);
+                }
             }
             break;
             
