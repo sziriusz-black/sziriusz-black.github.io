@@ -221,12 +221,11 @@ export function generateBubbleContent(tileX, tileY, tile) {
         const mineLevel = tile.level || 1;
         const isMining = gameState.miningMines.has(`${tileX},${tileY}`);
         
-        // Fejlesztés bónusz megjelenítése (csak vas és szén változik!)
-        const levelBonus = (mineLevel - 1) * 1;
-        const diamondChance = 1; // Fix 1%
-        const ironChance = 5 + levelBonus;
-        const coalChance = 4 + levelBonus;
-        const stoneChance = Math.max(0, 100 - diamondChance - ironChance - coalChance);
+        // Fejlesztés bónusz megjelenítése (csak vas és szén növekszik)
+        const levelBonus = (mineLevel - 1) * 0.5;
+        const diamondChance = '1.0'; // FIX 1%
+        const ironChance = (5 + levelBonus).toFixed(1);
+        const coalChance = (4 + levelBonus).toFixed(1);
         
         if (isMining) {
             const data = gameState.miningMines.get(`${tileX},${tileY}`);
@@ -245,7 +244,7 @@ export function generateBubbleContent(tileX, tileY, tile) {
             content.innerHTML = `
                 <div style="margin-bottom: 10px;">⛏️ ${t('bubble.mine', mineLevel)}</div>
                 <div style="font-size: 10px; margin-bottom: 5px; opacity: 0.8;">
-                    💎${diamondChance}% | 🔩${ironChance}% | ⚫${coalChance}% | 🪨${stoneChance}%
+                    💎${diamondChance}% | 🔩${ironChance}% | ⚫${coalChance}%
                 </div>
                 ${lastResult}
                 <button class="bubble-button" ${!canMine ? 'disabled' : ''} data-action="startMining" data-x="${tileX}" data-y="${tileY}">

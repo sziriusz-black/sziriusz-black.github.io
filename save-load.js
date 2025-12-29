@@ -183,31 +183,39 @@ export function loadGameState(createInitialMap, updateUI) {
                 }
             }
             
-            // === BÁNYA RESET (V2.0 változás - esélyek újraszámolása) ===
-            // Ha már volt bánya reset, ne csináljuk újra
-            const MINE_RESET_KEY = 'retroSkyblockMineResetV2';
-            if (!localStorage.getItem(MINE_RESET_KEY)) {
-                let refundTotal = 0;
+            // === MIGRÁCIÓ: Fejlesztett bányák törlése és pénz visszaadása ===
+            // Ez egy egyszeri migráció ami törli a fejlesztett bányákat
+            const MINE_MIGRATION_KEY = 'skyblockMineMigrationDone';
+            if (!localStorage.getItem(MINE_MIGRATION_KEY)) {
+                let refundedMoney = 0;
+                let removedMines = 0;
                 
-                // Végigmegyünk minden bányán
                 gameState.map.forEach(tile => {
                     if (tile.type === 'mine' && tile.level && tile.level > 1) {
-                        // Számoljuk ki a visszajáró pénzt
-                        for (let lvl = 1; lvl < tile.level; lvl++) {
-                            refundTotal += CONFIG.UPGRADE_BASE_PRICE + (lvl - 1) * CONFIG.UPGRADE_INCREMENT;
+                        // Számoljuk ki mennyi pénzt költött a játékos a fejlesztésekre
+                        // Upgrade költség: UPGRADE_BASE_PRICE + (level - 1) * UPGRADE_INCREMENT minden szinthez
+                        for (let i = 2; i <= tile.level; i++) {
+                            refundedMoney += CONFIG.UPGRADE_BASE_PRICE + (i - 2) * CONFIG.UPGRADE_INCREMENT;
                         }
-                        // Szint visszaállítása 1-re
-                        tile.level = 1;
+                        // Bánya ára is visszajár
+                        refundedMoney += CONFIG.MINE_BUILD_PRICE;
+                        
+                        // Tile visszaállítása üres területre
+                        tile.type = 'owned';
+                        delete tile.level;
+                        delete tile.lastMiningResult;
+                        removedMines++;
                     }
                 });
                 
-                if (refundTotal > 0) {
-                    gameState.money += refundTotal;
-                    console.log(`Bánya reset: ${refundTotal} pénz visszaadva!`);
+                if (removedMines > 0) {
+                    gameState.money += refundedMoney;
+                    console.log(`MIGRÁCIÓ: ${removedMines} fejlesztett bánya törölve, ${refundedMoney} pénz visszaadva.`);
+                    alert(`⛏️ Bánya rendszer frissítés!\n\n${removedMines} fejlesztett bánya törölve lett.\n${refundedMoney} 💰 visszaadva.\n\nA gyémánt esélye mostantól fix 1% marad.`);
                 }
                 
-                // Jelöljük, hogy a reset megtörtént
-                localStorage.setItem(MINE_RESET_KEY, 'true');
+                // Jelezzük hogy a migráció megtörtént
+                localStorage.setItem(MINE_MIGRATION_KEY, 'true');
             }
             
             if (updateUI) updateUI();

@@ -333,13 +333,6 @@ function saveChatMessages(messages) {
 
 // Rendszer üzenet hozzáadása
 function addSystemMessage(text) {
-    // Rendszer üzenetek csak Szíriusznak látszanak
-    const currentUser = getCurrentUser();
-    if (!currentUser || currentUser.username !== 'Szíriusz') {
-        // Nem Szíriusz, nem jelenítjük meg a rendszer üzenetet
-        return;
-    }
-    
     const messages = getChatMessages();
     messages.push({
         id: crypto.randomUUID(),
@@ -737,13 +730,6 @@ function renderMessages() {
             }
             // Ha nem nekem szól, nem jelenítjük meg
             return '';
-        }
-        
-        // Rendszer üzenetek csak Szíriusznak jelennek meg
-        if (msg.type === 'system') {
-            if (!currentUser || currentUser.username !== 'Szíriusz') {
-                return '';
-            }
         }
         
         const isOwn = currentUser && msg.userId === currentUser.id;

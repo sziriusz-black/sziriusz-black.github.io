@@ -45,12 +45,12 @@ export function updateTimers(updateUI, saveGameState, closeBubble) {
             if (tile && tile.type === 'tree') {
                 // Raktár kapacitás ellenőrzés
                 if (hasStorageSpace(1)) {
-                    tile.type = 'owned';
-                    gameState.planks++;
-                    updateUI();
-                    saveGameState();
-                    playSound('minecraftChop'); // Minecraft fa vágás hang
-                    onTutorialEvent('tree_cut', { x, y });
+                tile.type = 'owned';
+                gameState.planks++;
+                updateUI();
+                saveGameState();
+                playSound('minecraftChop'); // Minecraft fa vágás hang
+                onTutorialEvent('tree_cut', { x, y });
                 } else {
                     // Raktár tele - deszka elvész, de fa kivágva
                     tile.type = 'owned';
