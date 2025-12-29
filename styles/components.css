@@ -41,16 +41,23 @@
 }
 
 .close-btn {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    background: #ff4444;
-    border: 2px solid #cc0000;
+    position: sticky;
+    top: 0;
+    right: 0;
+    float: right;
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.8);
+    border: none;
+    border-radius: 50%;
     color: #fff;
-    width: 24px;
-    height: 24px;
+    width: 36px;
+    height: 36px;
     cursor: pointer;
-    font-size: 18px;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: -10px -10px 0 0;
     line-height: 20px;
     padding: 0;
     font-weight: bold;
@@ -58,12 +65,11 @@
 }
 
 .close-btn:hover {
-    background: #ff6666;
+    background: rgba(255, 0, 0, 0.8);
 }
 
 .close-btn:active {
-    transform: translate(1px, 1px);
-    box-shadow: 1px 1px 0px #000;
+    transform: scale(0.95);
 }
 
 #bubbleContent {

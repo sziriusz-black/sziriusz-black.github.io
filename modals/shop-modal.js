@@ -14,29 +14,29 @@ import { saveGameState } from '../save-load.js';
 import { updateUI } from '../ui.js';
 import { playSound } from '../audio.js';
 
-// Termék kategóriák és áruk
+// Termék kategóriák és áruk (Forintban)
 const SHOP_PRODUCTS = {
     money: [
-        { id: 'money_small', name: '💰 100 Arany', amount: 100, type: 'money', price: '0.99€', priceValue: 0.99 },
-        { id: 'money_medium', name: '💰 500 Arany', amount: 500, type: 'money', price: '3.99€', priceValue: 3.99, bonus: '+50 bónusz' },
-        { id: 'money_large', name: '💰 1000 Arany', amount: 1000, type: 'money', price: '6.99€', priceValue: 6.99, bonus: '+200 bónusz' },
-        { id: 'money_mega', name: '💎 5000 Arany', amount: 5000, type: 'money', price: '24.99€', priceValue: 24.99, bonus: '+1500 bónusz', featured: true }
+        { id: 'money_small', name: '💰 100 Arany', amount: 100, type: 'money', price: '399 Ft', priceValue: 399 },
+        { id: 'money_medium', name: '💰 500 Arany', amount: 500, type: 'money', price: '1 599 Ft', priceValue: 1599, bonus: '+50 bónusz' },
+        { id: 'money_large', name: '💰 1000 Arany', amount: 1000, type: 'money', price: '2 799 Ft', priceValue: 2799, bonus: '+200 bónusz' },
+        { id: 'money_mega', name: '💎 5000 Arany', amount: 5000, type: 'money', price: '9 999 Ft', priceValue: 9999, bonus: '+1500 bónusz', featured: true }
     ],
     resources: [
-        { id: 'planks_pack', name: '🪵 50 Deszka', amount: 50, type: 'planks', price: '1.99€', priceValue: 1.99 },
-        { id: 'corn_pack', name: '🌽 50 Kukorica', amount: 50, type: 'corn', price: '1.99€', priceValue: 1.99 },
-        { id: 'stone_pack', name: '🪨 30 Kő', amount: 30, type: 'stone', price: '2.49€', priceValue: 2.49 },
-        { id: 'iron_pack', name: '🔩 20 Vas', amount: 20, type: 'iron', price: '3.99€', priceValue: 3.99 },
-        { id: 'diamond_pack', name: '💎 5 Gyémánt', amount: 5, type: 'diamond', price: '4.99€', priceValue: 4.99, featured: true }
+        { id: 'planks_pack', name: '🪵 50 Deszka', amount: 50, type: 'planks', price: '799 Ft', priceValue: 799 },
+        { id: 'corn_pack', name: '🌽 50 Kukorica', amount: 50, type: 'corn', price: '799 Ft', priceValue: 799 },
+        { id: 'stone_pack', name: '🪨 30 Kő', amount: 30, type: 'stone', price: '999 Ft', priceValue: 999 },
+        { id: 'iron_pack', name: '🔩 20 Vas', amount: 20, type: 'iron', price: '1 599 Ft', priceValue: 1599 },
+        { id: 'diamond_pack', name: '💎 5 Gyémánt', amount: 5, type: 'diamond', price: '1 999 Ft', priceValue: 1999, featured: true }
     ],
     special: [
-        { id: 'starter_pack', name: '🎁 Kezdő Csomag', description: '500 Arany + 30 Deszka + 20 Kukorica', price: '4.99€', priceValue: 4.99, 
+        { id: 'starter_pack', name: '🎁 Kezdő Csomag', description: '500 Arany + 30 Deszka + 20 Kukorica', price: '1 999 Ft', priceValue: 1999, 
           rewards: { money: 500, planks: 30, corn: 20 }, featured: true },
-        { id: 'worker_boost', name: '👷 Munkás Bónusz', description: '+5 Extra Munkás (permanens)', price: '9.99€', priceValue: 9.99,
+        { id: 'worker_boost', name: '👷 Munkás Bónusz', description: '+5 Extra Munkás (permanens)', price: '3 999 Ft', priceValue: 3999,
           rewards: { workers: 5 } },
-        { id: 'storage_upgrade', name: '📦 Raktár Bővítés', description: '+50 Raktár Hely (permanens)', price: '7.99€', priceValue: 7.99,
+        { id: 'storage_upgrade', name: '📦 Raktár Bővítés', description: '+50 Raktár Hely (permanens)', price: '3 199 Ft', priceValue: 3199,
           rewards: { storage: 50 } },
-        { id: 'mega_bundle', name: '🌟 Mega Csomag', description: '2000 Arany + 100 minden erőforrás + 10 munkás', price: '29.99€', priceValue: 29.99,
+        { id: 'mega_bundle', name: '🌟 Mega Csomag', description: '2000 Arany + 100 minden erőforrás + 10 munkás', price: '11 999 Ft', priceValue: 11999,
           rewards: { money: 2000, planks: 100, corn: 100, stone: 100, iron: 50, diamond: 10, workers: 10 }, featured: true }
     ]
 };
@@ -153,7 +153,7 @@ window.purchaseProduct = function(productId) {
     
     alert(`✅ Sikeres vásárlás!\n\n${product.name}\n\nKöszönjük a támogatást! 🎉`);
     
-    closeShopModal();
+    // Bolt nyitva marad vásárlás után
 };
 
 // Eseménykezelők beállítása
@@ -171,5 +171,15 @@ export function setupShopModalEvents() {
             }
         });
     }
+    
+    // Escape billentyűvel bezárás
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            const modal = document.getElementById('shopModal');
+            if (modal && !modal.classList.contains('hidden')) {
+                closeShopModal();
+            }
+        }
+    });
 }
 
