@@ -3,7 +3,8 @@
 .auction-modal {
     max-width: 800px;
     width: 90%;
-    max-height: 85vh;
+    height: 95vh;
+    max-height: 95vh;
     overflow-y: auto;
     position: relative;
 }
