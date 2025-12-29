@@ -21,14 +21,15 @@ import { getZoomLevel } from './camera.js';
 
 // Kezdő térkép létrehozása
 export function createInitialMap() {
-    // 4 terület: 1 ház, 1 raktár, 2 üres
+    // 5 terület: 1 ház, 1 raktár, 3 üres
     gameState.map = [
         { x: 0, y: 0, type: 'house' },
         { x: 1, y: 0, type: 'owned' },
+        { x: 2, y: 0, type: 'owned' },
         { x: 0, y: 1, type: 'owned' },
         { x: 1, y: 1, type: 'warehouse', level: 1 }  // Kezdő raktár
     ];
-    gameState.ownedTiles = 4;
+    gameState.ownedTiles = 5;
     // Kezdő ház munkásai (3/3)
     gameState.workers = CONFIG.STARTER_HOUSE_WORKERS;
     gameState.maxWorkers = CONFIG.STARTER_HOUSE_WORKERS;
