@@ -20,7 +20,7 @@ function initThemeEarly() {
 }
 
 // A céldátum amire visszaszámolunk (módosítható)
-const TARGET_DATE = new Date('2025-12-30T12:00:00');
+const TARGET_DATE = new Date('2026-01-17T12:00:00');
 
 // Titkos kód ellenőrzése
 function hasSecretAccess() {
