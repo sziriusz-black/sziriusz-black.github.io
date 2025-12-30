@@ -28,6 +28,16 @@ function hasSecretAccess() {
     return urlParams.get('secret') === '67';
 }
 
+// Átirányítás a fő weboldalra
+function redirectToMainSite() {
+    window.location.href = 'https://sziriusz-black.hu';
+}
+
+// Ellenőrzi, hogy túl vagyunk-e az időponton
+function isPastTargetDate() {
+    return new Date() >= TARGET_DATE;
+}
+
 // Visszaszámláló frissítése
 function updateCountdown() {
     const now = new Date();
@@ -37,7 +47,8 @@ function updateCountdown() {
     if (!countdownElement) return;
 
     if (difference <= 0) {
-        countdownElement.textContent = '🎮 Hamarosan...';
+        // Túl vagyunk az időponton - átirányítás
+        redirectToMainSite();
         return;
     }
 
@@ -78,7 +89,14 @@ function initSecretAccess() {
         if (countdownOverlay) countdownOverlay.classList.add('hidden');
         return true;
     } else {
-        // Nincs titkos hozzáférés - visszaszámláló megjelenítése
+        // Nincs titkos hozzáférés
+        // Ha már túl vagyunk az időponton, rögtön átirányítunk
+        if (isPastTargetDate()) {
+            redirectToMainSite();
+            return false;
+        }
+        
+        // Visszaszámláló megjelenítése
         if (gameContent) gameContent.classList.add('hidden');
         if (countdownOverlay) countdownOverlay.classList.remove('hidden');
         
